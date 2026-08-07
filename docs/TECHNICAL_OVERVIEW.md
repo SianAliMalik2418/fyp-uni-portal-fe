@@ -31,7 +31,7 @@ This document summarizes the frontend technical choices for the University Porta
 - `date-fns`: Date formatting and manipulation.
 - `react-day-picker`: Calendar/date-picker UI behavior.
 - `embla-carousel-react`: Carousel behavior.
-- `input-otp`: OTP input UI package already present in the frontend stack. It is not part of the planned Better Auth sign-in flow because app authentication is Gmail-only.
+- `input-otp`: OTP input UI package already present in the frontend stack. It is not part of the planned Better Auth sign-in flow because app authentication is email/password-only.
 - `react-resizable-panels`: Resizable layout panels.
 - `recharts`: Charts for dashboards and academic analytics.
 - `tw-animate-css`: Tailwind-compatible animation utilities.
@@ -46,7 +46,9 @@ This document summarizes the frontend technical choices for the University Porta
 
 Authentication will use Better Auth as the app-level authentication framework.
 
-The only supported sign-in provider for this app will be Gmail through Better Auth's Google social provider. The frontend should expose Google/Gmail sign-in only; it should not offer email/password login, OTP login, magic links, passkeys, GitHub, Microsoft, or any other OAuth provider unless the project requirements change.
+The only supported sign-in method for this app will be Better Auth email/password login. The frontend should expose sign-in, forgot-password, and reset-password flows only; it should not expose public signup, OTP login, magic links, passkeys, Google, GitHub, Microsoft, or any OAuth provider unless the project requirements change.
+
+Account creation is admin-provisioned. A developer-created super admin creates initial admin accounts, and admins create teacher, HOD, student, and other role accounts. Newly created users receive the default temporary password `@Abc1234`, stored only as a secure hash, and must complete the forgot/reset password flow before normal portal access.
 
 The Better Auth documentation MCP server is configured at the repository root in `mcp.json` so AI-capable development tools can query current Better Auth docs while implementation work is happening.
 
@@ -59,7 +61,7 @@ Better Auth agent skills are also installed under `.agents/skills`:
 - `organization-best-practices`
 - `two-factor-authentication-best-practices`
 
-The current frontend package list does not yet include a Better Auth client package or auth screens. When auth is implemented, frontend code should use Better Auth's client session helpers for the Gmail-only flow, treat the backend session as the source of truth, and avoid storing sensitive tokens in browser storage. Protected screens should rely on backend-verified session state and role data.
+The current frontend package list does not yet include a Better Auth client package or auth screens. When auth is implemented, frontend code should use Better Auth's client session helpers for the email/password-only flow, treat the backend session as the source of truth, and avoid storing sensitive tokens in browser storage. Protected screens should rely on backend-verified session state, role data, account status, and password-reset onboarding state.
 
 ## Testing and Quality
 
