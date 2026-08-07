@@ -1,7 +1,11 @@
 node_modules
+.agents
 dist
 dist-ssr
 coverage
+docs/*.md
+playwright-report
+test-results
 package-lock.json
 components.json
 src/docs

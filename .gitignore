@@ -1,15 +1,26 @@
 # Dependencies
 node_modules
+bun.lockb
+.agents
+skills-lock.json
 
 # Builds
 dist
 dist-ssr
+coverage
+playwright-report
+test-results
 
 # Environment
 .env
 .env.*
 !.env.example
 *.local
+
+# Other package managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
 
 # Logs
 logs
