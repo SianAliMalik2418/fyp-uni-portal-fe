@@ -1,8 +1,9 @@
+import type { ComponentProps } from 'react'
 import { cn } from '@/lib/utils'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Loading03Icon } from '@hugeicons/core-free-icons'
 
-type SpinnerProps = Omit<React.ComponentProps<typeof HugeiconsIcon>, 'icon'>
+type SpinnerProps = Omit<ComponentProps<typeof HugeiconsIcon>, 'icon' | 'strokeWidth'>
 
 function Spinner({ className, ...props }: SpinnerProps) {
   return (

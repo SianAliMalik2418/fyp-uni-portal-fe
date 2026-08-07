@@ -14,10 +14,67 @@ This document summarizes the frontend technical choices for the University Porta
 ## Application Framework
 
 - `react` and `react-dom`: Core UI library and browser renderer.
-- `@tanstack/react-router`: Planned client-side routing for portal areas such as student, teacher, HOD, admin, and public/auth flows.
-- `@tanstack/react-query`: Server-state management for API reads, mutations, caching, loading states, and retries.
-- `axios`: HTTP client for backend API calls.
+- `react-router-dom`: Client-side routing for auth entry, protected portal routes, and role module paths such as `/dashboard`, `/students`, and `/teachers`.
+- `@tanstack/react-query`: Server-state management for API reads, mutations, caching, loading states, and auth-session cache updates.
+- `axios`: HTTP transport for backend API calls. The shared Axios instance lives in `src/shared/api/http-client.ts`.
 - `zustand`: Lightweight client state for UI/session-adjacent state that should not live in server cache.
+
+Routing is implemented with `react-router-dom` because that is the agreed routing library for this phase. `@tanstack/react-router` is not part of the current frontend dependency set.
+
+## Frontend Architecture
+
+The frontend uses a feature-based structure so domain code stays close to the screens and API contracts it supports.
+
+```text
+src/
+  app/
+    App.tsx
+    query-client.ts
+  features/
+    auth/
+      api/
+      components/
+      schemas/
+      types/
+    portal/
+      components/
+      constants/
+      types/
+  shared/
+    api/
+    constants/
+  components/
+    ui/
+```
+
+- `src/app`: Application composition, providers, route wiring, and app-level clients.
+- `src/features/auth`: Auth request functions, TanStack Query options, login/password screens, Zod schemas, and auth types.
+- `src/features/portal`: Protected shell, role navigation, role labels, demo stat definitions, and portal-specific types.
+- `src/shared/api`: Cross-feature HTTP client configuration and API error normalization.
+- `src/shared/constants`: Shared product branding such as portal name, tagline, and logo path.
+- `src/components/ui`: shadcn-generated reusable UI primitives only. Feature/domain components should not be added here.
+
+## API and Server State
+
+All current frontend API usage follows this pattern:
+
+```text
+Screen component -> useQuery/useMutation -> feature API function -> shared Axios client -> backend
+```
+
+Current auth endpoints:
+
+- `/auth/me`: `useQuery(currentUserQueryOptions)` reads the current backend-verified session.
+- `/auth/login`: `useMutation({ mutationFn: login })` signs in and writes the authenticated user into the auth query cache.
+- `/auth/change-password`: `useMutation({ mutationFn: changePassword })` completes temporary-password onboarding and updates the auth query cache.
+- `/auth/logout`: `useMutation({ mutationFn: logout })` clears auth queries and returns to the login route.
+
+Query keys are centralized in `features/auth/api/auth-queries.ts` using hierarchical keys:
+
+- `authKeys.all`
+- `authKeys.currentUser()`
+
+The Query Client is configured in `src/app/query-client.ts` with short session freshness, disabled retry for predictable auth failures, and disabled window-focus refetching.
 
 ## UI and Design System
 
@@ -36,11 +93,22 @@ This document summarizes the frontend technical choices for the University Porta
 - `recharts`: Charts for dashboards and academic analytics.
 - `tw-animate-css`: Tailwind-compatible animation utilities.
 
+Design direction for the current screens is intentionally operational, not marketing-led: quiet role-based portal surfaces, restrained spacing, semantic design tokens, one icon family, and compact dashboard information hierarchy.
+
+Branding uses `src/shared/constants/branding.ts` and the public `ncba&e-logo.webp` asset. The larger PNG remains in `public`, but the frontend points to the smaller webp file for faster loading.
+
 ## Forms and Validation
 
 - `react-hook-form`: Form state and validation lifecycle.
 - `@hookform/resolvers`: Adapter between form validation and schema validators.
 - `zod`: Shared-style runtime validation for form schemas and API payload boundaries.
+
+Auth forms currently use:
+
+- `loginSchema`: validates required email, valid email format, and required password.
+- `changePasswordSchema`: validates current password, minimum 8-character new password, confirm password, and matching new/confirm passwords.
+
+Forms use `noValidate` so browser-native validation does not bypass the Zod validation path. Field-level errors are rendered below inputs and connected with `aria-describedby` and `aria-invalid`.
 
 ## Authentication Direction
 
@@ -61,7 +129,9 @@ Better Auth agent skills are also installed under `.agents/skills`:
 - `organization-best-practices`
 - `two-factor-authentication-best-practices`
 
-The current frontend package list does not yet include a Better Auth client package or auth screens. When auth is implemented, frontend code should use Better Auth's client session helpers for the email/password-only flow, treat the backend session as the source of truth, and avoid storing sensitive tokens in browser storage. Protected screens should rely on backend-verified session state, role data, account status, and password-reset onboarding state.
+The current frontend has an email/password auth UI wired to backend `/auth/*` endpoints through Axios and TanStack Query. It treats the backend session as the source of truth and does not store sensitive tokens in browser storage. Protected screens rely on backend-verified session state, role data, account status, and temporary-password onboarding state.
+
+When the Better Auth client package is introduced, it should preserve the same product contract: email/password-only access, no public signup, no OAuth/passkey/magic-link UI unless requirements change, backend-owned session security, and role-aware protected routes.
 
 ## Testing and Quality
 

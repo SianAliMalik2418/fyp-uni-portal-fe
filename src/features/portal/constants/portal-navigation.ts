@@ -1,0 +1,67 @@
+import {
+  BookOpen01Icon,
+  Building01Icon,
+  Calendar03Icon,
+  ChartEvaluationIcon,
+  CourseIcon,
+  DashboardCircleIcon,
+  File02Icon,
+  Invoice01Icon,
+  Megaphone01Icon,
+  Mortarboard01Icon,
+  SchoolReportCardIcon,
+  TeacherIcon,
+  UserGroupIcon,
+} from '@hugeicons/core-free-icons'
+import type { UserRole } from '@/features/auth/types/auth.types'
+import type { NavItem } from '../types/portal.types'
+
+export const roleLabels: Record<UserRole, string> = {
+  student: 'Student',
+  teacher: 'Teacher',
+  hod: 'HOD',
+  admin: 'Admin',
+}
+
+export const roleNavigation: Record<UserRole, NavItem[]> = {
+  student: [
+    { id: 'dashboard', label: 'Dashboard', icon: DashboardCircleIcon },
+    { id: 'courses', label: 'Courses', icon: CourseIcon },
+    { id: 'attendance', label: 'Attendance', icon: Calendar03Icon },
+    { id: 'results', label: 'Results', icon: SchoolReportCardIcon },
+    { id: 'fees', label: 'Fees', icon: Invoice01Icon },
+    { id: 'timetable', label: 'Timetable', icon: Calendar03Icon },
+    { id: 'exams', label: 'Exams', icon: File02Icon },
+    { id: 'materials', label: 'Materials', icon: BookOpen01Icon },
+    { id: 'announcements', label: 'Announcements', icon: Megaphone01Icon },
+  ],
+  teacher: [
+    { id: 'dashboard', label: 'Dashboard', icon: DashboardCircleIcon },
+    { id: 'courses', label: 'Courses', icon: CourseIcon },
+    { id: 'attendance', label: 'Attendance', icon: Calendar03Icon },
+    { id: 'assessments', label: 'Assessments', icon: ChartEvaluationIcon },
+    { id: 'results', label: 'Results', icon: SchoolReportCardIcon },
+    { id: 'materials', label: 'Materials', icon: BookOpen01Icon },
+  ],
+  hod: [
+    { id: 'dashboard', label: 'Dashboard', icon: DashboardCircleIcon },
+    { id: 'department', label: 'Department', icon: Building01Icon },
+    { id: 'courses', label: 'Courses', icon: CourseIcon },
+    { id: 'teachers', label: 'Teachers', icon: TeacherIcon },
+    { id: 'attendance', label: 'Attendance', icon: Calendar03Icon },
+    { id: 'results', label: 'Results', icon: SchoolReportCardIcon },
+  ],
+  admin: [
+    { id: 'dashboard', label: 'Dashboard', icon: DashboardCircleIcon },
+    { id: 'students', label: 'Students', icon: UserGroupIcon },
+    { id: 'teachers', label: 'Teachers', icon: TeacherIcon },
+    { id: 'departments', label: 'Departments', icon: Building01Icon },
+    { id: 'programs', label: 'Programs', icon: Mortarboard01Icon },
+    { id: 'academic-structure', label: 'Academic Structure', icon: SchoolReportCardIcon },
+    { id: 'courses', label: 'Courses', icon: CourseIcon },
+    { id: 'fees', label: 'Fees', icon: Invoice01Icon },
+    { id: 'timetables', label: 'Timetables', icon: Calendar03Icon },
+    { id: 'exams', label: 'Exams', icon: File02Icon },
+    { id: 'announcements', label: 'Announcements', icon: Megaphone01Icon },
+  ],
+}
