@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { LockPasswordIcon, Login03Icon, Mail01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useForm } from 'react-hook-form'
 import { login } from '@/features/auth/api/auth-api'
+import { authKeys } from '@/features/auth/api/auth-queries'
 import { AuthShell } from '@/features/auth/components/AuthShell'
 import { loginSchema, type LoginFormValues } from '@/features/auth/schemas/auth.schemas'
 import type { PortalUser } from '@/features/auth/types/auth.types'
@@ -12,9 +13,10 @@ import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input, PasswordInput } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast-manager'
 
 export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }) {
+  const queryClient = useQueryClient()
   const {
     formState: { errors },
     handleSubmit,
@@ -28,7 +30,10 @@ export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }
   })
   const loginMutation = useMutation({
     mutationFn: login,
-    onSuccess: (response) => onLogin(response.user),
+    onSuccess: (response) => {
+      queryClient.setQueryData(authKeys.currentUser(), { user: response.user })
+      onLogin(response.user)
+    },
     onError: (error) => {
       const message = getApiErrorMessage(error, 'Invalid login credentials')
       const isInactiveAccount = /inactive/i.test(message)

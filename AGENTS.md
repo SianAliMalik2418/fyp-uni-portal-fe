@@ -10,6 +10,7 @@
 - Work from the `FE/` directory for frontend package commands.
 - Use Bun for frontend dependency and script execution.
 - Keep `FE/bun.lock` as the frontend package lockfile.
+- Before every push, tell the user which GitHub account will be used for the push.
 
 ## Frontend Architecture
 

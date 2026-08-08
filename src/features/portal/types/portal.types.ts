@@ -1,4 +1,5 @@
 import type { IconSvgElement } from '@hugeicons/react'
+import type { UserRole } from '@/features/auth/types/auth.types'
 
 export type NavItem = {
   id: string
@@ -18,4 +19,13 @@ export type ModulePlaceholderContent = {
   readinessDescription: string
   nextIntegrationLabel: string
   nextIntegrationValue: string
+}
+
+export type ModulePlaceholderDetails = {
+  stats?: Partial<Record<UserRole, ModulePlaceholderStat[]>>
+  emptyStates?: Partial<
+    Record<UserRole, Pick<ModulePlaceholderContent, 'emptyTitle' | 'emptyDescription'>>
+  >
+  readinessDescription?: string
+  nextIntegrationValue?: string
 }

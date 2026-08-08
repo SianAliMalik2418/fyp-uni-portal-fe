@@ -1,15 +1,16 @@
-import type { ComponentProps } from 'react'
 import { cn } from '@/lib/utils'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Loading03Icon } from '@hugeicons/core-free-icons'
 
-type SpinnerProps = Omit<ComponentProps<typeof HugeiconsIcon>, 'icon' | 'strokeWidth'>
+type SpinnerProps = Omit<React.ComponentProps<typeof HugeiconsIcon>, 'icon' | 'strokeWidth'> & {
+  strokeWidth?: number
+}
 
-function Spinner({ className, ...props }: SpinnerProps) {
+function Spinner({ className, strokeWidth = 2, ...props }: SpinnerProps) {
   return (
     <HugeiconsIcon
       icon={Loading03Icon}
-      strokeWidth={2}
+      strokeWidth={strokeWidth}
       data-slot="spinner"
       role="status"
       aria-label="Loading"

@@ -5,6 +5,7 @@ import { Toast as ToastPrimitive } from '@base-ui/react/toast'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/toast-manager'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   Cancel01Icon,
@@ -14,8 +15,6 @@ import {
   MultiplicationSignCircleIcon,
   Loading03Icon,
 } from '@hugeicons/core-free-icons'
-
-const toast = ToastPrimitive.createToastManager()
 
 function ToastProvider({ ...props }: ToastPrimitive.Provider.Props) {
   return <ToastPrimitive.Provider {...props} />
@@ -98,32 +97,23 @@ function ToastDescription({ className, ...props }: ToastPrimitive.Description.Pr
   )
 }
 
-function ToastAction({
-  className,
-  render = <Button variant="outline" size="sm" />,
-  ...props
-}: ToastPrimitive.Action.Props) {
+function ToastAction({ className, render, ...props }: ToastPrimitive.Action.Props) {
   return (
     <ToastPrimitive.Action
       data-slot="toast-action"
-      render={render}
+      render={render ?? React.createElement(Button, { variant: 'outline', size: 'sm' })}
       className={cn('shrink-0', className)}
       {...props}
     />
   )
 }
 
-function ToastClose({
-  className,
-  children,
-  render = <Button variant="ghost" size="icon-sm" />,
-  ...props
-}: ToastPrimitive.Close.Props) {
+function ToastClose({ className, children, render, ...props }: ToastPrimitive.Close.Props) {
   return (
     <ToastPrimitive.Close
       data-slot="toast-close"
       aria-label="Close toast"
-      render={render}
+      render={render ?? React.createElement(Button, { variant: 'ghost', size: 'icon-sm' })}
       className={cn(
         "text-muted-foreground hover:text-foreground relative shrink-0 after:absolute after:-inset-2 after:content-['']",
         className
@@ -217,9 +207,6 @@ function Toaster({ children, toastManager = toast, ...props }: ToastPrimitive.Pr
   )
 }
 
-const createToastManager = ToastPrimitive.createToastManager
-const useToastManager = ToastPrimitive.useToastManager
-
 export {
   Toaster,
   Toast,
@@ -231,7 +218,4 @@ export {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-  createToastManager,
-  toast,
-  useToastManager,
 }

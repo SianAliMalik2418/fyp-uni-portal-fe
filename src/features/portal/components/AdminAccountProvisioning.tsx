@@ -1,8 +1,8 @@
-import { useEffect, useMemo, type ComponentProps, type FormEvent } from 'react'
+import { useEffect, type ComponentProps, type FormEvent, type ReactNode } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { UserAdd01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useForm } from 'react-hook-form'
+import { useForm, type FieldErrors, type UseFormRegisterReturn } from 'react-hook-form'
 import type { UserRole } from '@/features/auth/types/auth.types'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { toast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast-manager'
 import { createUserAccount } from '../api/user-accounts-api'
 import { userAccountKeys, userAccountsQueryOptions } from '../api/user-accounts-queries'
 import { roleLabels } from '../constants/portal-navigation'
@@ -94,6 +94,16 @@ function identifierForAccount(account: ProvisionedUserAccount) {
   return account.registrationNumber ?? account.employeeId ?? '-'
 }
 
+type AccountSectionKind = 'students' | 'teachers' | 'all'
+
+function accountSectionKind(sectionId: string): AccountSectionKind {
+  if (sectionId === 'students' || sectionId === 'teachers') {
+    return sectionId
+  }
+
+  return 'all'
+}
+
 function RequiredLabel({ children, ...props }: ComponentProps<typeof Label>) {
   return (
     <Label {...props}>
@@ -105,12 +115,240 @@ function RequiredLabel({ children, ...props }: ComponentProps<typeof Label>) {
   )
 }
 
+type AccountFormCardProps = {
+  createPending: boolean
+  employeeIdField: UseFormRegisterReturn<'employeeId'>
+  errors: FieldErrors<CreateUserAccountFormValues>
+  fixedRole: UserRole
+  fullNameField: UseFormRegisterReturn<'fullName'>
+  emailField: UseFormRegisterReturn<'email'>
+  isActiveField: UseFormRegisterReturn<'isActive'>
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+  registrationNumberField: UseFormRegisterReturn<'registrationNumber'>
+  roleField: UseFormRegisterReturn<'role'>
+  sectionKind: AccountSectionKind
+  sectionRoleOptions: UserRole[]
+}
+
+function AccountFormCard({
+  createPending,
+  employeeIdField,
+  errors,
+  fixedRole,
+  fullNameField,
+  emailField,
+  isActiveField,
+  onSubmit,
+  registrationNumberField,
+  roleField,
+  sectionKind,
+  sectionRoleOptions,
+}: AccountFormCardProps) {
+  const hasFixedRole = sectionRoleOptions.length === 1
+  const showRegistrationNumber = sectionKind === 'students'
+  const showEmployeeId = sectionKind === 'teachers'
+
+  return (
+    <Card className="bg-background">
+      <CardHeader>
+        <CardTitle>Create account</CardTitle>
+        <CardDescription>
+          New users must change the temporary password on first login.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form className="grid gap-4" noValidate onSubmit={onSubmit}>
+          <div className="grid gap-2">
+            <RequiredLabel htmlFor="fullName">Full name</RequiredLabel>
+            <Input
+              id="fullName"
+              placeholder="Ayesha Khan"
+              aria-invalid={Boolean(errors.fullName)}
+              aria-describedby={errors.fullName ? 'fullName-error' : undefined}
+              {...fullNameField}
+            />
+            {errors.fullName ? (
+              <p id="fullName-error" className="text-destructive text-xs">
+                {errors.fullName.message}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="grid gap-2">
+            <RequiredLabel htmlFor="accountEmail">Email</RequiredLabel>
+            <Input
+              id="accountEmail"
+              type="email"
+              autoComplete="email"
+              placeholder="ayesha.khan@example.com"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? 'accountEmail-error' : undefined}
+              {...emailField}
+            />
+            {errors.email ? (
+              <p id="accountEmail-error" className="text-destructive text-xs">
+                {errors.email.message}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="grid gap-2">
+            {hasFixedRole ? (
+              <Label htmlFor="role">Role</Label>
+            ) : (
+              <RequiredLabel htmlFor="role">Account type</RequiredLabel>
+            )}
+            {hasFixedRole ? (
+              <>
+                <input type="hidden" name="role" value={fixedRole} />
+                <Input id="role" value={roleLabels[fixedRole]} disabled aria-readonly="true" />
+              </>
+            ) : (
+              <NativeSelect id="role" className="w-full" {...roleField}>
+                {sectionRoleOptions.map((role) => (
+                  <NativeSelectOption key={role} value={role}>
+                    {roleLabels[role]}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            )}
+          </div>
+
+          {showRegistrationNumber ? (
+            <div className="grid gap-2">
+              <RequiredLabel htmlFor="registrationNumber">Registration no.</RequiredLabel>
+              <Input
+                id="registrationNumber"
+                placeholder="REG-001"
+                aria-invalid={Boolean(errors.registrationNumber)}
+                aria-describedby={
+                  errors.registrationNumber ? 'registrationNumber-error' : undefined
+                }
+                {...registrationNumberField}
+              />
+              {errors.registrationNumber ? (
+                <p id="registrationNumber-error" className="text-destructive text-xs">
+                  {errors.registrationNumber.message}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {showEmployeeId ? (
+            <div className="grid gap-2">
+              <RequiredLabel htmlFor="employeeId">Employee ID</RequiredLabel>
+              <Input
+                id="employeeId"
+                placeholder="EMP-001"
+                aria-invalid={Boolean(errors.employeeId)}
+                aria-describedby={errors.employeeId ? 'employeeId-error' : undefined}
+                {...employeeIdField}
+              />
+              {errors.employeeId ? (
+                <p id="employeeId-error" className="text-destructive text-xs">
+                  {errors.employeeId.message}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" className="accent-primary size-4" {...isActiveField} />
+            Active account
+          </label>
+
+          <Button type="submit" disabled={createPending}>
+            <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
+            {createPending ? 'Creating...' : 'Create account'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
+
+type AccountsCardProps = {
+  accounts: ProvisionedUserAccount[]
+  error: unknown
+  identifierColumnLabel: string
+  isError: boolean
+  isPending: boolean
+}
+
+function AccountsCard({
+  accounts,
+  error,
+  identifierColumnLabel,
+  isError,
+  isPending,
+}: AccountsCardProps) {
+  let content: ReactNode
+
+  if (isPending) {
+    content = <p className="text-muted-foreground text-sm">Loading accounts...</p>
+  } else if (isError) {
+    content = (
+      <Alert variant="destructive">
+        <AlertTitle>Accounts unavailable</AlertTitle>
+        <AlertDescription>{getApiErrorMessage(error, 'Unable to load accounts')}</AlertDescription>
+      </Alert>
+    )
+  } else if (accounts.length) {
+    content = (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>{identifierColumnLabel}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {accounts.map((account) => (
+            <TableRow key={account.id}>
+              <TableCell>
+                <span className="text-foreground block font-medium">{account.fullName}</span>
+                <span className="text-muted-foreground block">{account.email}</span>
+              </TableCell>
+              <TableCell>{roleLabels[account.role]}</TableCell>
+              <TableCell>
+                <Badge variant={account.isActive ? 'outline' : 'destructive'}>
+                  {account.accountStatus}
+                </Badge>
+              </TableCell>
+              <TableCell>{identifierForAccount(account)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    )
+  } else {
+    content = (
+      <div className="bg-muted/30 grid min-h-40 place-items-center rounded-md border border-dashed px-4 text-center">
+        <p className="text-muted-foreground text-sm">No accounts have been created yet.</p>
+      </div>
+    )
+  }
+
+  return (
+    <Card className="bg-background">
+      <CardHeader>
+        <CardTitle>Provisioned accounts</CardTitle>
+        <CardDescription>Existing admin-created and seeded accounts for this area.</CardDescription>
+      </CardHeader>
+      <CardContent>{content}</CardContent>
+    </Card>
+  )
+}
+
 export function AdminAccountProvisioning({ item }: { item: NavItem }) {
   const queryClient = useQueryClient()
   const accountsQuery = useQuery(userAccountsQueryOptions)
   const sectionRoleOptions = roleOptionsForSection(item.id)
   const isStudentSection = item.id === 'students'
   const isTeacherSection = item.id === 'teachers'
+  const sectionKind = accountSectionKind(item.id)
   const {
     clearErrors,
     formState: { errors },
@@ -166,13 +404,9 @@ export function AdminAccountProvisioning({ item }: { item: NavItem }) {
       })
     },
   })
-  const visibleAccounts = useMemo(
-    () =>
-      accountsQuery.data?.users.filter((account) => accountMatchesSection(account, item.id)) ?? [],
-    [accountsQuery.data?.users, item.id]
-  )
+  const visibleAccounts =
+    accountsQuery.data?.users.filter((account) => accountMatchesSection(account, item.id)) ?? []
   const identifierColumnLabel = identifierLabelForSection(item.id)
-  const hasFixedRole = sectionRoleOptions.length === 1
   const fixedRole = sectionRoleOptions[0] ?? defaultRoleForSection(item.id)
   const fullNameField = register('fullName', {
     onChange: () => clearErrors('fullName'),
@@ -260,176 +494,27 @@ export function AdminAccountProvisioning({ item }: { item: NavItem }) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-        <Card className="bg-background">
-          <CardHeader>
-            <CardTitle>Create account</CardTitle>
-            <CardDescription>
-              New users must change the temporary password on first login.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="grid gap-4" noValidate onSubmit={submitForm}>
-              <div className="grid gap-2">
-                <RequiredLabel htmlFor="fullName">Full name</RequiredLabel>
-                <Input
-                  id="fullName"
-                  placeholder="Ayesha Khan"
-                  aria-invalid={Boolean(errors.fullName)}
-                  aria-describedby={errors.fullName ? 'fullName-error' : undefined}
-                  {...fullNameField}
-                />
-                {errors.fullName ? (
-                  <p id="fullName-error" className="text-destructive text-xs">
-                    {errors.fullName.message}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="grid gap-2">
-                <RequiredLabel htmlFor="accountEmail">Email</RequiredLabel>
-                <Input
-                  id="accountEmail"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="ayesha.khan@example.com"
-                  aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? 'accountEmail-error' : undefined}
-                  {...emailField}
-                />
-                {errors.email ? (
-                  <p id="accountEmail-error" className="text-destructive text-xs">
-                    {errors.email.message}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="grid gap-2">
-                {hasFixedRole ? (
-                  <Label htmlFor="role">Role</Label>
-                ) : (
-                  <RequiredLabel htmlFor="role">Account type</RequiredLabel>
-                )}
-                {hasFixedRole ? (
-                  <>
-                    <input type="hidden" name="role" value={fixedRole} />
-                    <Input id="role" value={roleLabels[fixedRole]} disabled aria-readonly="true" />
-                  </>
-                ) : (
-                  <NativeSelect id="role" className="w-full" {...roleField}>
-                    {sectionRoleOptions.map((role) => (
-                      <NativeSelectOption key={role} value={role}>
-                        {roleLabels[role]}
-                      </NativeSelectOption>
-                    ))}
-                  </NativeSelect>
-                )}
-              </div>
-
-              {isStudentSection ? (
-                <div className="grid gap-2">
-                  <RequiredLabel htmlFor="registrationNumber">Registration no.</RequiredLabel>
-                  <Input
-                    id="registrationNumber"
-                    placeholder="REG-001"
-                    aria-invalid={Boolean(errors.registrationNumber)}
-                    aria-describedby={
-                      errors.registrationNumber ? 'registrationNumber-error' : undefined
-                    }
-                    {...registrationNumberField}
-                  />
-                  {errors.registrationNumber ? (
-                    <p id="registrationNumber-error" className="text-destructive text-xs">
-                      {errors.registrationNumber.message}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {isTeacherSection ? (
-                <div className="grid gap-2">
-                  <RequiredLabel htmlFor="employeeId">Employee ID</RequiredLabel>
-                  <Input
-                    id="employeeId"
-                    placeholder="EMP-001"
-                    aria-invalid={Boolean(errors.employeeId)}
-                    aria-describedby={errors.employeeId ? 'employeeId-error' : undefined}
-                    {...employeeIdField}
-                  />
-                  {errors.employeeId ? (
-                    <p id="employeeId-error" className="text-destructive text-xs">
-                      {errors.employeeId.message}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" className="accent-primary size-4" {...isActiveField} />
-                Active account
-              </label>
-
-              <Button type="submit" disabled={createAccountMutation.isPending}>
-                <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
-                {createAccountMutation.isPending ? 'Creating...' : 'Create account'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-background">
-          <CardHeader>
-            <CardTitle>Provisioned accounts</CardTitle>
-            <CardDescription>
-              Existing admin-created and seeded accounts for this area.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {accountsQuery.isPending ? (
-              <p className="text-muted-foreground text-sm">Loading accounts...</p>
-            ) : accountsQuery.isError ? (
-              <Alert variant="destructive">
-                <AlertTitle>Accounts unavailable</AlertTitle>
-                <AlertDescription>
-                  {getApiErrorMessage(accountsQuery.error, 'Unable to load accounts')}
-                </AlertDescription>
-              </Alert>
-            ) : visibleAccounts.length ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>{identifierColumnLabel}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {visibleAccounts.map((account) => (
-                    <TableRow key={account.id}>
-                      <TableCell>
-                        <span className="text-foreground block font-medium">
-                          {account.fullName}
-                        </span>
-                        <span className="text-muted-foreground block">{account.email}</span>
-                      </TableCell>
-                      <TableCell>{roleLabels[account.role]}</TableCell>
-                      <TableCell>
-                        <Badge variant={account.isActive ? 'outline' : 'destructive'}>
-                          {account.accountStatus}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{identifierForAccount(account)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="bg-muted/30 grid min-h-40 place-items-center rounded-md border border-dashed px-4 text-center">
-                <p className="text-muted-foreground text-sm">No accounts have been created yet.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <AccountFormCard
+          createPending={createAccountMutation.isPending}
+          employeeIdField={employeeIdField}
+          errors={errors}
+          fixedRole={fixedRole}
+          fullNameField={fullNameField}
+          emailField={emailField}
+          isActiveField={isActiveField}
+          onSubmit={submitForm}
+          registrationNumberField={registrationNumberField}
+          roleField={roleField}
+          sectionKind={sectionKind}
+          sectionRoleOptions={sectionRoleOptions}
+        />
+        <AccountsCard
+          accounts={visibleAccounts}
+          error={accountsQuery.error}
+          identifierColumnLabel={identifierColumnLabel}
+          isError={accountsQuery.isError}
+          isPending={accountsQuery.isPending}
+        />
       </div>
     </div>
   )

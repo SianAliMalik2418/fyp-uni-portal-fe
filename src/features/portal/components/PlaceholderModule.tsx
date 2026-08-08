@@ -1,14 +1,27 @@
 import { ArrowRight01Icon, Database01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { modulePlaceholderContent, modulePlaceholderStats } from '../constants/portal-placeholders'
+import {
+  academicPerformancePlaceholders,
+  modulePlaceholderContent,
+  modulePlaceholderStats,
+} from '../constants/portal-placeholders'
 import { roleLabels } from '../constants/portal-navigation'
 import type { NavItem } from '../types/portal.types'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavItem }) {
-  const stats = modulePlaceholderStats[user.role]
+  const moduleDetails = academicPerformancePlaceholders[item.id]
+  const roleEmptyState = moduleDetails?.emptyStates?.[user.role]
+  const stats = moduleDetails?.stats?.[user.role] ?? modulePlaceholderStats[user.role]
+  const emptyTitle = roleEmptyState?.emptyTitle ?? modulePlaceholderContent.emptyTitle
+  const emptyDescription =
+    roleEmptyState?.emptyDescription ?? modulePlaceholderContent.emptyDescription
+  const readinessDescription =
+    moduleDetails?.readinessDescription ?? modulePlaceholderContent.readinessDescription
+  const nextIntegrationValue =
+    moduleDetails?.nextIntegrationValue ?? modulePlaceholderContent.nextIntegrationValue
 
   return (
     <div className="mx-auto grid max-w-6xl gap-5">
@@ -59,12 +72,8 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
                 <HugeiconsIcon icon={Database01Icon} strokeWidth={2} className="size-5" />
               </span>
               <div className="grid gap-1">
-                <p className="text-foreground text-sm font-medium">
-                  {modulePlaceholderContent.emptyTitle}
-                </p>
-                <p className="text-muted-foreground text-sm leading-6">
-                  {modulePlaceholderContent.emptyDescription}
-                </p>
+                <p className="text-foreground text-sm font-medium">{emptyTitle}</p>
+                <p className="text-muted-foreground text-sm leading-6">{emptyDescription}</p>
               </div>
             </div>
           </div>
@@ -75,14 +84,14 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
         <Card className="bg-background">
           <CardHeader>
             <CardTitle className="text-base">{modulePlaceholderContent.readinessTitle}</CardTitle>
-            <CardDescription>{modulePlaceholderContent.readinessDescription}</CardDescription>
+            <CardDescription>{readinessDescription}</CardDescription>
           </CardHeader>
         </Card>
         <Card className="bg-background">
           <CardHeader>
             <CardDescription>{modulePlaceholderContent.nextIntegrationLabel}</CardDescription>
             <CardTitle className="flex items-center gap-2 text-base">
-              {modulePlaceholderContent.nextIntegrationValue}
+              {nextIntegrationValue}
               <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} className="size-4" />
             </CardTitle>
           </CardHeader>

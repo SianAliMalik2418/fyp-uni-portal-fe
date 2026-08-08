@@ -3,8 +3,8 @@ import { Input as InputPrimitive } from '@base-ui/react/input'
 import { EyeIcon, EyeOffIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   return (
@@ -20,22 +20,22 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   )
 }
 
-function PasswordInput({ className, ...props }: Omit<React.ComponentProps<'input'>, 'type'>) {
+function PasswordInput({ className, ...props }: React.ComponentProps<'input'>) {
   const [isVisible, setIsVisible] = React.useState(false)
 
   return (
     <div className="relative">
-      <Input type={isVisible ? 'text' : 'password'} className={cn('pr-10', className)} {...props} />
+      <Input type={isVisible ? 'text' : 'password'} className={cn('pr-9', className)} {...props} />
       <Button
         type="button"
         variant="ghost"
         size="icon-sm"
+        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1 size-7 -translate-y-1/2"
         aria-label={isVisible ? 'Hide password' : 'Show password'}
         aria-pressed={isVisible}
-        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-0.5 -translate-y-1/2"
         onClick={() => setIsVisible((current) => !current)}
       >
-        <HugeiconsIcon icon={isVisible ? EyeOffIcon : EyeIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={isVisible ? EyeOffIcon : EyeIcon} strokeWidth={2} aria-hidden="true" />
       </Button>
     </div>
   )

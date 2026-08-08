@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { queryClient } from './app/query-client'
-import { toast } from './components/ui/toast'
+import { toast } from './components/ui/toast-manager'
 import { apiClient } from './shared/api/http-client'
 
 type MockUser = {
@@ -34,6 +34,16 @@ const temporaryStudent: MockUser = {
   accountStatus: 'active',
   isActive: true,
   passwordChangeRequired: true,
+}
+
+const activeTeacher: MockUser = {
+  id: 'teacher-1',
+  name: 'Tayabba Teacher',
+  email: 'teacher@example.com',
+  role: 'teacher',
+  accountStatus: 'active',
+  isActive: true,
+  passwordChangeRequired: false,
 }
 
 describe('App', () => {
@@ -162,6 +172,22 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /students/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /academic structure/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /announcements/i })).toBeInTheDocument()
+  })
+
+  it('renders Tayabba phase 1 academic performance placeholders for teachers', async () => {
+    window.history.pushState(null, '', '/marks')
+    getSpy.mockResolvedValueOnce({ data: { user: activeTeacher } })
+
+    render(<App />)
+
+    await screen.findByRole('navigation', { name: /teacher navigation/i })
+
+    expect(screen.getByRole('link', { name: /attendance/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /assessments/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /marks/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /results/i })).toBeInTheDocument()
+    expect(screen.getByText(/no marks records available yet/i)).toBeInTheDocument()
+    expect(screen.getByText(/marks api/i)).toBeInTheDocument()
   })
 
   it('opens the profile menu and logs out from the portal shell', async () => {

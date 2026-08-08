@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PasswordInput } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast-manager'
 
 export function PasswordChangeScreen({
   user,
