@@ -28,6 +28,9 @@
 - Use TanStack Query for all server-state reads and mutations.
 - Use the shared Axios client for HTTP transport.
 - Use `react-hook-form` with Zod schemas for form validation.
+- Use toasts from `src/components/ui/toast` for form submit success/failure feedback; do not render inline success/error alert blocks above forms for mutation results. Keep field-level validation errors inline by their inputs, and keep persistent page/query load errors inline when the user needs ongoing context.
+- Give every user-facing text-like form input a clear placeholder.
+- Use a password field with a show/hide option for every password input.
 - Do not store sensitive auth tokens in browser storage.
 
 ## Design System

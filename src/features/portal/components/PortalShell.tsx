@@ -2,10 +2,15 @@ import { useParams } from 'react-router-dom'
 import { ShieldUserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
+import { AdminAccountProvisioning } from './AdminAccountProvisioning'
 import { PlaceholderModule } from './PlaceholderModule'
 import { PortalHeader } from './PortalHeader'
 import { PortalSidebar } from './PortalSidebar'
 import { UnauthorizedSection } from './UnauthorizedSection'
+
+function isAdminAccountSection(user: PortalUser, sectionId: string) {
+  return user.role === 'admin' && (sectionId === 'students' || sectionId === 'teachers')
+}
 
 export function PortalShell({ user, onLogout }: { user: PortalUser; onLogout: () => void }) {
   const params = useParams()
@@ -32,7 +37,9 @@ export function PortalShell({ user, onLogout }: { user: PortalUser; onLogout: ()
         />
 
         <div className="p-4 md:p-6">
-          {activeItem ? (
+          {activeItem && isAdminAccountSection(user, activeItem.id) ? (
+            <AdminAccountProvisioning item={activeItem} />
+          ) : activeItem ? (
             <PlaceholderModule user={user} item={activeItem} />
           ) : (
             <UnauthorizedSection user={user} section={activeSection} />

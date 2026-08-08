@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -39,19 +40,21 @@ export function ProfileMenu({ user, onLogout }: { user: PortalUser; onLogout: ()
         </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <span className="text-foreground block truncate">{user.name}</span>
-          <span className="block truncate">{user.email}</span>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <HugeiconsIcon icon={UserIcon} strokeWidth={2} />
-          Account profile
-        </DropdownMenuItem>
-        <DropdownMenuItem variant="destructive" onClick={onLogout}>
-          <HugeiconsIcon icon={Logout03Icon} strokeWidth={2} />
-          Logout
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            <span className="text-foreground block truncate">{user.name}</span>
+            <span className="block truncate">{user.email}</span>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <HugeiconsIcon icon={UserIcon} strokeWidth={2} />
+            Account profile
+          </DropdownMenuItem>
+          <DropdownMenuItem variant="destructive" onClick={onLogout}>
+            <HugeiconsIcon icon={Logout03Icon} strokeWidth={2} />
+            Logout
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

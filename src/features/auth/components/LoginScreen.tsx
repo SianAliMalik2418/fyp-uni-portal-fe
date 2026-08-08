@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { LockPasswordIcon, Login03Icon, Mail01Icon } from '@hugeicons/core-free-icons'
@@ -9,14 +8,13 @@ import { AuthShell } from '@/features/auth/components/AuthShell'
 import { loginSchema, type LoginFormValues } from '@/features/auth/schemas/auth.schemas'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Input, PasswordInput } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { toast } from '@/components/ui/toast'
 
 export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }) {
-  const [error, setError] = useState('')
   const {
     formState: { errors },
     handleSubmit,
@@ -31,15 +29,22 @@ export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: (response) => onLogin(response.user),
-    onError: (error) => setError(getApiErrorMessage(error, 'Invalid login credentials')),
+    onError: (error) => {
+      const message = getApiErrorMessage(error, 'Invalid login credentials')
+      const isInactiveAccount = /inactive/i.test(message)
+
+      toast.add({
+        title: isInactiveAccount ? 'Inactive account' : 'Login failed',
+        description: message,
+        type: isInactiveAccount ? 'warning' : 'error',
+        priority: 'high',
+      })
+    },
   })
 
   function submitLogin(values: LoginFormValues) {
-    setError('')
     loginMutation.mutate(values)
   }
-
-  const isInactiveAccount = /inactive/i.test(error)
 
   return (
     <AuthShell supportingCopy="Use the email and temporary password provided by the administrator. Account access is checked against the backend session.">
@@ -49,13 +54,6 @@ export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }
       </CardHeader>
       <CardContent>
         <form className="grid gap-4" noValidate onSubmit={handleSubmit(submitLogin)}>
-          {error ? (
-            <Alert variant={isInactiveAccount ? 'destructive' : 'default'}>
-              <AlertTitle>{isInactiveAccount ? 'Inactive account' : 'Login failed'}</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          ) : null}
-
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
@@ -68,6 +66,7 @@ export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }
                 id="email"
                 type="email"
                 autoComplete="email"
+                placeholder="admin@example.com"
                 className="pl-7"
                 aria-describedby={errors.email ? 'email-error' : undefined}
                 aria-invalid={Boolean(errors.email)}
@@ -89,10 +88,10 @@ export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }
                 strokeWidth={2}
                 className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2"
               />
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 autoComplete="current-password"
+                placeholder="Enter your password"
                 className="pl-7"
                 aria-describedby={errors.password ? 'password-error' : undefined}
                 aria-invalid={Boolean(errors.password)}

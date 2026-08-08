@@ -8,6 +8,7 @@ import { LoginScreen } from '@/features/auth/components/LoginScreen'
 import { PasswordChangeScreen } from '@/features/auth/components/PasswordChangeScreen'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { PortalShell } from '@/features/portal/components/PortalShell'
+import { Toaster } from '@/components/ui/toast'
 import { queryClient } from './query-client'
 
 function AppRoutes() {
@@ -65,9 +66,11 @@ function AppRoutes() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <Toaster>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </Toaster>
     </QueryClientProvider>
   )
 }

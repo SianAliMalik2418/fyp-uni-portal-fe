@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { LockPasswordIcon } from '@hugeicons/core-free-icons'
@@ -12,11 +11,11 @@ import {
 } from '@/features/auth/schemas/auth.schemas'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { toast } from '@/components/ui/toast'
 
 export function PasswordChangeScreen({
   user,
@@ -27,7 +26,6 @@ export function PasswordChangeScreen({
   onChanged: (user: PortalUser) => void
   onLogout: () => void
 }) {
-  const [error, setError] = useState('')
   const {
     formState: { errors },
     handleSubmit,
@@ -42,12 +40,25 @@ export function PasswordChangeScreen({
   })
   const changePasswordMutation = useMutation({
     mutationFn: changePassword,
-    onSuccess: (response) => onChanged(response.user),
-    onError: (error) => setError(getApiErrorMessage(error, 'Password change failed')),
+    onSuccess: (response) => {
+      toast.add({
+        title: 'Password updated',
+        description: 'You can now access the portal.',
+        type: 'success',
+      })
+      onChanged(response.user)
+    },
+    onError: (error) => {
+      toast.add({
+        title: 'Password change failed',
+        description: getApiErrorMessage(error, 'Password change failed'),
+        type: 'error',
+        priority: 'high',
+      })
+    },
   })
 
   function submitPasswordChange(values: ChangePasswordFormValues) {
-    setError('')
     changePasswordMutation.mutate(values)
   }
 
@@ -61,19 +72,12 @@ export function PasswordChangeScreen({
       </CardHeader>
       <CardContent>
         <form className="grid gap-4" noValidate onSubmit={handleSubmit(submitPasswordChange)}>
-          {error ? (
-            <Alert variant="destructive">
-              <AlertTitle>Password change failed</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          ) : null}
-
           <div className="grid gap-2">
             <Label htmlFor="current-password">Current temporary password</Label>
-            <Input
+            <PasswordInput
               id="current-password"
-              type="password"
               autoComplete="current-password"
+              placeholder="Enter current password"
               aria-describedby={errors.currentPassword ? 'current-password-error' : undefined}
               aria-invalid={Boolean(errors.currentPassword)}
               {...register('currentPassword')}
@@ -86,10 +90,10 @@ export function PasswordChangeScreen({
           </div>
           <div className="grid gap-2">
             <Label htmlFor="new-password">New password</Label>
-            <Input
+            <PasswordInput
               id="new-password"
-              type="password"
               autoComplete="new-password"
+              placeholder="Enter new password"
               aria-describedby={errors.newPassword ? 'new-password-error' : undefined}
               aria-invalid={Boolean(errors.newPassword)}
               {...register('newPassword')}
@@ -102,10 +106,10 @@ export function PasswordChangeScreen({
           </div>
           <div className="grid gap-2">
             <Label htmlFor="confirm-password">Confirm password</Label>
-            <Input
+            <PasswordInput
               id="confirm-password"
-              type="password"
               autoComplete="new-password"
+              placeholder="Confirm new password"
               aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
               aria-invalid={Boolean(errors.confirmPassword)}
               {...register('confirmPassword')}

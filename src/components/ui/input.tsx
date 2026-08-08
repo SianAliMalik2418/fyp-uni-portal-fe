@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { Input as InputPrimitive } from '@base-ui/react/input'
+import { EyeIcon, EyeOffIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
@@ -17,4 +20,25 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   )
 }
 
-export { Input }
+function PasswordInput({ className, ...props }: Omit<React.ComponentProps<'input'>, 'type'>) {
+  const [isVisible, setIsVisible] = React.useState(false)
+
+  return (
+    <div className="relative">
+      <Input type={isVisible ? 'text' : 'password'} className={cn('pr-10', className)} {...props} />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        aria-label={isVisible ? 'Hide password' : 'Show password'}
+        aria-pressed={isVisible}
+        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-0.5 -translate-y-1/2"
+        onClick={() => setIsVisible((current) => !current)}
+      >
+        <HugeiconsIcon icon={isVisible ? EyeOffIcon : EyeIcon} strokeWidth={2} />
+      </Button>
+    </div>
+  )
+}
+
+export { Input, PasswordInput }

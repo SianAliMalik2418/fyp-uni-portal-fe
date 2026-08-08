@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { queryClient } from './app/query-client'
+import { toast } from './components/ui/toast'
 import { apiClient } from './shared/api/http-client'
 
 type MockUser = {
@@ -40,12 +41,14 @@ describe('App', () => {
   let postSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    toast.close()
     getSpy = vi.spyOn(apiClient, 'get')
     postSpy = vi.spyOn(apiClient, 'post')
     window.history.pushState(null, '', '/')
   })
 
   afterEach(() => {
+    toast.close()
     cleanup()
     queryClient.clear()
     vi.restoreAllMocks()
@@ -63,7 +66,7 @@ describe('App', () => {
 
     await screen.findByLabelText(/email/i)
     await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'temporary-password')
+    await user.type(screen.getByLabelText(/^password$/i), 'temporary-password')
     await user.click(screen.getByRole('button', { name: /login/i }))
 
     await screen.findByText(/admin workspace/i)
@@ -161,6 +164,197 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /announcements/i })).toBeInTheDocument()
   })
 
+  it('opens the profile menu and logs out from the portal shell', async () => {
+    const user = userEvent.setup()
+    getSpy.mockResolvedValueOnce({ data: { user: activeAdmin } })
+    postSpy.mockResolvedValueOnce({ data: { message: 'Logout successful' } })
+
+    render(<App />)
+
+    await screen.findByRole('navigation', { name: /admin navigation/i })
+    await user.click(screen.getByRole('button', { name: /open profile menu/i }))
+    await user.click(await screen.findByText(/^logout$/i))
+
+    await screen.findByRole('button', { name: /login/i })
+
+    expect(postSpy).toHaveBeenCalledWith('/auth/logout')
+  })
+
+  it('lets admins provision accounts with a temporary password', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', '/students')
+    getSpy
+      .mockResolvedValueOnce({ data: { user: activeAdmin } })
+      .mockResolvedValueOnce({ data: { users: [] } })
+      .mockResolvedValueOnce({
+        data: {
+          users: [
+            {
+              id: 'student-2',
+              fullName: 'New Student',
+              email: 'new.student@example.com',
+              role: 'student',
+              registrationNumber: 'REG-001',
+              accountStatus: 'active',
+              isActive: true,
+              passwordChangeRequired: true,
+            },
+          ],
+        },
+      })
+    postSpy.mockResolvedValueOnce({
+      data: {
+        message: 'User account created',
+        temporaryPassword: '@Abc1234',
+        user: {
+          id: 'student-2',
+          fullName: 'New Student',
+          email: 'new.student@example.com',
+          role: 'student',
+          accountStatus: 'active',
+          isActive: true,
+          passwordChangeRequired: true,
+        },
+      },
+    })
+
+    render(<App />)
+
+    await screen.findByRole('button', { name: /create account/i })
+    expect(screen.queryByRole('combobox', { name: /role/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: /role/i })).toHaveValue('Student')
+    expect(screen.getByRole('textbox', { name: /role/i })).toBeDisabled()
+    expect(screen.queryByRole('option', { name: /admin/i })).not.toBeInTheDocument()
+    expect(screen.getByLabelText(/registration no/i)).toBeInTheDocument()
+    expect(screen.queryByLabelText(/employee id/i)).not.toBeInTheDocument()
+    await user.type(screen.getByLabelText(/full name/i), 'New Student')
+    await user.type(screen.getByLabelText(/email/i), 'new.student@example.com')
+    await user.type(screen.getByLabelText(/registration no/i), 'REG-001')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+
+    await screen.findByText(/temporary password issued/i)
+
+    expect(postSpy).toHaveBeenCalledWith('/users', {
+      fullName: 'New Student',
+      email: 'new.student@example.com',
+      role: 'student',
+      registrationNumber: 'REG-001',
+      employeeId: undefined,
+      isActive: true,
+    })
+    expect(screen.getByText(/@Abc1234/i)).toBeInTheDocument()
+    expect(
+      await screen.findByRole('columnheader', { name: /registration no/i })
+    ).toBeInTheDocument()
+    expect(screen.getByText('REG-001')).toBeInTheDocument()
+  })
+
+  it('clears required account errors after visible form values are entered', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', '/students')
+    getSpy
+      .mockResolvedValueOnce({ data: { user: activeAdmin } })
+      .mockResolvedValueOnce({ data: { users: [] } })
+    postSpy.mockResolvedValueOnce({
+      data: {
+        message: 'User account created',
+        temporaryPassword: '@Abc1234',
+        user: {
+          id: 'student-3',
+          fullName: 'Sian Malik',
+          email: 'sianalimalik2418@gmail.com',
+          role: 'student',
+          accountStatus: 'active',
+          isActive: true,
+          passwordChangeRequired: true,
+        },
+      },
+    })
+
+    render(<App />)
+
+    await screen.findByRole('button', { name: /create account/i })
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+
+    expect(await screen.findByText(/full name is required/i)).toBeInTheDocument()
+    expect(await screen.findByText(/email is required|valid email/i)).toBeInTheDocument()
+    expect(await screen.findByText(/registration no. is required/i)).toBeInTheDocument()
+
+    await user.type(screen.getByLabelText(/full name/i), 'Sian Malik')
+    expect(screen.queryByText(/full name is required/i)).not.toBeInTheDocument()
+    await user.type(screen.getByLabelText(/email/i), 'sianalimalik2418@gmail.com')
+    expect(screen.queryByText(/email is required|valid email/i)).not.toBeInTheDocument()
+    await user.type(screen.getByLabelText(/registration no/i), 'BSCS-F22-51')
+    expect(screen.queryByText(/registration no. is required/i)).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+
+    await screen.findByText(/temporary password issued/i)
+
+    expect(postSpy).toHaveBeenCalledWith('/users', {
+      fullName: 'Sian Malik',
+      email: 'sianalimalik2418@gmail.com',
+      role: 'student',
+      registrationNumber: 'BSCS-F22-51',
+      employeeId: undefined,
+      isActive: true,
+    })
+  })
+
+  it('limits teacher page account roles to teacher and HOD', async () => {
+    window.history.pushState(null, '', '/teachers')
+    getSpy.mockResolvedValueOnce({ data: { user: activeAdmin } }).mockResolvedValueOnce({
+      data: {
+        users: [
+          {
+            id: 'teacher-2',
+            fullName: 'Visible Teacher',
+            email: 'visible.teacher@example.com',
+            role: 'teacher',
+            employeeId: 'EMP-002',
+            accountStatus: 'active',
+            isActive: true,
+            passwordChangeRequired: false,
+          },
+        ],
+      },
+    })
+
+    render(<App />)
+
+    await screen.findByRole('button', { name: /create account/i })
+
+    expect(screen.getByRole('combobox', { name: /account type/i })).toHaveValue('teacher')
+    expect(screen.getByRole('option', { name: /teacher/i })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /hod/i })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /student/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /admin/i })).not.toBeInTheDocument()
+    expect(screen.getByLabelText(/employee id/i)).toBeInTheDocument()
+    expect(screen.queryByLabelText(/registration no/i)).not.toBeInTheDocument()
+    expect(await screen.findByRole('columnheader', { name: /employee id/i })).toBeInTheDocument()
+    expect(screen.getByText('EMP-002')).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: /password/i })).not.toBeInTheDocument()
+  })
+
+  it('requires an employee ID before creating teacher accounts', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', '/teachers')
+    getSpy
+      .mockResolvedValueOnce({ data: { user: activeAdmin } })
+      .mockResolvedValueOnce({ data: { users: [] } })
+
+    render(<App />)
+
+    await screen.findByRole('button', { name: /create account/i })
+    await user.type(screen.getByLabelText(/full name/i), 'New Teacher')
+    await user.type(screen.getByLabelText(/email/i), 'new.teacher@example.com')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+
+    expect(await screen.findByText(/employee id is required/i)).toBeInTheDocument()
+    await user.type(screen.getByLabelText(/employee id/i), 'EMP-001')
+    expect(screen.queryByText(/employee id is required/i)).not.toBeInTheDocument()
+    expect(postSpy).not.toHaveBeenCalledWith('/users', expect.anything())
+  })
+
   it('shows unauthorized handling when the URL targets another role area', async () => {
     window.history.pushState(null, '', '/teachers')
     getSpy.mockResolvedValueOnce({
@@ -183,11 +377,11 @@ describe('App', () => {
 
     await screen.findByLabelText(/email/i)
     await user.type(screen.getByLabelText(/email/i), 'inactive@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'temporary-password')
+    await user.type(screen.getByLabelText(/^password$/i), 'temporary-password')
     await user.click(screen.getByRole('button', { name: /login/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/inactive account/i)).toBeInTheDocument()
+      expect(screen.getAllByText(/inactive account/i).length).toBeGreaterThan(0)
     })
   })
 })
