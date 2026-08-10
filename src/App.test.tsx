@@ -48,11 +48,13 @@ const activeTeacher: MockUser = {
 
 describe('App', () => {
   let getSpy: ReturnType<typeof vi.spyOn>
+  let patchSpy: ReturnType<typeof vi.spyOn>
   let postSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     toast.close()
     getSpy = vi.spyOn(apiClient, 'get')
+    patchSpy = vi.spyOn(apiClient, 'patch')
     postSpy = vi.spyOn(apiClient, 'post')
     window.history.pushState(null, '', '/')
   })
@@ -177,6 +179,140 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /students/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /academic structure/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /announcements/i })).toBeInTheDocument()
+  })
+
+  it('renders the Sian phase 2 academic structure workspace', async () => {
+    window.history.pushState(null, '', '/academic-structure')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeAdmin } })
+      }
+
+      if (url === '/programs') {
+        return Promise.resolve({
+          data: {
+            programs: [
+              {
+                id: 'program-1',
+                name: 'BS Computer Science',
+                code: 'BSCS',
+                department: {
+                  id: 'department-1',
+                  name: 'Computer Science',
+                  code: 'CS',
+                  isActive: true,
+                },
+                totalSemesters: 8,
+                duration: 4,
+                durationUnit: 'years',
+                isActive: true,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/batches') {
+        return Promise.resolve({
+          data: {
+            batches: [
+              {
+                id: 'batch-1',
+                name: 'Fall 2026',
+                program: {
+                  id: 'program-1',
+                  name: 'BS Computer Science',
+                  code: 'BSCS',
+                  isActive: true,
+                },
+                startingYear: 2026,
+                expectedGraduationYear: 2030,
+                isActive: true,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/semesters') {
+        return Promise.resolve({
+          data: {
+            semesters: [
+              {
+                id: 'semester-1',
+                name: 'Fall Semester',
+                academicYear: '2026-2027',
+                startsAt: '2026-09-01T00:00:00.000Z',
+                endsAt: '2027-01-15T00:00:00.000Z',
+                isActive: false,
+                isClosed: false,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/sections') {
+        return Promise.resolve({
+          data: {
+            sections: [
+              {
+                id: 'section-1',
+                name: 'A',
+                program: {
+                  id: 'program-1',
+                  name: 'BS Computer Science',
+                  code: 'BSCS',
+                  isActive: true,
+                },
+                batch: {
+                  id: 'batch-1',
+                  name: 'Fall 2026',
+                  startingYear: 2026,
+                  expectedGraduationYear: 2030,
+                  isActive: true,
+                },
+                semester: {
+                  id: 'semester-1',
+                  name: 'Fall Semester',
+                  academicYear: '2026-2027',
+                  isActive: false,
+                  isClosed: false,
+                },
+                isActive: true,
+              },
+            ],
+          },
+        })
+      }
+
+      return Promise.reject(new Error(`Unhandled GET ${url}`))
+    })
+    patchSpy.mockResolvedValueOnce({
+      data: {
+        message: 'Semester activated',
+        semester: {
+          id: 'semester-1',
+          name: 'Fall Semester',
+          academicYear: '2026-2027',
+          isActive: true,
+          isClosed: false,
+        },
+      },
+    })
+
+    render(<App />)
+
+    expect(await screen.findByRole('heading', { name: /academic structure/i })).toBeInTheDocument()
+    expect(screen.getByText(/no active semester/i)).toBeInTheDocument()
+    expect(await screen.findByText('Fall 2026')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('tab', { name: /semesters/i }))
+    await userEvent.click(screen.getByRole('button', { name: /activate/i }))
+
+    await waitFor(() => {
+      expect(patchSpy).toHaveBeenCalledWith('/semesters/semester-1/activate')
+    })
   })
 
   it('renders Tayabba phase 1 academic performance placeholders for teachers', async () => {

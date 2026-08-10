@@ -1,5 +1,12 @@
 import type { Program } from '@/features/programs/types/program.types'
 
+export type AcademicStructureTab = 'batches' | 'semesters' | 'sections'
+
+export type DeleteAcademicStructureTarget =
+  | { kind: 'batch'; id: string; label: string }
+  | { kind: 'semester'; id: string; label: string }
+  | { kind: 'section'; id: string; label: string }
+
 export type AcademicStatus = {
   isActive: boolean
 }

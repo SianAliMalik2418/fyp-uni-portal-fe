@@ -19,10 +19,25 @@
 - Keep cross-feature constants under `src/shared/constants`.
 - Keep feature route-entry components under `src/features/*/pages`.
 - Keep reusable feature/domain components under `src/features/*/components`, and have pages compose those components.
+- Do not dump feature UI, forms, tables, dialogs, or helper components into a single page file. Route pages should orchestrate data, mutations, routing state, and high-level layout only.
+- When a page needs a form, table/list card, sheet/dialog, empty/loading/error state, or repeated domain UI, create a focused component under that feature's `components/` directory.
+- Prefer one clear component per file once a component grows beyond a small helper. For example, use `BatchForm.tsx`, `BatchesCard.tsx`, and `DeleteBatchDialog.tsx` instead of one large `AcademicStructurePage.tsx` or one catch-all component file.
+- Keep feature schemas under `src/features/*/schemas`, API calls under `src/features/*/api`, TanStack Query options under `src/features/*/api`, domain types under `src/features/*/types`, and payload/form mappers under `src/features/*/utils`.
+- Before adding frontend code, inspect a similar completed feature such as `departments`, `programs`, or `user-accounts`, and mirror its structure unless the current feature has a concrete reason to differ.
 - Keep auth-specific API functions, TanStack Query options, schemas, types, pages, and components under `src/features/auth`.
 - Keep portal-specific pages, shell components, navigation, constants, and types under `src/features/portal`.
 - Keep reusable shadcn UI primitives under `src/components/ui`.
 - Put feature/domain components outside `src/components/ui` so generated shadcn files stay easy to update.
+
+## Frontend Structure Checklist
+
+Before handing off frontend work, verify:
+
+- Route pages under `src/features/*/pages` compose feature components instead of containing most markup directly.
+- No page file contains large inline forms, data tables, confirmation dialogs, or repeated UI blocks that should be feature components.
+- New components live in the owning feature's `components/` directory, not in `src/components/ui` unless they are reusable shadcn-style primitives.
+- Forms use feature schemas, payload mappers, and typed API functions instead of ad hoc inline payload shaping.
+- The implementation still matches the layout pattern already used by equivalent pages, such as the list card plus right-side sheet pattern used by departments and programs.
 
 ## API, Routing, and Forms
 
@@ -41,7 +56,7 @@
 - Use only design-system tokens for colors, borders, rings, backgrounds, foregrounds, radius, shadows, and semantic states.
 - Do not introduce raw color values or arbitrary Tailwind color classes in application components unless they are already part of token definitions.
 - Use only free Hugeicons for icons. Do not add Lucide or another icon library unless the user explicitly approves it.
-- For any UI-related work, use the `design-taste-frontend` skill with the existing shadcn/Tailwind/Hugeicons system.
+- use the existing shadcn/Tailwind/Hugeicons system.
 - Do not force marketing-page taste patterns onto dense dashboards, admin tables, forms, or backend-driven product workflows.
 
 ## Frontend Verification
