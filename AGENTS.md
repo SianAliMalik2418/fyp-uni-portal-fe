@@ -10,6 +10,7 @@
 - Work from the `FE/` directory for frontend package commands.
 - Use Bun for frontend dependency and script execution.
 - Keep `FE/bun.lock` as the frontend package lockfile.
+- For git-only requests such as commit, push, or commit and push, do only the requested Git workflow. Do not run lint, tests, builds, or format checks unless the user explicitly asks for verification.
 
 ## Frontend Architecture
 
