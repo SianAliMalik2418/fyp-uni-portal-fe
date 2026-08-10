@@ -3,8 +3,10 @@ import { ShieldUserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AdminAccountProvisioning } from '@/features/portal/components/AdminAccountProvisioning'
 import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
+import { FloatingChatbot } from '@/features/portal/components/FloatingChatbot'
 import { PortalHeader } from '@/features/portal/components/PortalHeader'
 import { PortalSidebar } from '@/features/portal/components/PortalSidebar'
+import { StudentDashboardShell } from '@/features/portal/components/StudentDashboardShell'
 import { UnauthorizedSection } from '@/features/portal/components/UnauthorizedSection'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 
@@ -37,7 +39,9 @@ export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () 
         />
 
         <div className="p-4 md:p-6">
-          {activeItem && isAdminAccountSection(user, activeItem.id) ? (
+          {activeItem && user.role === 'student' && activeItem.id === 'dashboard' ? (
+            <StudentDashboardShell user={user} />
+          ) : activeItem && isAdminAccountSection(user, activeItem.id) ? (
             <AdminAccountProvisioning item={activeItem} />
           ) : activeItem ? (
             <PlaceholderModule user={user} item={activeItem} />
@@ -46,6 +50,7 @@ export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () 
           )}
         </div>
       </section>
+      {user.role === 'student' ? <FloatingChatbot /> : null}
     </main>
   )
 }

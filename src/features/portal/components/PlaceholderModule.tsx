@@ -5,6 +5,7 @@ import {
   academicPerformancePlaceholders,
   modulePlaceholderContent,
   modulePlaceholderStats,
+  studentServicePlaceholders,
 } from '../constants/portal-placeholders'
 import { roleLabels } from '../constants/portal-navigation'
 import type { NavItem } from '../types/portal.types'
@@ -12,7 +13,8 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavItem }) {
-  const moduleDetails = academicPerformancePlaceholders[item.id]
+  const moduleDetails =
+    academicPerformancePlaceholders[item.id] ?? studentServicePlaceholders[item.id]
   const roleEmptyState = moduleDetails?.emptyStates?.[user.role]
   const stats = moduleDetails?.stats?.[user.role] ?? modulePlaceholderStats[user.role]
   const emptyTitle = roleEmptyState?.emptyTitle ?? modulePlaceholderContent.emptyTitle

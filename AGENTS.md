@@ -41,13 +41,14 @@
 - Use only design-system tokens for colors, borders, rings, backgrounds, foregrounds, radius, shadows, and semantic states.
 - Do not introduce raw color values or arbitrary Tailwind color classes in application components unless they are already part of token definitions.
 - Use only free Hugeicons for icons. Do not add Lucide or another icon library unless the user explicitly approves it.
-- For UI-heavy redesign work, read `.agents/skills/design-taste-frontend/SKILL.md` and apply it with the existing shadcn/Tailwind/Hugeicons system.
+- For any UI-related work, use the `design-taste-frontend` skill with the existing shadcn/Tailwind/Hugeicons system.
 - Do not force marketing-page taste patterns onto dense dashboards, admin tables, forms, or backend-driven product workflows.
 
 ## Frontend Verification
 
 - After frontend changes, run the relevant Bun-backed scripts from `FE/`, such as `bun run test`, `bun run build`, `bun run lint`, and `bun run format:check`.
 - Run `bun run test:e2e` when a change affects routing, auth, critical user flows, or browser-only behavior.
+- Always use the `simplify` skill before handing frontend work over for review.
 
 ## Frontend Testing
 

@@ -147,3 +147,180 @@ export const academicPerformancePlaceholders: Record<string, ModulePlaceholderDe
     nextIntegrationValue: 'Results API',
   },
 }
+
+export const studentServicePlaceholders: Record<string, ModulePlaceholderDetails> = {
+  fees: {
+    stats: {
+      student: [
+        { label: 'Outstanding balance', value: '0' },
+        { label: 'Paid challans', value: '0' },
+        { label: 'Due notices', value: '0' },
+      ],
+      admin: [
+        { label: 'Fee batches', value: '0' },
+        { label: 'Pending payments', value: '0' },
+        { label: 'Challan drafts', value: '0' },
+      ],
+    },
+    emptyStates: {
+      student: {
+        emptyTitle: 'No fee information available yet.',
+        emptyDescription: 'Fee status, challans, and payment history will appear here.',
+      },
+      admin: {
+        emptyTitle: 'No fee batches available yet.',
+        emptyDescription: 'Admin fee setup and student challan records will appear here.',
+      },
+    },
+    readinessDescription: 'The fees workspace is ready for challans, dues, and payment status.',
+    nextIntegrationValue: 'Fees API',
+  },
+  timetable: {
+    stats: {
+      student: [
+        { label: 'Today classes', value: '0' },
+        { label: 'Weekly slots', value: '0' },
+        { label: 'Room changes', value: '0' },
+      ],
+      teacher: [
+        { label: 'Teaching slots', value: '0' },
+        { label: 'Sections', value: '0' },
+        { label: 'Room changes', value: '0' },
+      ],
+    },
+    emptyStates: {
+      student: {
+        emptyTitle: 'No timetable available yet.',
+        emptyDescription: 'Your weekly class schedule will appear here.',
+      },
+      teacher: {
+        emptyTitle: 'No teaching timetable available yet.',
+        emptyDescription: 'Assigned class slots will appear after timetable setup.',
+      },
+    },
+    readinessDescription: 'The timetable workspace is ready for class slots and room details.',
+    nextIntegrationValue: 'Timetable API',
+  },
+  timetables: {
+    stats: {
+      admin: [
+        { label: 'Published schedules', value: '0' },
+        { label: 'Draft schedules', value: '0' },
+        { label: 'Sections covered', value: '0' },
+      ],
+    },
+    emptyStates: {
+      admin: {
+        emptyTitle: 'No timetables configured yet.',
+        emptyDescription: 'Admin timetable setup and publishing controls will appear here.',
+      },
+    },
+    readinessDescription: 'The timetable administration workspace is ready for schedule setup.',
+    nextIntegrationValue: 'Timetable API',
+  },
+  exams: {
+    stats: {
+      student: [
+        { label: 'Upcoming papers', value: '0' },
+        { label: 'Date sheets', value: '0' },
+        { label: 'Exam notices', value: '0' },
+      ],
+      teacher: [
+        { label: 'Invigilation slots', value: '0' },
+        { label: 'Course exams', value: '0' },
+        { label: 'Exam notices', value: '0' },
+      ],
+      admin: [
+        { label: 'Published sheets', value: '0' },
+        { label: 'Draft sheets', value: '0' },
+        { label: 'Exam rooms', value: '0' },
+      ],
+    },
+    emptyStates: {
+      student: {
+        emptyTitle: 'No exam date sheet available yet.',
+        emptyDescription: 'Exam dates, rooms, and timings will appear here.',
+      },
+      teacher: {
+        emptyTitle: 'No exam duties available yet.',
+        emptyDescription: 'Course exam and invigilation details will appear here.',
+      },
+      admin: {
+        emptyTitle: 'No exam schedule configured yet.',
+        emptyDescription: 'Admin exam date sheet publishing controls will appear here.',
+      },
+    },
+    readinessDescription: 'The exams workspace is ready for date sheets and exam notices.',
+    nextIntegrationValue: 'Exams API',
+  },
+  materials: {
+    stats: {
+      student: [
+        { label: 'Available files', value: '0' },
+        { label: 'Course folders', value: '0' },
+        { label: 'New uploads', value: '0' },
+      ],
+      teacher: [
+        { label: 'Uploaded files', value: '0' },
+        { label: 'Course folders', value: '0' },
+        { label: 'Draft uploads', value: '0' },
+      ],
+    },
+    emptyStates: {
+      student: {
+        emptyTitle: 'No course materials available yet.',
+        emptyDescription: 'Lecture files, handouts, and shared resources will appear here.',
+      },
+      teacher: {
+        emptyTitle: 'No materials uploaded yet.',
+        emptyDescription: 'Teacher upload controls will appear after course assignments exist.',
+      },
+    },
+    readinessDescription: 'The materials workspace is ready for course files and upload flows.',
+    nextIntegrationValue: 'Materials API',
+  },
+  announcements: {
+    stats: {
+      student: [
+        { label: 'Unread notices', value: '0' },
+        { label: 'Pinned notices', value: '0' },
+        { label: 'Department alerts', value: '0' },
+      ],
+      teacher: [
+        { label: 'Unread notices', value: '0' },
+        { label: 'Course notices', value: '0' },
+        { label: 'Draft notices', value: '0' },
+      ],
+      hod: [
+        { label: 'Department notices', value: '0' },
+        { label: 'Pinned notices', value: '0' },
+        { label: 'Draft notices', value: '0' },
+      ],
+      admin: [
+        { label: 'Published notices', value: '0' },
+        { label: 'Pinned notices', value: '0' },
+        { label: 'Draft notices', value: '0' },
+      ],
+    },
+    emptyStates: {
+      student: {
+        emptyTitle: 'No announcements available yet.',
+        emptyDescription: 'University and department announcements will appear here.',
+      },
+      teacher: {
+        emptyTitle: 'No announcements available yet.',
+        emptyDescription: 'Relevant staff and course notices will appear here.',
+      },
+      hod: {
+        emptyTitle: 'No department announcements available yet.',
+        emptyDescription: 'Department notices and publishing controls will appear here.',
+      },
+      admin: {
+        emptyTitle: 'No announcements published yet.',
+        emptyDescription: 'Admin announcement publishing controls will appear here.',
+      },
+    },
+    readinessDescription: 'The announcements workspace is ready for notices and targeting.',
+    nextIntegrationValue: 'Announcements API',
+  },
+}
