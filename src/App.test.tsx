@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
@@ -64,6 +64,11 @@ describe('App', () => {
     vi.restoreAllMocks()
     window.history.pushState(null, '', '/')
   })
+
+  async function openCreateAccountSheet(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(await screen.findByRole('button', { name: /create account/i }))
+    return within(await screen.findByRole('dialog', { name: /create account/i }))
+  }
 
   it('shows email/password login and signs in with the backend auth contract', async () => {
     const user = userEvent.setup()
@@ -246,17 +251,17 @@ describe('App', () => {
 
     render(<App />)
 
-    await screen.findByRole('button', { name: /create account/i })
+    const sheet = await openCreateAccountSheet(user)
     expect(screen.queryByRole('combobox', { name: /role/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: /role/i })).toHaveValue('Student')
-    expect(screen.getByRole('textbox', { name: /role/i })).toBeDisabled()
+    expect(sheet.getByRole('textbox', { name: /role/i })).toHaveValue('Student')
+    expect(sheet.getByRole('textbox', { name: /role/i })).toBeDisabled()
     expect(screen.queryByRole('option', { name: /admin/i })).not.toBeInTheDocument()
-    expect(screen.getByLabelText(/registration no/i)).toBeInTheDocument()
+    expect(sheet.getByLabelText(/registration no/i)).toBeInTheDocument()
     expect(screen.queryByLabelText(/employee id/i)).not.toBeInTheDocument()
-    await user.type(screen.getByLabelText(/full name/i), 'New Student')
-    await user.type(screen.getByLabelText(/email/i), 'new.student@example.com')
-    await user.type(screen.getByLabelText(/registration no/i), 'REG-001')
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    await user.type(sheet.getByLabelText(/full name/i), 'New Student')
+    await user.type(sheet.getByLabelText(/email/i), 'new.student@example.com')
+    await user.type(sheet.getByLabelText(/registration no/i), 'REG-001')
+    await user.click(sheet.getByRole('button', { name: /create account/i }))
 
     await screen.findByText(/temporary password issued/i)
 
@@ -299,20 +304,20 @@ describe('App', () => {
 
     render(<App />)
 
-    await screen.findByRole('button', { name: /create account/i })
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    const sheet = await openCreateAccountSheet(user)
+    await user.click(sheet.getByRole('button', { name: /create account/i }))
 
     expect(await screen.findByText(/full name is required/i)).toBeInTheDocument()
     expect(await screen.findByText(/email is required|valid email/i)).toBeInTheDocument()
     expect(await screen.findByText(/registration no. is required/i)).toBeInTheDocument()
 
-    await user.type(screen.getByLabelText(/full name/i), 'Sian Malik')
+    await user.type(sheet.getByLabelText(/full name/i), 'Sian Malik')
     expect(screen.queryByText(/full name is required/i)).not.toBeInTheDocument()
-    await user.type(screen.getByLabelText(/email/i), 'sianalimalik2418@gmail.com')
+    await user.type(sheet.getByLabelText(/email/i), 'sianalimalik2418@gmail.com')
     expect(screen.queryByText(/email is required|valid email/i)).not.toBeInTheDocument()
-    await user.type(screen.getByLabelText(/registration no/i), 'BSCS-F22-51')
+    await user.type(sheet.getByLabelText(/registration no/i), 'BSCS-F22-51')
     expect(screen.queryByText(/registration no. is required/i)).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    await user.click(sheet.getByRole('button', { name: /create account/i }))
 
     await screen.findByText(/temporary password issued/i)
 
@@ -327,6 +332,7 @@ describe('App', () => {
   })
 
   it('limits teacher page account roles to teacher and HOD', async () => {
+    const user = userEvent.setup()
     window.history.pushState(null, '', '/teachers')
     getSpy.mockResolvedValueOnce({ data: { user: activeAdmin } }).mockResolvedValueOnce({
       data: {
@@ -347,18 +353,20 @@ describe('App', () => {
 
     render(<App />)
 
-    await screen.findByRole('button', { name: /create account/i })
-
-    expect(screen.getByRole('combobox', { name: /account type/i })).toHaveValue('teacher')
-    expect(screen.getByRole('option', { name: /teacher/i })).toBeInTheDocument()
-    expect(screen.getByRole('option', { name: /hod/i })).toBeInTheDocument()
-    expect(screen.queryByRole('option', { name: /student/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('option', { name: /admin/i })).not.toBeInTheDocument()
-    expect(screen.getByLabelText(/employee id/i)).toBeInTheDocument()
-    expect(screen.queryByLabelText(/registration no/i)).not.toBeInTheDocument()
     expect(await screen.findByRole('columnheader', { name: /employee id/i })).toBeInTheDocument()
     expect(screen.getByText('EMP-002')).toBeInTheDocument()
     expect(screen.queryByRole('columnheader', { name: /password/i })).not.toBeInTheDocument()
+
+    await user.click(await screen.findByRole('button', { name: /create account/i }))
+    const sheet = within(await screen.findByRole('dialog', { name: /create account/i }))
+
+    expect(sheet.getByRole('combobox', { name: /account type/i })).toHaveValue('teacher')
+    expect(sheet.getByRole('option', { name: /teacher/i })).toBeInTheDocument()
+    expect(sheet.getByRole('option', { name: /hod/i })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /student/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /admin/i })).not.toBeInTheDocument()
+    expect(sheet.getByLabelText(/employee id/i)).toBeInTheDocument()
+    expect(screen.queryByLabelText(/registration no/i)).not.toBeInTheDocument()
   })
 
   it('requires an employee ID before creating teacher accounts', async () => {
@@ -370,13 +378,13 @@ describe('App', () => {
 
     render(<App />)
 
-    await screen.findByRole('button', { name: /create account/i })
-    await user.type(screen.getByLabelText(/full name/i), 'New Teacher')
-    await user.type(screen.getByLabelText(/email/i), 'new.teacher@example.com')
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    const sheet = await openCreateAccountSheet(user)
+    await user.type(sheet.getByLabelText(/full name/i), 'New Teacher')
+    await user.type(sheet.getByLabelText(/email/i), 'new.teacher@example.com')
+    await user.click(sheet.getByRole('button', { name: /create account/i }))
 
     expect(await screen.findByText(/employee id is required/i)).toBeInTheDocument()
-    await user.type(screen.getByLabelText(/employee id/i), 'EMP-001')
+    await user.type(sheet.getByLabelText(/employee id/i), 'EMP-001')
     expect(screen.queryByText(/employee id is required/i)).not.toBeInTheDocument()
     expect(postSpy).not.toHaveBeenCalledWith('/users', expect.anything())
   })

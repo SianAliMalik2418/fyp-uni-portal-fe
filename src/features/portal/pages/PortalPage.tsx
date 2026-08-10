@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { ShieldUserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { DepartmentsPage } from '@/features/departments/pages/DepartmentsPage'
+import { ProgramsPage } from '@/features/programs/pages/ProgramsPage'
 import { StudentDashboardPage } from '@/features/student-dashboard/pages/StudentDashboardPage'
 import { UserAccountsPage } from '@/features/user-accounts/pages/UserAccountsPage'
 import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
@@ -20,6 +21,10 @@ function isDepartmentsSection(user: PortalUser, sectionId: string) {
   return user.role === 'admin' && sectionId === 'departments'
 }
 
+function isProgramsSection(user: PortalUser, sectionId: string) {
+  return user.role === 'admin' && sectionId === 'programs'
+}
+
 function portalModuleFor(user: PortalUser, activeItem: NavItem) {
   if (user.role === 'student' && activeItem.id === 'dashboard') {
     return <StudentDashboardPage user={user} />
@@ -31,6 +36,10 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
 
   if (isDepartmentsSection(user, activeItem.id)) {
     return <DepartmentsPage title={activeItem.label} />
+  }
+
+  if (isProgramsSection(user, activeItem.id)) {
+    return <ProgramsPage title={activeItem.label} />
   }
 
   return <PlaceholderModule user={user} item={activeItem} />

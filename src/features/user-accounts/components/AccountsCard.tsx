@@ -3,7 +3,7 @@ import { roleLabels } from '@/shared/constants/user-roles'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -81,10 +81,6 @@ export function AccountsCard({
 
   return (
     <Card className="bg-background">
-      <CardHeader>
-        <CardTitle>Provisioned accounts</CardTitle>
-        <CardDescription>Existing admin-created and seeded accounts for this area.</CardDescription>
-      </CardHeader>
       <CardContent>{content}</CardContent>
     </Card>
   )

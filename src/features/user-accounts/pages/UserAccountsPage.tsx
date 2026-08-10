@@ -1,9 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { getApiErrorMessage } from '@/shared/api/http-client'
+import { UserAdd01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { toast } from '@/components/ui/toast-manager'
 import { createUserAccount } from '../api/user-accounts-api'
 import { userAccountKeys, userAccountsQueryOptions } from '../api/user-accounts-queries'
@@ -23,6 +36,8 @@ import {
   roleOptionsForSection,
 } from '../utils/account-sections'
 
+const accountFormId = 'account-sheet-form'
+
 type UserAccountsPageProps = {
   sectionId: string
   title: string
@@ -35,6 +50,7 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
   const isStudentSection = sectionId === 'students'
   const isTeacherSection = sectionId === 'teachers'
   const sectionKind = accountSectionKind(sectionId)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const form = useForm<CreateUserAccountFormValues>({
     resolver: zodResolver(createUserAccountSchema),
     mode: 'onSubmit',
@@ -56,6 +72,7 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
         type: 'success',
       })
       reset(defaultAccountValues(sectionId))
+      setIsSheetOpen(false)
       await queryClient.invalidateQueries({ queryKey: userAccountKeys.all })
     },
     onError: (error) => {
@@ -83,6 +100,16 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
     })
   }
 
+  function openCreateSheet() {
+    reset(defaultAccountValues(sectionId))
+    setIsSheetOpen(true)
+  }
+
+  function closeSheet() {
+    setIsSheetOpen(false)
+    reset(defaultAccountValues(sectionId))
+  }
+
   const visibleAccounts =
     accountsQuery.data?.users.filter((account) => accountMatchesSection(account, sectionId)) ?? []
   const identifierColumnLabel = identifierLabelForSection(sectionId)
@@ -97,26 +124,60 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
             Create portal accounts with temporary passwords and fixed roles.
           </p>
         </div>
-        <Badge variant="outline">Admin only</Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline">Admin only</Badge>
+          <Button type="button" onClick={openCreateSheet}>
+            <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
+            Create account
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-        <AccountFormCard
-          fixedRole={fixedRole}
-          form={form}
-          isCreating={createAccountMutation.isPending}
-          onSubmit={submitAccount}
-          sectionKind={sectionKind}
-          sectionRoleOptions={sectionRoleOptions}
-        />
-        <AccountsCard
-          accounts={visibleAccounts}
-          error={accountsQuery.error}
-          identifierColumnLabel={identifierColumnLabel}
-          isError={accountsQuery.isError}
-          isPending={accountsQuery.isPending}
-        />
-      </div>
+      <AccountsCard
+        accounts={visibleAccounts}
+        error={accountsQuery.error}
+        identifierColumnLabel={identifierColumnLabel}
+        isError={accountsQuery.isError}
+        isPending={accountsQuery.isPending}
+      />
+
+      <Sheet
+        open={isSheetOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeSheet()
+            return
+          }
+
+          setIsSheetOpen(true)
+        }}
+      >
+        <SheetContent className="flex w-full flex-col gap-0 space-y-0 sm:max-w-xl" side="right">
+          <SheetHeader className="border-b pr-14">
+            <SheetTitle>Create account</SheetTitle>
+            <SheetDescription>
+              New users must change the temporary password on first login.
+            </SheetDescription>
+          </SheetHeader>
+          <ScrollArea className="h-[calc(100vh-230px)] flex-1 grow py-4">
+            <AccountFormCard
+              fixedRole={fixedRole}
+              formId={accountFormId}
+              form={form}
+              onSubmit={submitAccount}
+              sectionKind={sectionKind}
+              sectionRoleOptions={sectionRoleOptions}
+            />
+          </ScrollArea>
+          <SheetFooter className="border-t">
+            <Button type="submit" form={accountFormId} disabled={createAccountMutation.isPending}>
+              <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
+              {createAccountMutation.isPending ? 'Creating...' : 'Create account'}
+            </Button>
+            <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

@@ -3,7 +3,20 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { getApiErrorMessage } from '@/shared/api/http-client'
+import { Add01Icon, FloppyDiskIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { toast } from '@/components/ui/toast-manager'
 import { createDepartment, deleteDepartment, updateDepartment } from '../api/departments-api'
 import { departmentKeys, departmentsQueryOptions } from '../api/departments-queries'
@@ -18,11 +31,14 @@ import {
   toDepartmentPayload,
 } from '../utils/department-mappers'
 
+const departmentFormId = 'department-sheet-form'
+
 export function DepartmentsPage({ title }: { title: string }) {
   const queryClient = useQueryClient()
   const departmentsQuery = useQuery(departmentsQueryOptions)
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null)
   const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const form = useForm<DepartmentFormValues>({
     resolver: zodResolver(departmentSchema),
     mode: 'onSubmit',
@@ -44,6 +60,7 @@ export function DepartmentsPage({ title }: { title: string }) {
         type: 'success',
       })
       reset(emptyDepartmentValues)
+      setIsSheetOpen(false)
       await queryClient.invalidateQueries({ queryKey: departmentKeys.all })
     },
     onError: (error) => {
@@ -65,6 +82,7 @@ export function DepartmentsPage({ title }: { title: string }) {
         type: 'success',
       })
       setEditingDepartment(null)
+      setIsSheetOpen(false)
       await queryClient.invalidateQueries({ queryKey: departmentKeys.all })
     },
     onError: (error) => {
@@ -116,6 +134,23 @@ export function DepartmentsPage({ title }: { title: string }) {
     }
   }
 
+  function openCreateSheet() {
+    setEditingDepartment(null)
+    reset(emptyDepartmentValues)
+    setIsSheetOpen(true)
+  }
+
+  function openEditSheet(department: Department) {
+    setEditingDepartment(department)
+    setIsSheetOpen(true)
+  }
+
+  function closeSheet() {
+    setIsSheetOpen(false)
+    setEditingDepartment(null)
+    reset(emptyDepartmentValues)
+  }
+
   const isSaving = createDepartmentMutation.isPending || updateDepartmentMutation.isPending
   const departments = departmentsQuery.data?.departments ?? []
 
@@ -128,27 +163,52 @@ export function DepartmentsPage({ title }: { title: string }) {
             Add, edit, deactivate, or remove departments used across academic records.
           </p>
         </div>
-        <Badge variant="outline">Admin only</Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline">Admin only</Badge>
+          <Button type="button" onClick={openCreateSheet}>
+            <HugeiconsIcon icon={Add01Icon} strokeWidth={2} data-icon="inline-start" />
+            Add department
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-        <DepartmentFormCard
-          editingDepartment={editingDepartment}
-          form={form}
-          isSaving={isSaving}
-          onCancelEdit={() => setEditingDepartment(null)}
-          onSubmit={submitDepartment}
-        />
-        <DepartmentsCard
-          departments={departments}
-          error={departmentsQuery.error}
-          isDeleting={deleteDepartmentMutation.isPending}
-          isError={departmentsQuery.isError}
-          isPending={departmentsQuery.isPending}
-          onDelete={setDepartmentToDelete}
-          onEdit={setEditingDepartment}
-        />
-      </div>
+      <DepartmentsCard
+        departments={departments}
+        error={departmentsQuery.error}
+        isDeleting={deleteDepartmentMutation.isPending}
+        isError={departmentsQuery.isError}
+        isPending={departmentsQuery.isPending}
+        onDelete={setDepartmentToDelete}
+        onEdit={openEditSheet}
+      />
+
+      <Sheet
+        open={isSheetOpen}
+        onOpenChange={(open) => (!open ? closeSheet() : setIsSheetOpen(true))}
+      >
+        <SheetContent className="flex w-full flex-col gap-0 space-y-0 sm:max-w-xl" side="right">
+          <SheetHeader className="border-b pr-14">
+            <SheetTitle>{editingDepartment ? 'Edit department' : 'Add department'}</SheetTitle>
+            <SheetDescription>
+              Department codes are used by programs, batches, sections, and reports.
+            </SheetDescription>
+          </SheetHeader>
+          <ScrollArea className="h-[calc(100vh-230px)] flex-1 grow py-4">
+            <DepartmentFormCard formId={departmentFormId} form={form} onSubmit={submitDepartment} />
+          </ScrollArea>
+          <SheetFooter className="border-t">
+            <Button type="submit" form={departmentFormId} disabled={isSaving}>
+              <HugeiconsIcon
+                icon={editingDepartment ? FloppyDiskIcon : Add01Icon}
+                strokeWidth={2}
+                data-icon="inline-start"
+              />
+              {isSaving ? 'Saving...' : editingDepartment ? 'Save changes' : 'Add department'}
+            </Button>
+            <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       <DeleteDepartmentDialog
         department={departmentToDelete}

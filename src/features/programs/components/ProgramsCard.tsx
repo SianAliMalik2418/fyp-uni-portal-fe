@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Building01Icon, Delete02Icon, Edit02Icon } from '@hugeicons/core-free-icons'
+import { Delete02Icon, Edit02Icon, Mortarboard01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -14,66 +14,74 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { Department } from '../types/department.types'
+import type { Program } from '../types/program.types'
 
-type DepartmentsCardProps = {
-  departments: Department[]
+type ProgramsCardProps = {
   error: unknown
   isDeleting: boolean
   isError: boolean
   isPending: boolean
-  onDelete: (department: Department) => void
-  onEdit: (department: Department) => void
+  onDelete: (program: Program) => void
+  onEdit: (program: Program) => void
+  programs: Program[]
 }
 
-export function DepartmentsCard({
-  departments,
+export function ProgramsCard({
   error,
   isDeleting,
   isError,
   isPending,
   onDelete,
   onEdit,
-}: DepartmentsCardProps) {
+  programs,
+}: ProgramsCardProps) {
   let content: ReactNode
 
   if (isPending) {
-    content = <p className="text-muted-foreground text-sm">Loading departments...</p>
+    content = <p className="text-muted-foreground text-sm">Loading programs...</p>
   } else if (isError) {
     content = (
       <Alert variant="destructive">
-        <AlertTitle>Departments unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(error, 'Unable to load departments')}
-        </AlertDescription>
+        <AlertTitle>Programs unavailable</AlertTitle>
+        <AlertDescription>{getApiErrorMessage(error, 'Unable to load programs')}</AlertDescription>
       </Alert>
     )
-  } else if (departments.length) {
+  } else if (programs.length) {
     content = (
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Program</TableHead>
             <TableHead>Department</TableHead>
-            <TableHead>Code</TableHead>
+            <TableHead>Structure</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-32 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {departments.map((department) => (
-            <TableRow key={department.id}>
+          {programs.map((program) => (
+            <TableRow key={program.id}>
               <TableCell>
-                <span className="text-foreground block font-medium">{department.name}</span>
-                <span className="text-muted-foreground block">
-                  {department.description ?? 'No description'}
+                <span className="text-foreground block font-medium">{program.name}</span>
+                <Badge variant="outline" className="mt-1">
+                  {program.code}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <span className="text-foreground block">{program.department.name}</span>
+                <span className="text-muted-foreground block text-sm">
+                  {program.department.code}
                 </span>
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{department.code}</Badge>
+                <span className="text-foreground block">{program.totalSemesters} semesters</span>
+                <span className="text-muted-foreground block text-sm">
+                  {program.duration} {program.durationUnit}
+                </span>
               </TableCell>
               <TableCell>
-                <Badge variant={department.isActive ? 'outline' : 'destructive'}>
-                  {department.isActive ? 'active' : 'inactive'}
+                <Badge variant={program.isActive ? 'outline' : 'destructive'}>
+                  {program.isActive ? 'active' : 'inactive'}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -82,8 +90,8 @@ export function DepartmentsCard({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Edit ${department.name}`}
-                    onClick={() => onEdit(department)}
+                    aria-label={`Edit ${program.name}`}
+                    onClick={() => onEdit(program)}
                   >
                     <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
                   </Button>
@@ -91,9 +99,9 @@ export function DepartmentsCard({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Delete ${department.name}`}
+                    aria-label={`Delete ${program.name}`}
                     disabled={isDeleting}
-                    onClick={() => onDelete(department)}
+                    onClick={() => onDelete(program)}
                   >
                     <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
                   </Button>
@@ -109,11 +117,11 @@ export function DepartmentsCard({
       <div className="bg-muted/30 grid min-h-48 place-items-center rounded-md border border-dashed px-4 text-center">
         <div className="grid justify-items-center gap-2">
           <div className="bg-background text-muted-foreground grid size-10 place-items-center rounded-md border">
-            <HugeiconsIcon icon={Building01Icon} strokeWidth={2} className="size-5" />
+            <HugeiconsIcon icon={Mortarboard01Icon} strokeWidth={2} className="size-5" />
           </div>
-          <p className="text-foreground text-sm font-medium">No departments yet</p>
+          <p className="text-foreground text-sm font-medium">No programs yet</p>
           <p className="text-muted-foreground max-w-sm text-sm">
-            Add the first department to start building the academic hierarchy.
+            Add a program after creating its department to continue the academic hierarchy.
           </p>
         </div>
       </div>
