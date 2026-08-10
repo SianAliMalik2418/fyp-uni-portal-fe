@@ -1,5 +1,6 @@
 import { ArrowRight01Icon, Database01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { AcademicPerformanceContextPanel } from '@/features/academic-performance/components/AcademicPerformanceContextPanel'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { roleLabels } from '@/shared/constants/user-roles'
 import {
@@ -15,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavItem }) {
   const moduleDetails =
     academicPerformancePlaceholders[item.id] ?? studentServicePlaceholders[item.id]
+  const isAcademicPerformanceModule = Boolean(academicPerformancePlaceholders[item.id])
   const roleEmptyState = moduleDetails?.emptyStates?.[user.role]
   const stats = moduleDetails?.stats?.[user.role] ?? modulePlaceholderStats[user.role]
   const emptyTitle = roleEmptyState?.emptyTitle ?? modulePlaceholderContent.emptyTitle
@@ -81,6 +83,8 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
           </div>
         </CardContent>
       </Card>
+
+      {isAcademicPerformanceModule ? <AcademicPerformanceContextPanel /> : null}
 
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
         <Card className="bg-background">
