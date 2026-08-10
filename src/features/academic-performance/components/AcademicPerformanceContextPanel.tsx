@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { AlertCircleIcon, Books01Icon, Layers01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { academicPerformanceContextQueryOptions } from '../api/academic-performance-queries'
@@ -95,9 +94,9 @@ export function AcademicPerformanceContextPanel() {
               Performance modules can read the current semester and section hierarchy.
             </CardDescription>
           </div>
-          <Badge variant="outline">
+          <span className="text-muted-foreground text-sm">
             {context.canResolveStudentSection ? 'Student link ready' : 'Student link pending'}
-          </Badge>
+          </span>
         </div>
       </CardHeader>
       <CardContent className="grid gap-3 md:grid-cols-3">

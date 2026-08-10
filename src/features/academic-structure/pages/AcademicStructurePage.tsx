@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { Add01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast-manager'
 import { programsQueryOptions } from '@/features/programs/api/programs-queries'
@@ -353,11 +352,10 @@ export function AcademicStructurePage({ title }: { title: string }) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline">Admin only</Badge>
           {activeSemester ? (
-            <Badge variant="secondary">Active: {activeSemester.name}</Badge>
+            <span className="text-muted-foreground text-sm">Active: {activeSemester.name}</span>
           ) : (
-            <Badge variant="destructive">No active semester</Badge>
+            <span className="text-muted-foreground text-sm">No active semester</span>
           )}
           <Button type="button" onClick={() => openCreateSheet()}>
             <HugeiconsIcon icon={Add01Icon} strokeWidth={2} data-icon="inline-start" />

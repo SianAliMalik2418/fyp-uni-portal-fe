@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Add01Icon, FloppyDiskIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
@@ -165,7 +164,6 @@ export function DepartmentsPage({ title }: { title: string }) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline">Admin only</Badge>
           <Button type="button" onClick={openCreateSheet}>
             <HugeiconsIcon icon={Add01Icon} strokeWidth={2} data-icon="inline-start" />
             Add department

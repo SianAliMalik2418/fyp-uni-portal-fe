@@ -7,7 +7,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getApiErrorMessage } from '@/shared/api/http-client'
@@ -69,7 +68,7 @@ function ServiceScopeCard({
           <HugeiconsIcon icon={icon} strokeWidth={2} className="size-4" />
           {label}
         </p>
-        <Badge variant="outline">{scopeLabel(scope)}</Badge>
+        <span className="text-muted-foreground text-xs">{scopeLabel(scope)}</span>
       </div>
       <div className="grid gap-2 text-xs">
         <span className="text-muted-foreground">
@@ -124,7 +123,9 @@ export function StudentServiceContextPanel() {
               Timetable, exam, and AI modules can reference program, semester, and section data.
             </CardDescription>
           </div>
-          <Badge variant="outline">{context.availableSections.length} active sections</Badge>
+          <span className="text-muted-foreground text-sm">
+            {context.availableSections.length} active sections
+          </span>
         </div>
       </CardHeader>
       <CardContent className="grid gap-4">
