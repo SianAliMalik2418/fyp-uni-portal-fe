@@ -11,7 +11,6 @@ import {
   studentServicePlaceholders,
 } from '../constants/portal-placeholders'
 import type { NavItem } from '../types/portal.types'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavItem }) {
@@ -31,14 +30,13 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
 
   return (
     <div className="mx-auto grid max-w-6xl gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div>
         <div>
           <h1 className="text-foreground text-2xl leading-tight font-semibold">{item.label}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             {roleLabels[user.role]} module access is ready for backend data.
           </p>
         </div>
-        <Badge variant="outline">{user.accountStatus}</Badge>
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">

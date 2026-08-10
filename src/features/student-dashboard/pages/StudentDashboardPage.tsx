@@ -2,7 +2,6 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { NotificationPanel } from '@/features/portal/components/NotificationPanel'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 const studentDashboardStats = [
@@ -17,14 +16,13 @@ export function StudentDashboardPage({ user }: { user: PortalUser }) {
 
   return (
     <div className="mx-auto grid max-w-6xl gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div>
         <div>
           <h1 className="text-foreground text-2xl leading-tight font-semibold">Dashboard</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Student service summary for {user.name}.
           </p>
         </div>
-        <Badge variant="outline">{user.accountStatus}</Badge>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

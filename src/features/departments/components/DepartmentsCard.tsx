@@ -3,7 +3,6 @@ import { Building01Icon, Delete02Icon, Edit02Icon } from '@hugeicons/core-free-i
 import { HugeiconsIcon } from '@hugeicons/react'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
@@ -70,12 +69,12 @@ export function DepartmentsCard({
                 </span>
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{department.code}</Badge>
+                <span className="text-muted-foreground text-sm">{department.code}</span>
               </TableCell>
               <TableCell>
-                <Badge variant={department.isActive ? 'outline' : 'destructive'}>
+                <span className="text-muted-foreground text-sm">
                   {department.isActive ? 'active' : 'inactive'}
-                </Badge>
+                </span>
               </TableCell>
               <TableCell>
                 <div className="flex justify-end gap-1">

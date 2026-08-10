@@ -3,7 +3,6 @@ import { Delete02Icon, Edit02Icon, Mortarboard01Icon } from '@hugeicons/core-fre
 import { HugeiconsIcon } from '@hugeicons/react'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
@@ -64,9 +63,9 @@ export function ProgramsCard({
             <TableRow key={program.id}>
               <TableCell>
                 <span className="text-foreground block font-medium">{program.name}</span>
-                <Badge variant="outline" className="mt-1">
+                <span className="text-muted-foreground mt-1 block text-sm">
                   {program.code}
-                </Badge>
+                </span>
               </TableCell>
               <TableCell>
                 <span className="text-foreground block">{program.department.name}</span>
@@ -81,9 +80,9 @@ export function ProgramsCard({
                 </span>
               </TableCell>
               <TableCell>
-                <Badge variant={program.isActive ? 'outline' : 'destructive'}>
+                <span className="text-muted-foreground text-sm">
                   {program.isActive ? 'active' : 'inactive'}
-                </Badge>
+                </span>
               </TableCell>
               <TableCell>
                 <div className="flex justify-end gap-1">

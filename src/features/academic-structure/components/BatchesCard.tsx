@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import type { Batch, DeleteAcademicStructureTarget } from '../types/academic-structure.types'
 import { AcademicQueryMessage } from './AcademicQueryMessage'
-import { AcademicStatusBadge } from './AcademicStatusBadge'
+import { AcademicStatusText } from './AcademicStatusText'
 
 type QueryState = {
   error: unknown
@@ -63,7 +63,7 @@ export function BatchesCard({
                   </TableCell>
                   <TableCell>{sectionCountsByBatch.get(batch.id) ?? 0}</TableCell>
                   <TableCell>
-                    <AcademicStatusBadge active={batch.isActive} />
+                    <AcademicStatusText active={batch.isActive} />
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">

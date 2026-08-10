@@ -25,7 +25,7 @@ import {
 import { formatDateRange } from '@/shared/utils/date-format'
 import type { DeleteAcademicStructureTarget, Semester } from '../types/academic-structure.types'
 import { AcademicQueryMessage } from './AcademicQueryMessage'
-import { AcademicStatusBadge } from './AcademicStatusBadge'
+import { AcademicStatusText } from './AcademicStatusText'
 
 type QueryState = {
   error: unknown
@@ -74,7 +74,7 @@ export function SemestersCard({
                     {formatDateRange(semester.startsAt, semester.endsAt)}
                   </TableCell>
                   <TableCell>
-                    <AcademicStatusBadge active={semester.isActive} closed={semester.isClosed} />
+                    <AcademicStatusText active={semester.isActive} closed={semester.isClosed} />
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">

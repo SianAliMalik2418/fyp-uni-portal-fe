@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import type { DeleteAcademicStructureTarget, Section } from '../types/academic-structure.types'
 import { AcademicQueryMessage } from './AcademicQueryMessage'
-import { AcademicStatusBadge } from './AcademicStatusBadge'
+import { AcademicStatusText } from './AcademicStatusText'
 
 type QueryState = {
   error: unknown
@@ -59,7 +59,7 @@ export function SectionsCard({ onDelete, onEdit, query, sections }: SectionsCard
                     </span>
                   </TableCell>
                   <TableCell>
-                    <AcademicStatusBadge active={section.isActive} />
+                    <AcademicStatusText active={section.isActive} />
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">

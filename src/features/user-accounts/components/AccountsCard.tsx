@@ -2,7 +2,6 @@ import { type ReactNode } from 'react'
 import { roleLabels } from '@/shared/constants/user-roles'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
 import {
@@ -62,9 +61,7 @@ export function AccountsCard({
               </TableCell>
               <TableCell>{roleLabels[account.role]}</TableCell>
               <TableCell>
-                <Badge variant={account.isActive ? 'outline' : 'destructive'}>
-                  {account.accountStatus}
-                </Badge>
+                <span className="text-muted-foreground text-sm">{account.accountStatus}</span>
               </TableCell>
               <TableCell>{identifierForAccount(account)}</TableCell>
             </TableRow>
