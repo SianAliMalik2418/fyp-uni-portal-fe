@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input, PasswordInput } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { toast } from '@/components/ui/toast-manager'
 
 export function LoginPage({ onLogin }: { onLogin: (user: PortalUser) => void }) {
@@ -105,8 +106,12 @@ export function LoginPage({ onLogin }: { onLogin: (user: PortalUser) => void }) 
           </FieldGroup>
 
           <Button type="submit" size="lg" disabled={loginMutation.isPending} className="w-full">
-            <HugeiconsIcon icon={Login03Icon} strokeWidth={2} data-icon="inline-start" />
-            {loginMutation.isPending ? 'Signing in...' : 'Login'}
+            {loginMutation.isPending ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <HugeiconsIcon icon={Login03Icon} strokeWidth={2} data-icon="inline-start" />
+            )}
+            Login
           </Button>
         </form>
       </CardContent>

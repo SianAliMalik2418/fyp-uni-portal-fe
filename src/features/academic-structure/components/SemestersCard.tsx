@@ -118,6 +118,7 @@ export function SemestersCard({
           <AcademicQueryMessage
             title="Semesters"
             query={query}
+            skeletonColumns={4}
             emptyIcon={<HugeiconsIcon icon={Calendar03Icon} strokeWidth={2} className="size-5" />}
             emptyTitle="No semesters yet"
             emptyText="Create a semester and activate it before assigning sections."

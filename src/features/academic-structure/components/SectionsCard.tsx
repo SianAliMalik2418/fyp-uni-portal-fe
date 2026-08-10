@@ -97,6 +97,7 @@ export function SectionsCard({ onDelete, onEdit, query, sections }: SectionsCard
           <AcademicQueryMessage
             title="Sections"
             query={query}
+            skeletonColumns={6}
             emptyIcon={<HugeiconsIcon icon={Add01Icon} strokeWidth={2} className="size-5" />}
             emptyTitle="No sections yet"
             emptyText="Create batches and semesters first, then add sections for each intake."

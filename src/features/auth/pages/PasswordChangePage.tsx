@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { PasswordInput } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { toast } from '@/components/ui/toast-manager'
 
 export function PasswordChangePage({
@@ -116,8 +117,12 @@ export function PasswordChangePage({
               Logout
             </Button>
             <Button type="submit" disabled={changePasswordMutation.isPending}>
-              <HugeiconsIcon icon={LockPasswordIcon} strokeWidth={2} data-icon="inline-start" />
-              {changePasswordMutation.isPending ? 'Updating...' : 'Update password'}
+              {changePasswordMutation.isPending ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <HugeiconsIcon icon={LockPasswordIcon} strokeWidth={2} data-icon="inline-start" />
+              )}
+              Update password
             </Button>
           </div>
         </form>

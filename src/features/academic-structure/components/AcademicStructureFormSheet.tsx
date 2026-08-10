@@ -5,6 +5,7 @@ import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Spinner } from '@/components/ui/spinner'
 import {
   Sheet,
   SheetClose,
@@ -117,8 +118,12 @@ export function AcademicStructureFormSheet({
         </ScrollArea>
         <SheetFooter className="border-t">
           <Button type="submit" form={formId} disabled={isSaveDisabled}>
-            <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} data-icon="inline-start" />
-            {isSaving ? 'Saving...' : formTitle}
+            {isSaving ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} data-icon="inline-start" />
+            )}
+            {formTitle}
           </Button>
           <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
         </SheetFooter>

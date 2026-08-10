@@ -8,6 +8,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Spinner } from '@/components/ui/spinner'
 import {
   Sheet,
   SheetClose,
@@ -171,8 +172,12 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
           </ScrollArea>
           <SheetFooter className="border-t">
             <Button type="submit" form={accountFormId} disabled={createAccountMutation.isPending}>
-              <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
-              {createAccountMutation.isPending ? 'Creating...' : 'Create account'}
+              {createAccountMutation.isPending ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
+              )}
+              Create account
             </Button>
             <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
           </SheetFooter>

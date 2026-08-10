@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Spinner } from '@/components/ui/spinner'
 import type { DeleteAcademicStructureTarget } from '../types/academic-structure.types'
 
 type DeleteAcademicStructureDialogProps = {
@@ -39,6 +40,7 @@ export function DeleteAcademicStructureDialog({
             disabled={!target || isDeleting}
             onClick={() => target && onConfirm(target)}
           >
+            {isDeleting ? <Spinner data-icon="inline-start" /> : null}
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

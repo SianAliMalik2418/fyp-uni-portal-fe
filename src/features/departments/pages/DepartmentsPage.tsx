@@ -8,6 +8,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Spinner } from '@/components/ui/spinner'
 import {
   Sheet,
   SheetClose,
@@ -198,12 +199,16 @@ export function DepartmentsPage({ title }: { title: string }) {
           </ScrollArea>
           <SheetFooter className="border-t">
             <Button type="submit" form={departmentFormId} disabled={isSaving}>
-              <HugeiconsIcon
-                icon={editingDepartment ? FloppyDiskIcon : Add01Icon}
-                strokeWidth={2}
-                data-icon="inline-start"
-              />
-              {isSaving ? 'Saving...' : editingDepartment ? 'Save changes' : 'Add department'}
+              {isSaving ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <HugeiconsIcon
+                  icon={editingDepartment ? FloppyDiskIcon : Add01Icon}
+                  strokeWidth={2}
+                  data-icon="inline-start"
+                />
+              )}
+              {editingDepartment ? 'Save changes' : 'Add department'}
             </Button>
             <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
           </SheetFooter>

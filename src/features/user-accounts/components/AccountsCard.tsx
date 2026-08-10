@@ -4,6 +4,7 @@ import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 import {
   Table,
   TableBody,
@@ -33,7 +34,7 @@ export function AccountsCard({
   let content: ReactNode
 
   if (isPending) {
-    content = <p className="text-muted-foreground text-sm">Loading accounts...</p>
+    content = <TableSkeleton columns={4} />
   } else if (isError) {
     content = (
       <Alert variant="destructive">

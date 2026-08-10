@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast-manager'
 import { programsQueryOptions } from '@/features/programs/api/programs-queries'
+import type { Program } from '@/features/programs/types/program.types'
 import {
   activateSemester,
   closeSemester,
@@ -58,10 +59,10 @@ import {
   toSemesterPayload,
 } from '../utils/academic-structure-mappers'
 
-const EMPTY_PROGRAMS = []
-const EMPTY_BATCHES = []
-const EMPTY_SEMESTERS = []
-const EMPTY_SECTIONS = []
+const EMPTY_PROGRAMS: Program[] = []
+const EMPTY_BATCHES: Batch[] = []
+const EMPTY_SEMESTERS: Semester[] = []
+const EMPTY_SECTIONS: Section[] = []
 
 export function AcademicStructurePage({ title }: { title: string }) {
   const queryClient = useQueryClient()

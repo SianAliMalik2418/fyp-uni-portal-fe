@@ -95,6 +95,7 @@ export function BatchesCard({
           <AcademicQueryMessage
             title="Batches"
             query={query}
+            skeletonColumns={6}
             emptyIcon={<HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} className="size-5" />}
             emptyTitle="No batches yet"
             emptyText="Add a batch after creating at least one active program."

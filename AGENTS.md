@@ -56,7 +56,8 @@ Before handing off frontend work, verify:
 - Use only design-system tokens for colors, borders, rings, backgrounds, foregrounds, radius, shadows, and semantic states.
 - Do not introduce raw color values or arbitrary Tailwind color classes in application components unless they are already part of token definitions.
 - Use only free Hugeicons for icons. Do not add Lucide or another icon library unless the user explicitly approves it.
-- use the existing shadcn/Tailwind/Hugeicons system.
+- Use the existing shadcn/Tailwind/Hugeicons system.
+- Use skeletons for page, section, card, and table content loading states. Use spinners for short-lived inline actions such as form submits, deletes, uploads, or blocking button actions. Avoid replacing UI with plain loading text such as `Loading...`, `Saving...`, or `Deleting...`.
 - Do not force marketing-page taste patterns onto dense dashboards, admin tables, forms, or backend-driven product workflows.
 
 ## Frontend Verification

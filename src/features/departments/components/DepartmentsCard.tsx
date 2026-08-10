@@ -6,6 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 import {
   Table,
   TableBody,
@@ -38,7 +39,7 @@ export function DepartmentsCard({
   let content: ReactNode
 
   if (isPending) {
-    content = <p className="text-muted-foreground text-sm">Loading departments...</p>
+    content = <TableSkeleton columns={4} />
   } else if (isError) {
     content = (
       <Alert variant="destructive">

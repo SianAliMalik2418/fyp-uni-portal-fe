@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Spinner } from '@/components/ui/spinner'
 import {
   Sheet,
   SheetClose,
@@ -225,12 +226,16 @@ export function ProgramsPage({ title }: { title: string }) {
               form={programFormId}
               disabled={isSaving || departmentsQuery.isPending || !hasActiveDepartments}
             >
-              <HugeiconsIcon
-                icon={editingProgram ? FloppyDiskIcon : Add01Icon}
-                strokeWidth={2}
-                data-icon="inline-start"
-              />
-              {isSaving ? 'Saving...' : editingProgram ? 'Save changes' : 'Add program'}
+              {isSaving ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <HugeiconsIcon
+                  icon={editingProgram ? FloppyDiskIcon : Add01Icon}
+                  strokeWidth={2}
+                  data-icon="inline-start"
+                />
+              )}
+              {editingProgram ? 'Save changes' : 'Add program'}
             </Button>
             <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
           </SheetFooter>

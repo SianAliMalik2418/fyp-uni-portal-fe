@@ -1,13 +1,12 @@
 import { QueryClientProvider, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
-import { ShieldUserIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
 import { logout } from '@/features/auth/api/auth-api'
 import { authKeys, currentUserQueryOptions } from '@/features/auth/api/auth-queries'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { PasswordChangePage } from '@/features/auth/pages/PasswordChangePage'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { PortalPage } from '@/features/portal/pages/PortalPage'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Toaster } from '@/components/ui/toast'
 import { queryClient } from './query-client'
 
@@ -35,10 +34,17 @@ function AppRoutes() {
 
   if (currentUserQuery.isPending) {
     return (
-      <main className="bg-background flex min-h-svh items-center justify-center">
-        <div className="text-muted-foreground flex items-center gap-2 text-sm">
-          <HugeiconsIcon icon={ShieldUserIcon} strokeWidth={2} className="size-4" />
-          Checking session...
+      <main className="bg-background flex min-h-svh items-center justify-center" aria-busy="true">
+        <div className="grid w-full max-w-sm gap-4 px-6">
+          <Skeleton className="mx-auto size-14 rounded-md" />
+          <div className="grid gap-2">
+            <Skeleton className="mx-auto h-5 w-48" />
+            <Skeleton className="mx-auto h-4 w-64 max-w-full" />
+          </div>
+          <div className="grid gap-2">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
         </div>
       </main>
     )

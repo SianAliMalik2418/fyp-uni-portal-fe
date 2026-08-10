@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 
 type QueryState = {
   error: unknown
@@ -13,6 +14,7 @@ type AcademicQueryMessageProps = {
   emptyText: string
   emptyTitle: string
   query: QueryState
+  skeletonColumns: number
   title: string
 }
 
@@ -21,10 +23,11 @@ export function AcademicQueryMessage({
   emptyText,
   emptyTitle,
   query,
+  skeletonColumns,
   title,
 }: AcademicQueryMessageProps) {
   if (query.isPending) {
-    return <p className="text-muted-foreground text-sm">Loading {title.toLowerCase()}...</p>
+    return <TableSkeleton columns={skeletonColumns} />
   }
 
   if (query.isError) {

@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Spinner } from '@/components/ui/spinner'
 import type { Department } from '../types/department.types'
 
 type DeleteDepartmentDialogProps = {
@@ -36,7 +37,8 @@ export function DeleteDepartmentDialog({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive" disabled={isDeleting} onClick={onConfirm}>
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? <Spinner data-icon="inline-start" /> : null}
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
