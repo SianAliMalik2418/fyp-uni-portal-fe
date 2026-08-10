@@ -1,7 +1,7 @@
 import { ShieldUserIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { roleLabels } from '@/features/portal/constants/portal-navigation'
+import { roleLabels } from '@/shared/constants/user-roles'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 export function UnauthorizedSection({ user, section }: { user: PortalUser; section: string }) {

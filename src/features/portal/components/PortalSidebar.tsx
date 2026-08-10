@@ -1,8 +1,9 @@
 import { NavLink } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { roleLabels, roleNavigation } from '@/features/portal/constants/portal-navigation'
+import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 import { portalBrand } from '@/shared/constants/branding'
+import { roleLabels } from '@/shared/constants/user-roles'
 
 export function PortalSidebar({ user }: { user: PortalUser }) {
   const navigation = roleNavigation[user.role]

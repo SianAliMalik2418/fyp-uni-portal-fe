@@ -37,11 +37,27 @@ src/
       pages/
       schemas/
       types/
+    departments/
+      api/
+      components/
+      pages/
+      schemas/
+      types/
+      utils/
     portal/
       components/
       pages/
       constants/
       types/
+    student-dashboard/
+      pages/
+    user-accounts/
+      api/
+      components/
+      pages/
+      schemas/
+      types/
+      utils/
   shared/
     api/
     constants/
@@ -51,11 +67,14 @@ src/
 
 - `src/app`: Application composition, providers, route wiring, and app-level clients.
 - `src/features/auth`: Auth request functions, TanStack Query options, route-level pages, feature components, Zod schemas, and auth types.
-- `src/features/portal`: Route-level portal pages, feature components, role navigation, role labels, demo stat definitions, and portal-specific types.
+- `src/features/portal`: Authenticated portal shell, role navigation, header/sidebar/profile components, fallback module rendering, and portal-specific types.
+- `src/features/departments`: Department management page, API functions, TanStack Query options, form schema, domain types, table/form/dialog components, and payload mappers.
+- `src/features/user-accounts`: Admin account provisioning page, API functions, TanStack Query options, form schema, domain types, section helpers, and account form/table components.
+- `src/features/student-dashboard`: Student dashboard route module.
 - `src/features/*/pages`: Route-level page components for that feature. Pages compose feature components and wire screen-level behavior.
 - `src/features/*/components`: Reusable feature/domain components consumed by pages. Keep route entry components in `pages/`.
 - `src/shared/api`: Cross-feature HTTP client configuration and API error normalization.
-- `src/shared/constants`: Shared product branding such as portal name, tagline, and logo path.
+- `src/shared/constants`: Shared product branding and cross-feature labels such as role display names.
 - `src/components/ui`: shadcn-generated reusable UI primitives only. Feature/domain components should not be added here.
 
 ## Code Quality Principles

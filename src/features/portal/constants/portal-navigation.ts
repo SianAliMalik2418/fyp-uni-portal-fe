@@ -17,13 +17,6 @@ import {
 import type { UserRole } from '@/features/auth/types/auth.types'
 import type { NavItem } from '../types/portal.types'
 
-export const roleLabels: Record<UserRole, string> = {
-  student: 'Student',
-  teacher: 'Teacher',
-  hod: 'HOD',
-  admin: 'Admin',
-}
-
 export const roleNavigation: Record<UserRole, NavItem[]> = {
   student: [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardCircleIcon },

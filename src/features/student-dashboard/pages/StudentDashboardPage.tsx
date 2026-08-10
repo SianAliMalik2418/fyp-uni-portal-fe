@@ -1,9 +1,9 @@
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
+import { NotificationPanel } from '@/features/portal/components/NotificationPanel'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { NotificationPanel } from './NotificationPanel'
 
 const studentDashboardStats = [
   { label: 'Due fees', value: '0', sectionId: 'fees' },
@@ -12,7 +12,7 @@ const studentDashboardStats = [
   { label: 'New materials', value: '0', sectionId: 'materials' },
 ]
 
-export function StudentDashboardShell({ user }: { user: PortalUser }) {
+export function StudentDashboardPage({ user }: { user: PortalUser }) {
   const navigation = roleNavigation.student
 
   return (

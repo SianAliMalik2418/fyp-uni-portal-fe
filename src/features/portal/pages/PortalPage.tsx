@@ -1,22 +1,39 @@
 import { useParams } from 'react-router-dom'
 import { ShieldUserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { AdminAccountProvisioning } from '@/features/portal/components/AdminAccountProvisioning'
-import { DepartmentManagement } from '@/features/portal/components/DepartmentManagement'
+import { DepartmentsPage } from '@/features/departments/pages/DepartmentsPage'
+import { StudentDashboardPage } from '@/features/student-dashboard/pages/StudentDashboardPage'
+import { UserAccountsPage } from '@/features/user-accounts/pages/UserAccountsPage'
 import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
 import { FloatingChatbot } from '@/features/portal/components/FloatingChatbot'
 import { PortalHeader } from '@/features/portal/components/PortalHeader'
 import { PortalSidebar } from '@/features/portal/components/PortalSidebar'
-import { StudentDashboardShell } from '@/features/portal/components/StudentDashboardShell'
 import { UnauthorizedSection } from '@/features/portal/components/UnauthorizedSection'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
+import type { NavItem } from '@/features/portal/types/portal.types'
 
 function isAdminAccountSection(user: PortalUser, sectionId: string) {
   return user.role === 'admin' && (sectionId === 'students' || sectionId === 'teachers')
 }
 
-function isDepartmentManagementSection(user: PortalUser, sectionId: string) {
+function isDepartmentsSection(user: PortalUser, sectionId: string) {
   return user.role === 'admin' && sectionId === 'departments'
+}
+
+function portalModuleFor(user: PortalUser, activeItem: NavItem) {
+  if (user.role === 'student' && activeItem.id === 'dashboard') {
+    return <StudentDashboardPage user={user} />
+  }
+
+  if (isAdminAccountSection(user, activeItem.id)) {
+    return <UserAccountsPage sectionId={activeItem.id} title={activeItem.label} />
+  }
+
+  if (isDepartmentsSection(user, activeItem.id)) {
+    return <DepartmentsPage title={activeItem.label} />
+  }
+
+  return <PlaceholderModule user={user} item={activeItem} />
 }
 
 export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () => void }) {
@@ -44,14 +61,8 @@ export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () 
         />
 
         <div className="p-4 md:p-6">
-          {activeItem && user.role === 'student' && activeItem.id === 'dashboard' ? (
-            <StudentDashboardShell user={user} />
-          ) : activeItem && isAdminAccountSection(user, activeItem.id) ? (
-            <AdminAccountProvisioning item={activeItem} />
-          ) : activeItem && isDepartmentManagementSection(user, activeItem.id) ? (
-            <DepartmentManagement item={activeItem} />
-          ) : activeItem ? (
-            <PlaceholderModule user={user} item={activeItem} />
+          {activeItem ? (
+            portalModuleFor(user, activeItem)
           ) : (
             <UnauthorizedSection user={user} section={activeSection} />
           )}

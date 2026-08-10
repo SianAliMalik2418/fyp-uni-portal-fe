@@ -1,13 +1,13 @@
 import { ArrowRight01Icon, Database01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
+import { roleLabels } from '@/shared/constants/user-roles'
 import {
   academicPerformancePlaceholders,
   modulePlaceholderContent,
   modulePlaceholderStats,
   studentServicePlaceholders,
 } from '../constants/portal-placeholders'
-import { roleLabels } from '../constants/portal-navigation'
 import type { NavItem } from '../types/portal.types'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

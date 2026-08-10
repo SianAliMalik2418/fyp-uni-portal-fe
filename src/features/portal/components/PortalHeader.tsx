@@ -1,6 +1,6 @@
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { roleLabels } from '@/features/portal/constants/portal-navigation'
 import type { NavItem } from '@/features/portal/types/portal.types'
+import { roleLabels } from '@/shared/constants/user-roles'
 import { ProfileMenu } from './ProfileMenu'
 
 export function PortalHeader({
