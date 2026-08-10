@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { Input as InputPrimitive } from '@base-ui/react/input'
+import type { InputProps } from '@base-ui/react/input'
 import { EyeIcon, EyeOffIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+function Input({ className, type, ...props }: InputProps) {
   return (
     <InputPrimitive
       type={type}
@@ -20,7 +21,7 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   )
 }
 
-function PasswordInput({ className, ...props }: React.ComponentProps<'input'>) {
+function PasswordInput({ className, ...props }: InputProps) {
   const [isVisible, setIsVisible] = React.useState(false)
 
   return (

@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { ShieldUserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AdminAccountProvisioning } from '@/features/portal/components/AdminAccountProvisioning'
+import { DepartmentManagement } from '@/features/portal/components/DepartmentManagement'
 import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
 import { FloatingChatbot } from '@/features/portal/components/FloatingChatbot'
 import { PortalHeader } from '@/features/portal/components/PortalHeader'
@@ -12,6 +13,10 @@ import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 
 function isAdminAccountSection(user: PortalUser, sectionId: string) {
   return user.role === 'admin' && (sectionId === 'students' || sectionId === 'teachers')
+}
+
+function isDepartmentManagementSection(user: PortalUser, sectionId: string) {
+  return user.role === 'admin' && sectionId === 'departments'
 }
 
 export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () => void }) {
@@ -43,6 +48,8 @@ export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () 
             <StudentDashboardShell user={user} />
           ) : activeItem && isAdminAccountSection(user, activeItem.id) ? (
             <AdminAccountProvisioning item={activeItem} />
+          ) : activeItem && isDepartmentManagementSection(user, activeItem.id) ? (
+            <DepartmentManagement item={activeItem} />
           ) : activeItem ? (
             <PlaceholderModule user={user} item={activeItem} />
           ) : (
