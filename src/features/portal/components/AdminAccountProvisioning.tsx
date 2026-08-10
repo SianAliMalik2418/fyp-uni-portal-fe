@@ -1,16 +1,18 @@
-import { useEffect, type ComponentProps, type FormEvent, type ReactNode } from 'react'
+import { useEffect, type ComponentProps, type ReactNode } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { UserAdd01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useForm, type FieldErrors, type UseFormRegisterReturn } from 'react-hook-form'
+import { Controller, useForm, type UseFormReturn } from 'react-hook-form'
 import type { UserRole } from '@/features/auth/types/auth.types'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import {
   Table,
@@ -96,6 +98,17 @@ function identifierForAccount(account: ProvisionedUserAccount) {
 
 type AccountSectionKind = 'students' | 'teachers' | 'all'
 
+function defaultAccountValues(sectionId: string): CreateUserAccountFormValues {
+  return {
+    fullName: '',
+    email: '',
+    role: defaultRoleForSection(sectionId),
+    registrationNumber: '',
+    employeeId: '',
+    isActive: true,
+  }
+}
+
 function accountSectionKind(sectionId: string): AccountSectionKind {
   if (sectionId === 'students' || sectionId === 'teachers') {
     return sectionId
@@ -104,46 +117,40 @@ function accountSectionKind(sectionId: string): AccountSectionKind {
   return 'all'
 }
 
-function RequiredLabel({ children, ...props }: ComponentProps<typeof Label>) {
+function RequiredLabel({ children, ...props }: ComponentProps<typeof FieldLabel>) {
   return (
-    <Label {...props}>
+    <FieldLabel {...props}>
       {children}
       <span className="text-destructive -ml-1" aria-hidden="true">
         *
       </span>
-    </Label>
+    </FieldLabel>
   )
 }
 
 type AccountFormCardProps = {
-  createPending: boolean
-  employeeIdField: UseFormRegisterReturn<'employeeId'>
-  errors: FieldErrors<CreateUserAccountFormValues>
+  isCreating: boolean
+  form: UseFormReturn<CreateUserAccountFormValues>
   fixedRole: UserRole
-  fullNameField: UseFormRegisterReturn<'fullName'>
-  emailField: UseFormRegisterReturn<'email'>
-  isActiveField: UseFormRegisterReturn<'isActive'>
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void
-  registrationNumberField: UseFormRegisterReturn<'registrationNumber'>
-  roleField: UseFormRegisterReturn<'role'>
+  onSubmit: (values: CreateUserAccountFormValues) => void
   sectionKind: AccountSectionKind
   sectionRoleOptions: UserRole[]
 }
 
 function AccountFormCard({
-  createPending,
-  employeeIdField,
-  errors,
+  form,
   fixedRole,
-  fullNameField,
-  emailField,
-  isActiveField,
+  isCreating,
   onSubmit,
-  registrationNumberField,
-  roleField,
   sectionKind,
   sectionRoleOptions,
 }: AccountFormCardProps) {
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+    register,
+  } = form
   const hasFixedRole = sectionRoleOptions.length === 1
   const showRegistrationNumber = sectionKind === 'students'
   const showEmployeeId = sectionKind === 'teachers'
@@ -157,109 +164,114 @@ function AccountFormCard({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="grid gap-4" noValidate onSubmit={onSubmit}>
-          <div className="grid gap-2">
-            <RequiredLabel htmlFor="fullName">Full name</RequiredLabel>
-            <Input
-              id="fullName"
-              placeholder="Ayesha Khan"
-              aria-invalid={Boolean(errors.fullName)}
-              aria-describedby={errors.fullName ? 'fullName-error' : undefined}
-              {...fullNameField}
-            />
-            {errors.fullName ? (
-              <p id="fullName-error" className="text-destructive text-xs">
-                {errors.fullName.message}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="grid gap-2">
-            <RequiredLabel htmlFor="accountEmail">Email</RequiredLabel>
-            <Input
-              id="accountEmail"
-              type="email"
-              autoComplete="email"
-              placeholder="ayesha.khan@example.com"
-              aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? 'accountEmail-error' : undefined}
-              {...emailField}
-            />
-            {errors.email ? (
-              <p id="accountEmail-error" className="text-destructive text-xs">
-                {errors.email.message}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="grid gap-2">
-            {hasFixedRole ? (
-              <Label htmlFor="role">Role</Label>
-            ) : (
-              <RequiredLabel htmlFor="role">Account type</RequiredLabel>
-            )}
-            {hasFixedRole ? (
-              <>
-                <input type="hidden" name="role" value={fixedRole} />
-                <Input id="role" value={roleLabels[fixedRole]} disabled aria-readonly="true" />
-              </>
-            ) : (
-              <NativeSelect id="role" className="w-full" {...roleField}>
-                {sectionRoleOptions.map((role) => (
-                  <NativeSelectOption key={role} value={role}>
-                    {roleLabels[role]}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            )}
-          </div>
-
-          {showRegistrationNumber ? (
-            <div className="grid gap-2">
-              <RequiredLabel htmlFor="registrationNumber">Registration no.</RequiredLabel>
+        <form className="grid gap-4" noValidate onSubmit={handleSubmit(onSubmit)}>
+          <FieldGroup className="gap-4">
+            <Field data-invalid={Boolean(errors.fullName)}>
+              <RequiredLabel htmlFor="fullName">Full name</RequiredLabel>
               <Input
-                id="registrationNumber"
-                placeholder="REG-001"
-                aria-invalid={Boolean(errors.registrationNumber)}
-                aria-describedby={
-                  errors.registrationNumber ? 'registrationNumber-error' : undefined
-                }
-                {...registrationNumberField}
+                id="fullName"
+                placeholder="Ayesha Khan"
+                aria-invalid={Boolean(errors.fullName)}
+                aria-describedby={errors.fullName ? 'fullName-error' : undefined}
+                {...register('fullName')}
               />
-              {errors.registrationNumber ? (
-                <p id="registrationNumber-error" className="text-destructive text-xs">
-                  {errors.registrationNumber.message}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
+              <FieldError id="fullName-error" errors={[errors.fullName]} />
+            </Field>
 
-          {showEmployeeId ? (
-            <div className="grid gap-2">
-              <RequiredLabel htmlFor="employeeId">Employee ID</RequiredLabel>
+            <Field data-invalid={Boolean(errors.email)}>
+              <RequiredLabel htmlFor="accountEmail">Email</RequiredLabel>
               <Input
-                id="employeeId"
-                placeholder="EMP-001"
-                aria-invalid={Boolean(errors.employeeId)}
-                aria-describedby={errors.employeeId ? 'employeeId-error' : undefined}
-                {...employeeIdField}
+                id="accountEmail"
+                type="email"
+                autoComplete="email"
+                placeholder="ayesha.khan@example.com"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'accountEmail-error' : undefined}
+                {...register('email')}
               />
-              {errors.employeeId ? (
-                <p id="employeeId-error" className="text-destructive text-xs">
-                  {errors.employeeId.message}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
+              <FieldError id="accountEmail-error" errors={[errors.email]} />
+            </Field>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" className="accent-primary size-4" {...isActiveField} />
-            Active account
-          </label>
+            <Field data-invalid={Boolean(errors.role)}>
+              {hasFixedRole ? (
+                <FieldLabel htmlFor="role">Role</FieldLabel>
+              ) : (
+                <RequiredLabel htmlFor="role">Account type</RequiredLabel>
+              )}
+              {hasFixedRole ? (
+                <>
+                  <input type="hidden" value={fixedRole} {...register('role')} />
+                  <Input id="role" value={roleLabels[fixedRole]} disabled aria-readonly="true" />
+                </>
+              ) : (
+                <NativeSelect
+                  id="role"
+                  className="w-full"
+                  aria-invalid={Boolean(errors.role)}
+                  {...register('role')}
+                >
+                  {sectionRoleOptions.map((role) => (
+                    <NativeSelectOption key={role} value={role}>
+                      {roleLabels[role]}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              )}
+              <FieldError errors={[errors.role]} />
+            </Field>
 
-          <Button type="submit" disabled={createPending}>
+            {showRegistrationNumber ? (
+              <Field data-invalid={Boolean(errors.registrationNumber)}>
+                <RequiredLabel htmlFor="registrationNumber">Registration no.</RequiredLabel>
+                <Input
+                  id="registrationNumber"
+                  placeholder="REG-001"
+                  aria-invalid={Boolean(errors.registrationNumber)}
+                  aria-describedby={
+                    errors.registrationNumber ? 'registrationNumber-error' : undefined
+                  }
+                  {...register('registrationNumber')}
+                />
+                <FieldError id="registrationNumber-error" errors={[errors.registrationNumber]} />
+              </Field>
+            ) : null}
+
+            {showEmployeeId ? (
+              <Field data-invalid={Boolean(errors.employeeId)}>
+                <RequiredLabel htmlFor="employeeId">Employee ID</RequiredLabel>
+                <Input
+                  id="employeeId"
+                  placeholder="EMP-001"
+                  aria-invalid={Boolean(errors.employeeId)}
+                  aria-describedby={errors.employeeId ? 'employeeId-error' : undefined}
+                  {...register('employeeId')}
+                />
+                <FieldError id="employeeId-error" errors={[errors.employeeId]} />
+              </Field>
+            ) : null}
+
+            <Field orientation="horizontal">
+              <Controller
+                control={control}
+                name="isActive"
+                render={({ field }) => (
+                  <Checkbox
+                    id="isActive"
+                    checked={field.value}
+                    disabled={field.disabled}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <FieldContent>
+                <FieldLabel htmlFor="isActive">Active account</FieldLabel>
+              </FieldContent>
+            </Field>
+          </FieldGroup>
+
+          <Button type="submit" disabled={isCreating}>
             <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
-            {createPending ? 'Creating...' : 'Create account'}
+            {isCreating ? 'Creating...' : 'Create account'}
           </Button>
         </form>
       </CardContent>
@@ -349,32 +361,16 @@ export function AdminAccountProvisioning({ item }: { item: NavItem }) {
   const isStudentSection = item.id === 'students'
   const isTeacherSection = item.id === 'teachers'
   const sectionKind = accountSectionKind(item.id)
-  const {
-    clearErrors,
-    formState: { errors },
-    register,
-    reset,
-    setError,
-  } = useForm<CreateUserAccountFormValues>({
-    defaultValues: {
-      fullName: '',
-      email: '',
-      role: defaultRoleForSection(item.id),
-      registrationNumber: '',
-      employeeId: '',
-      isActive: true,
-    },
+  const form = useForm<CreateUserAccountFormValues>({
+    resolver: zodResolver(createUserAccountSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+    defaultValues: defaultAccountValues(item.id),
   })
+  const { reset } = form
 
   useEffect(() => {
-    reset({
-      fullName: '',
-      email: '',
-      role: defaultRoleForSection(item.id),
-      registrationNumber: '',
-      employeeId: '',
-      isActive: true,
-    })
+    reset(defaultAccountValues(item.id))
   }, [item.id, reset])
 
   const createAccountMutation = useMutation({
@@ -385,14 +381,7 @@ export function AdminAccountProvisioning({ item }: { item: NavItem }) {
         description: `${response.user.email}: ${response.temporaryPassword}`,
         type: 'success',
       })
-      reset({
-        fullName: '',
-        email: '',
-        role: defaultRoleForSection(item.id),
-        registrationNumber: '',
-        employeeId: '',
-        isActive: true,
-      })
+      reset(defaultAccountValues(item.id))
       await queryClient.invalidateQueries({ queryKey: userAccountKeys.all })
     },
     onError: (error) => {
@@ -408,22 +397,6 @@ export function AdminAccountProvisioning({ item }: { item: NavItem }) {
     accountsQuery.data?.users.filter((account) => accountMatchesSection(account, item.id)) ?? []
   const identifierColumnLabel = identifierLabelForSection(item.id)
   const fixedRole = sectionRoleOptions[0] ?? defaultRoleForSection(item.id)
-  const fullNameField = register('fullName', {
-    onChange: () => clearErrors('fullName'),
-  })
-  const emailField = register('email', {
-    onChange: () => clearErrors('email'),
-  })
-  const roleField = register('role', {
-    onChange: () => clearErrors(['role', 'employeeId', 'registrationNumber']),
-  })
-  const registrationNumberField = register('registrationNumber', {
-    onChange: () => clearErrors('registrationNumber'),
-  })
-  const employeeIdField = register('employeeId', {
-    onChange: () => clearErrors('employeeId'),
-  })
-  const isActiveField = register('isActive')
 
   function submitAccount(values: CreateUserAccountFormValues) {
     const role = sectionRoleOptions.includes(values.role)
@@ -442,45 +415,6 @@ export function AdminAccountProvisioning({ item }: { item: NavItem }) {
     })
   }
 
-  function submitForm(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    const formData = new FormData(event.currentTarget)
-    const payload = {
-      fullName: String(formData.get('fullName') ?? ''),
-      email: String(formData.get('email') ?? ''),
-      role: String(formData.get('role') ?? fixedRole),
-      registrationNumber: String(formData.get('registrationNumber') ?? ''),
-      employeeId: String(formData.get('employeeId') ?? ''),
-      isActive: formData.get('isActive') === 'on',
-    }
-    const result = createUserAccountSchema.safeParse(payload)
-
-    if (!result.success) {
-      clearErrors()
-
-      for (const issue of result.error.issues) {
-        const fieldName = issue.path[0]
-
-        if (
-          fieldName === 'fullName' ||
-          fieldName === 'email' ||
-          fieldName === 'role' ||
-          fieldName === 'registrationNumber' ||
-          fieldName === 'employeeId' ||
-          fieldName === 'isActive'
-        ) {
-          setError(fieldName, { message: issue.message })
-        }
-      }
-
-      return
-    }
-
-    clearErrors()
-    submitAccount(result.data)
-  }
-
   return (
     <div className="mx-auto grid max-w-6xl gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -495,16 +429,10 @@ export function AdminAccountProvisioning({ item }: { item: NavItem }) {
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
         <AccountFormCard
-          createPending={createAccountMutation.isPending}
-          employeeIdField={employeeIdField}
-          errors={errors}
           fixedRole={fixedRole}
-          fullNameField={fullNameField}
-          emailField={emailField}
-          isActiveField={isActiveField}
-          onSubmit={submitForm}
-          registrationNumberField={registrationNumberField}
-          roleField={roleField}
+          form={form}
+          isCreating={createAccountMutation.isPending}
+          onSubmit={submitAccount}
           sectionKind={sectionKind}
           sectionRoleOptions={sectionRoleOptions}
         />

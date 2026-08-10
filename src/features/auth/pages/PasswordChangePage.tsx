@@ -13,11 +13,11 @@ import type { PortalUser } from '@/features/auth/types/auth.types'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { PasswordInput } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/toast-manager'
 
-export function PasswordChangeScreen({
+export function PasswordChangePage({
   user,
   onChanged,
   onLogout,
@@ -72,54 +72,44 @@ export function PasswordChangeScreen({
       </CardHeader>
       <CardContent>
         <form className="grid gap-4" noValidate onSubmit={handleSubmit(submitPasswordChange)}>
-          <div className="grid gap-2">
-            <Label htmlFor="current-password">Current temporary password</Label>
-            <PasswordInput
-              id="current-password"
-              autoComplete="current-password"
-              placeholder="Enter current password"
-              aria-describedby={errors.currentPassword ? 'current-password-error' : undefined}
-              aria-invalid={Boolean(errors.currentPassword)}
-              {...register('currentPassword')}
-            />
-            {errors.currentPassword ? (
-              <p id="current-password-error" className="text-destructive text-xs">
-                {errors.currentPassword.message}
-              </p>
-            ) : null}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="new-password">New password</Label>
-            <PasswordInput
-              id="new-password"
-              autoComplete="new-password"
-              placeholder="Enter new password"
-              aria-describedby={errors.newPassword ? 'new-password-error' : undefined}
-              aria-invalid={Boolean(errors.newPassword)}
-              {...register('newPassword')}
-            />
-            {errors.newPassword ? (
-              <p id="new-password-error" className="text-destructive text-xs">
-                {errors.newPassword.message}
-              </p>
-            ) : null}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="confirm-password">Confirm password</Label>
-            <PasswordInput
-              id="confirm-password"
-              autoComplete="new-password"
-              placeholder="Confirm new password"
-              aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
-              aria-invalid={Boolean(errors.confirmPassword)}
-              {...register('confirmPassword')}
-            />
-            {errors.confirmPassword ? (
-              <p id="confirm-password-error" className="text-destructive text-xs">
-                {errors.confirmPassword.message}
-              </p>
-            ) : null}
-          </div>
+          <FieldGroup className="gap-4">
+            <Field data-invalid={Boolean(errors.currentPassword)}>
+              <FieldLabel htmlFor="current-password">Current temporary password</FieldLabel>
+              <PasswordInput
+                id="current-password"
+                autoComplete="current-password"
+                placeholder="Enter current password"
+                aria-describedby={errors.currentPassword ? 'current-password-error' : undefined}
+                aria-invalid={Boolean(errors.currentPassword)}
+                {...register('currentPassword')}
+              />
+              <FieldError id="current-password-error" errors={[errors.currentPassword]} />
+            </Field>
+            <Field data-invalid={Boolean(errors.newPassword)}>
+              <FieldLabel htmlFor="new-password">New password</FieldLabel>
+              <PasswordInput
+                id="new-password"
+                autoComplete="new-password"
+                placeholder="Enter new password"
+                aria-describedby={errors.newPassword ? 'new-password-error' : undefined}
+                aria-invalid={Boolean(errors.newPassword)}
+                {...register('newPassword')}
+              />
+              <FieldError id="new-password-error" errors={[errors.newPassword]} />
+            </Field>
+            <Field data-invalid={Boolean(errors.confirmPassword)}>
+              <FieldLabel htmlFor="confirm-password">Confirm password</FieldLabel>
+              <PasswordInput
+                id="confirm-password"
+                autoComplete="new-password"
+                placeholder="Confirm new password"
+                aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
+                aria-invalid={Boolean(errors.confirmPassword)}
+                {...register('confirmPassword')}
+              />
+              <FieldError id="confirm-password-error" errors={[errors.confirmPassword]} />
+            </Field>
+          </FieldGroup>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
             <Button type="button" variant="outline" onClick={onLogout}>

@@ -17,8 +17,10 @@
 - Keep app providers and route wiring under `src/app`.
 - Keep frontend API transport under `src/shared/api`.
 - Keep cross-feature constants under `src/shared/constants`.
-- Keep auth-specific API functions, TanStack Query options, schemas, types, and components under `src/features/auth`.
-- Keep portal-specific shell, navigation, constants, and types under `src/features/portal`.
+- Keep feature route-entry components under `src/features/*/pages`.
+- Keep reusable feature/domain components under `src/features/*/components`, and have pages compose those components.
+- Keep auth-specific API functions, TanStack Query options, schemas, types, pages, and components under `src/features/auth`.
+- Keep portal-specific pages, shell components, navigation, constants, and types under `src/features/portal`.
 - Keep reusable shadcn UI primitives under `src/components/ui`.
 - Put feature/domain components outside `src/components/ui` so generated shadcn files stay easy to update.
 

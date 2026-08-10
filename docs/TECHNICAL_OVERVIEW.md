@@ -34,10 +34,12 @@ src/
     auth/
       api/
       components/
+      pages/
       schemas/
       types/
     portal/
       components/
+      pages/
       constants/
       types/
   shared/
@@ -48,8 +50,10 @@ src/
 ```
 
 - `src/app`: Application composition, providers, route wiring, and app-level clients.
-- `src/features/auth`: Auth request functions, TanStack Query options, login/password screens, Zod schemas, and auth types.
-- `src/features/portal`: Protected shell, role navigation, role labels, demo stat definitions, and portal-specific types.
+- `src/features/auth`: Auth request functions, TanStack Query options, route-level pages, feature components, Zod schemas, and auth types.
+- `src/features/portal`: Route-level portal pages, feature components, role navigation, role labels, demo stat definitions, and portal-specific types.
+- `src/features/*/pages`: Route-level page components for that feature. Pages compose feature components and wire screen-level behavior.
+- `src/features/*/components`: Reusable feature/domain components consumed by pages. Keep route entry components in `pages/`.
 - `src/shared/api`: Cross-feature HTTP client configuration and API error normalization.
 - `src/shared/constants`: Shared product branding such as portal name, tagline, and logo path.
 - `src/components/ui`: shadcn-generated reusable UI primitives only. Feature/domain components should not be added here.

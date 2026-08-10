@@ -11,11 +11,11 @@ import type { PortalUser } from '@/features/auth/types/auth.types'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input, PasswordInput } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/toast-manager'
 
-export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }) {
+export function LoginPage({ onLogin }: { onLogin: (user: PortalUser) => void }) {
   const queryClient = useQueryClient()
   const {
     formState: { errors },
@@ -59,56 +59,50 @@ export function LoginScreen({ onLogin }: { onLogin: (user: PortalUser) => void }
       </CardHeader>
       <CardContent>
         <form className="grid gap-4" noValidate onSubmit={handleSubmit(submitLogin)}>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Mail01Icon}
-                strokeWidth={2}
-                className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2"
-              />
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                placeholder="admin@example.com"
-                className="pl-7"
-                aria-describedby={errors.email ? 'email-error' : undefined}
-                aria-invalid={Boolean(errors.email)}
-                {...register('email')}
-              />
-            </div>
-            {errors.email ? (
-              <p id="email-error" className="text-destructive text-xs">
-                {errors.email.message}
-              </p>
-            ) : null}
-          </div>
+          <FieldGroup className="gap-4">
+            <Field data-invalid={Boolean(errors.email)}>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <div className="relative">
+                <HugeiconsIcon
+                  icon={Mail01Icon}
+                  strokeWidth={2}
+                  className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2"
+                />
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="admin@example.com"
+                  className="pl-7"
+                  aria-describedby={errors.email ? 'email-error' : undefined}
+                  aria-invalid={Boolean(errors.email)}
+                  {...register('email')}
+                />
+              </div>
+              <FieldError id="email-error" errors={[errors.email]} />
+            </Field>
 
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={LockPasswordIcon}
-                strokeWidth={2}
-                className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2"
-              />
-              <PasswordInput
-                id="password"
-                autoComplete="current-password"
-                placeholder="Enter your password"
-                className="pl-7"
-                aria-describedby={errors.password ? 'password-error' : undefined}
-                aria-invalid={Boolean(errors.password)}
-                {...register('password')}
-              />
-            </div>
-            {errors.password ? (
-              <p id="password-error" className="text-destructive text-xs">
-                {errors.password.message}
-              </p>
-            ) : null}
-          </div>
+            <Field data-invalid={Boolean(errors.password)}>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <div className="relative">
+                <HugeiconsIcon
+                  icon={LockPasswordIcon}
+                  strokeWidth={2}
+                  className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2"
+                />
+                <PasswordInput
+                  id="password"
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  className="pl-7"
+                  aria-describedby={errors.password ? 'password-error' : undefined}
+                  aria-invalid={Boolean(errors.password)}
+                  {...register('password')}
+                />
+              </div>
+              <FieldError id="password-error" errors={[errors.password]} />
+            </Field>
+          </FieldGroup>
 
           <Button type="submit" size="lg" disabled={loginMutation.isPending} className="w-full">
             <HugeiconsIcon icon={Login03Icon} strokeWidth={2} data-icon="inline-start" />

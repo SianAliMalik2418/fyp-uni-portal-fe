@@ -1,18 +1,18 @@
 import { useParams } from 'react-router-dom'
 import { ShieldUserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
+import { AdminAccountProvisioning } from '@/features/portal/components/AdminAccountProvisioning'
+import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
+import { PortalHeader } from '@/features/portal/components/PortalHeader'
+import { PortalSidebar } from '@/features/portal/components/PortalSidebar'
+import { UnauthorizedSection } from '@/features/portal/components/UnauthorizedSection'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
-import { AdminAccountProvisioning } from './AdminAccountProvisioning'
-import { PlaceholderModule } from './PlaceholderModule'
-import { PortalHeader } from './PortalHeader'
-import { PortalSidebar } from './PortalSidebar'
-import { UnauthorizedSection } from './UnauthorizedSection'
 
 function isAdminAccountSection(user: PortalUser, sectionId: string) {
   return user.role === 'admin' && (sectionId === 'students' || sectionId === 'teachers')
 }
 
-export function PortalShell({ user, onLogout }: { user: PortalUser; onLogout: () => void }) {
+export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () => void }) {
   const params = useParams()
   const activeSection = params.sectionId ?? 'dashboard'
   const navigation = roleNavigation[user.role]

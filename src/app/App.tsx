@@ -4,10 +4,10 @@ import { ShieldUserIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { logout } from '@/features/auth/api/auth-api'
 import { authKeys, currentUserQueryOptions } from '@/features/auth/api/auth-queries'
-import { LoginScreen } from '@/features/auth/components/LoginScreen'
-import { PasswordChangeScreen } from '@/features/auth/components/PasswordChangeScreen'
+import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { PasswordChangePage } from '@/features/auth/pages/PasswordChangePage'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { PortalShell } from '@/features/portal/components/PortalShell'
+import { PortalPage } from '@/features/portal/pages/PortalPage'
 import { Toaster } from '@/components/ui/toast'
 import { queryClient } from './query-client'
 
@@ -45,19 +45,19 @@ function AppRoutes() {
   }
 
   if (!user) {
-    return <LoginScreen onLogin={handleAuthenticated} />
+    return <LoginPage onLogin={handleAuthenticated} />
   }
 
   if (user.passwordChangeRequired) {
     return (
-      <PasswordChangeScreen user={user} onChanged={handleAuthenticated} onLogout={handleLogout} />
+      <PasswordChangePage user={user} onChanged={handleAuthenticated} onLogout={handleLogout} />
     )
   }
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/:sectionId" element={<PortalShell user={user} onLogout={handleLogout} />} />
+      <Route path="/:sectionId" element={<PortalPage user={user} onLogout={handleLogout} />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
