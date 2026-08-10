@@ -308,7 +308,8 @@ describe('App', () => {
     expect(await screen.findByText('Fall 2026')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('tab', { name: /semesters/i }))
-    await userEvent.click(screen.getByRole('button', { name: /activate/i }))
+    await userEvent.click(screen.getByRole('button', { name: /open actions for fall semester/i }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: /activate/i }))
 
     await waitFor(() => {
       expect(patchSpy).toHaveBeenCalledWith('/semesters/semester-1/activate')
@@ -495,10 +496,12 @@ describe('App', () => {
 
     await user.click(await screen.findByRole('button', { name: /create account/i }))
     const sheet = within(await screen.findByRole('dialog', { name: /create account/i }))
+    const accountTypeSelect = sheet.getByRole('combobox', { name: /account type/i })
 
-    expect(sheet.getByRole('combobox', { name: /account type/i })).toHaveValue('teacher')
-    expect(sheet.getByRole('option', { name: /teacher/i })).toBeInTheDocument()
-    expect(sheet.getByRole('option', { name: /hod/i })).toBeInTheDocument()
+    expect(accountTypeSelect).toHaveTextContent(/teacher/i)
+    await user.click(accountTypeSelect)
+    expect(await screen.findByRole('option', { name: /teacher/i })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /hod/i })).toBeInTheDocument()
     expect(screen.queryByRole('option', { name: /student/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('option', { name: /admin/i })).not.toBeInTheDocument()
     expect(sheet.getByLabelText(/employee id/i)).toBeInTheDocument()

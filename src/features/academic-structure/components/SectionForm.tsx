@@ -2,7 +2,13 @@ import { Controller, type UseFormReturn } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import type { Program } from '@/features/programs/types/program.types'
 import type { SectionFormValues } from '../schemas/academic-structure.schemas'
@@ -37,6 +43,10 @@ export function SectionForm({
     (batch) => batch.isActive && (!selectedProgramId || batch.program.id === selectedProgramId)
   )
   const availableSemesters = semesters.filter((semester) => !semester.isClosed)
+  const selectedBatchId = watch('batchId')
+  const selectedSemesterId = watch('semesterId')
+  const selectedBatch = batches.find((batch) => batch.id === selectedBatchId)
+  const selectedSemester = semesters.find((semester) => semester.id === selectedSemesterId)
 
   return (
     <form id={formId} className="space-y-4" noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -91,24 +101,33 @@ export function SectionForm({
             control={control}
             name="batchId"
             render={({ field }) => (
-              <NativeSelect
-                id="sectionBatch"
-                className="w-full"
+              <Select
                 value={field.value}
                 disabled={!matchingBatches.length}
-                onBlur={field.onBlur}
-                onChange={field.onChange}
-                aria-invalid={Boolean(errors.batchId)}
-                aria-describedby={errors.batchId ? 'sectionBatch-error' : undefined}
-                ref={field.ref}
+                onValueChange={(value) => field.onChange(value ?? '')}
               >
-                <NativeSelectOption value="">Select batch</NativeSelectOption>
-                {matchingBatches.map((batch) => (
-                  <NativeSelectOption key={batch.id} value={batch.id}>
-                    {batch.name} ({batch.startingYear})
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+                <SelectTrigger
+                  id="sectionBatch"
+                  className="w-full"
+                  onBlur={field.onBlur}
+                  aria-invalid={Boolean(errors.batchId)}
+                  aria-describedby={errors.batchId ? 'sectionBatch-error' : undefined}
+                  ref={field.ref}
+                >
+                  <SelectValue>
+                    {selectedBatch
+                      ? `${selectedBatch.name} (${selectedBatch.startingYear})`
+                      : 'Select batch'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {matchingBatches.map((batch) => (
+                    <SelectItem key={batch.id} value={batch.id}>
+                      {batch.name} ({batch.startingYear})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           />
           <FieldError id="sectionBatch-error" errors={[errors.batchId]} />
@@ -122,24 +141,33 @@ export function SectionForm({
             control={control}
             name="semesterId"
             render={({ field }) => (
-              <NativeSelect
-                id="sectionSemester"
-                className="w-full"
+              <Select
                 value={field.value}
                 disabled={!availableSemesters.length}
-                onBlur={field.onBlur}
-                onChange={field.onChange}
-                aria-invalid={Boolean(errors.semesterId)}
-                aria-describedby={errors.semesterId ? 'sectionSemester-error' : undefined}
-                ref={field.ref}
+                onValueChange={(value) => field.onChange(value ?? '')}
               >
-                <NativeSelectOption value="">Select semester</NativeSelectOption>
-                {availableSemesters.map((semester) => (
-                  <NativeSelectOption key={semester.id} value={semester.id}>
-                    {semester.name} ({semester.academicYear})
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+                <SelectTrigger
+                  id="sectionSemester"
+                  className="w-full"
+                  onBlur={field.onBlur}
+                  aria-invalid={Boolean(errors.semesterId)}
+                  aria-describedby={errors.semesterId ? 'sectionSemester-error' : undefined}
+                  ref={field.ref}
+                >
+                  <SelectValue>
+                    {selectedSemester
+                      ? `${selectedSemester.name} (${selectedSemester.academicYear})`
+                      : 'Select semester'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {availableSemesters.map((semester) => (
+                    <SelectItem key={semester.id} value={semester.id}>
+                      {semester.name} ({semester.academicYear})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           />
           <FieldError id="sectionSemester-error" errors={[errors.semesterId]} />

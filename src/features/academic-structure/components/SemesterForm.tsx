@@ -3,6 +3,7 @@ import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/compo
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import type { SemesterFormValues } from '../schemas/academic-structure.schemas'
+import { SemesterDateRangeField } from './SemesterDateRangeField'
 
 type SemesterFormProps = {
   form: UseFormReturn<SemesterFormValues>
@@ -66,50 +67,7 @@ export function SemesterForm({ form, formId, onSubmit }: SemesterFormProps) {
           <FieldError id="semesterAcademicYear-error" errors={[errors.academicYear]} />
         </Field>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field data-invalid={Boolean(errors.startsAt)}>
-            <FieldLabel htmlFor="semesterStartsAt">Start date</FieldLabel>
-            <Controller
-              control={control}
-              name="startsAt"
-              render={({ field }) => (
-                <Input
-                  id="semesterStartsAt"
-                  type="date"
-                  placeholder="2026-09-01"
-                  value={field.value ?? ''}
-                  onBlur={field.onBlur}
-                  onValueChange={field.onChange}
-                  aria-invalid={Boolean(errors.startsAt)}
-                  aria-describedby={errors.startsAt ? 'semesterStartsAt-error' : undefined}
-                  ref={field.ref}
-                />
-              )}
-            />
-            <FieldError id="semesterStartsAt-error" errors={[errors.startsAt]} />
-          </Field>
-          <Field data-invalid={Boolean(errors.endsAt)}>
-            <FieldLabel htmlFor="semesterEndsAt">End date</FieldLabel>
-            <Controller
-              control={control}
-              name="endsAt"
-              render={({ field }) => (
-                <Input
-                  id="semesterEndsAt"
-                  type="date"
-                  placeholder="2027-01-15"
-                  value={field.value ?? ''}
-                  onBlur={field.onBlur}
-                  onValueChange={field.onChange}
-                  aria-invalid={Boolean(errors.endsAt)}
-                  aria-describedby={errors.endsAt ? 'semesterEndsAt-error' : undefined}
-                  ref={field.ref}
-                />
-              )}
-            />
-            <FieldError id="semesterEndsAt-error" errors={[errors.endsAt]} />
-          </Field>
-        </div>
+        <SemesterDateRangeField form={form} />
 
         <div className="grid gap-3 sm:grid-cols-2">
           <Field orientation="horizontal">

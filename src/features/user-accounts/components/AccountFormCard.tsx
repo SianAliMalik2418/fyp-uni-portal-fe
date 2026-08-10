@@ -4,7 +4,13 @@ import { roleLabels } from '@/shared/constants/user-roles'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import type { CreateUserAccountFormValues } from '../schemas/user-account.schemas'
 import type { AccountSectionKind } from '../utils/account-sections'
 
@@ -82,18 +88,37 @@ export function AccountFormCard({
               <Input id="role" value={roleLabels[fixedRole]} disabled aria-readonly="true" />
             </>
           ) : (
-            <NativeSelect
-              id="role"
-              className="w-full"
-              aria-invalid={Boolean(errors.role)}
-              {...register('role')}
-            >
-              {sectionRoleOptions.map((role) => (
-                <NativeSelectOption key={role} value={role}>
-                  {roleLabels[role]}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
+            <Controller
+              control={control}
+              name="role"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    if (value) {
+                      field.onChange(value)
+                    }
+                  }}
+                >
+                  <SelectTrigger
+                    id="role"
+                    className="w-full"
+                    onBlur={field.onBlur}
+                    aria-invalid={Boolean(errors.role)}
+                    ref={field.ref}
+                  >
+                    <SelectValue>{roleLabels[field.value]}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sectionRoleOptions.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {roleLabels[role]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           )}
           <FieldError errors={[errors.role]} />
         </Field>

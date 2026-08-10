@@ -11,6 +11,7 @@ import type {
   Semester,
   SemesterPayload,
 } from '../types/academic-structure.types'
+import { formatInputDate } from '@/shared/utils/date-format'
 
 const currentYear = new Date().getFullYear()
 
@@ -53,8 +54,8 @@ export function semesterValues(semester: Semester): SemesterFormValues {
   return {
     name: semester.name,
     academicYear: semester.academicYear,
-    startsAt: semester.startsAt?.slice(0, 10) ?? '',
-    endsAt: semester.endsAt?.slice(0, 10) ?? '',
+    startsAt: formatInputDate(semester.startsAt),
+    endsAt: formatInputDate(semester.endsAt),
     isActive: semester.isActive,
     isClosed: semester.isClosed,
   }

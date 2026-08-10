@@ -1,7 +1,13 @@
 import { Controller, type UseFormReturn } from 'react-hook-form'
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import type { Department } from '@/features/departments/types/department.types'
 import type { ProgramFormValues } from '../schemas/program.schemas'
@@ -20,6 +26,10 @@ export function ProgramFormCard({ departments, formId, form, onSubmit }: Program
     handleSubmit,
   } = form
   const activeDepartments = departments.filter((department) => department.isActive)
+  const selectedDepartmentId = form.watch('departmentId')
+  const selectedDepartment = departments.find(
+    (department) => department.id === selectedDepartmentId
+  )
 
   return (
     <form id={formId} className="space-y-4" noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -78,24 +88,33 @@ export function ProgramFormCard({ departments, formId, form, onSubmit }: Program
             control={control}
             name="departmentId"
             render={({ field }) => (
-              <NativeSelect
-                id="programDepartment"
-                className="w-full"
+              <Select
                 value={field.value}
                 disabled={!activeDepartments.length}
-                onBlur={field.onBlur}
-                onChange={field.onChange}
-                aria-invalid={Boolean(errors.departmentId)}
-                aria-describedby={errors.departmentId ? 'programDepartment-error' : undefined}
-                ref={field.ref}
+                onValueChange={(value) => field.onChange(value ?? '')}
               >
-                <NativeSelectOption value="">Select department</NativeSelectOption>
-                {activeDepartments.map((department) => (
-                  <NativeSelectOption key={department.id} value={department.id}>
-                    {department.name} ({department.code})
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+                <SelectTrigger
+                  id="programDepartment"
+                  className="w-full"
+                  onBlur={field.onBlur}
+                  aria-invalid={Boolean(errors.departmentId)}
+                  aria-describedby={errors.departmentId ? 'programDepartment-error' : undefined}
+                  ref={field.ref}
+                >
+                  <SelectValue>
+                    {selectedDepartment
+                      ? `${selectedDepartment.name} (${selectedDepartment.code})`
+                      : 'Select department'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {activeDepartments.map((department) => (
+                    <SelectItem key={department.id} value={department.id}>
+                      {department.name} ({department.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           />
           <FieldError id="programDepartment-error" errors={[errors.departmentId]} />
@@ -160,18 +179,24 @@ export function ProgramFormCard({ departments, formId, form, onSubmit }: Program
                 control={control}
                 name="durationUnit"
                 render={({ field }) => (
-                  <NativeSelect
-                    id="programDurationUnit"
+                  <Select
                     value={field.value}
-                    onBlur={field.onBlur}
-                    onChange={field.onChange}
-                    aria-label="Duration unit"
-                    aria-invalid={Boolean(errors.durationUnit)}
-                    ref={field.ref}
+                    onValueChange={(value) => field.onChange(value ?? 'years')}
                   >
-                    <NativeSelectOption value="years">Years</NativeSelectOption>
-                    <NativeSelectOption value="months">Months</NativeSelectOption>
-                  </NativeSelect>
+                    <SelectTrigger
+                      id="programDurationUnit"
+                      onBlur={field.onBlur}
+                      aria-label="Duration unit"
+                      aria-invalid={Boolean(errors.durationUnit)}
+                      ref={field.ref}
+                    >
+                      <SelectValue>{field.value === 'months' ? 'Months' : 'Years'}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="years">Years</SelectItem>
+                      <SelectItem value="months">Months</SelectItem>
+                    </SelectContent>
+                  </Select>
                 )}
               />
             </div>

@@ -1,7 +1,19 @@
-import { Calendar03Icon, Delete02Icon, Edit02Icon } from '@hugeicons/core-free-icons'
+import {
+  Calendar03Icon,
+  Delete02Icon,
+  Edit02Icon,
+  MoreVerticalIcon,
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -10,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { formatDateRange } from '@/shared/utils/date-format'
 import type { DeleteAcademicStructureTarget, Semester } from '../types/academic-structure.types'
 import { AcademicQueryMessage } from './AcademicQueryMessage'
 import { AcademicStatusBadge } from './AcademicStatusBadge'
@@ -47,7 +60,7 @@ export function SemestersCard({
                 <TableHead>Semester</TableHead>
                 <TableHead>Dates</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-56 text-right">Actions</TableHead>
+                <TableHead className="w-32 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -58,32 +71,13 @@ export function SemestersCard({
                     <span className="text-muted-foreground text-sm">{semester.academicYear}</span>
                   </TableCell>
                   <TableCell className="text-sm">
-                    {semester.startsAt?.slice(0, 10) ?? 'No start'} to{' '}
-                    {semester.endsAt?.slice(0, 10) ?? 'No end'}
+                    {formatDateRange(semester.startsAt, semester.endsAt)}
                   </TableCell>
                   <TableCell>
                     <AcademicStatusBadge active={semester.isActive} closed={semester.isClosed} />
                   </TableCell>
                   <TableCell>
-                    <div className="flex flex-wrap justify-end gap-1">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={semester.isActive || semester.isClosed}
-                        onClick={() => onActivate(semester.id)}
-                      >
-                        Activate
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={semester.isClosed}
-                        onClick={() => onClose(semester.id)}
-                      >
-                        Close
-                      </Button>
+                    <div className="flex justify-end gap-1">
                       <Button
                         type="button"
                         variant="ghost"
@@ -108,6 +102,34 @@ export function SemestersCard({
                       >
                         <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
                       </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          className="hover:bg-muted focus-visible:ring-ring/30 flex size-8 items-center justify-center rounded-md outline-none focus-visible:ring-2"
+                          aria-label={`Open actions for ${semester.name}`}
+                        >
+                          <HugeiconsIcon
+                            icon={MoreVerticalIcon}
+                            strokeWidth={2}
+                            className="size-4"
+                          />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-36">
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              disabled={semester.isActive || semester.isClosed}
+                              onClick={() => onActivate(semester.id)}
+                            >
+                              Activate
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={semester.isClosed}
+                              onClick={() => onClose(semester.id)}
+                            >
+                              Close
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
