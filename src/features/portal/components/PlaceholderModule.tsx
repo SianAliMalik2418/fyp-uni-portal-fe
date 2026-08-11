@@ -1,6 +1,7 @@
 import { ArrowRight01Icon, Database01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { AcademicPerformanceContextPanel } from '@/features/academic-performance/components/AcademicPerformanceContextPanel'
+import { AcademicPerformanceOfferingsPanel } from '@/features/academic-performance/components/AcademicPerformanceOfferingsPanel'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { StudentServiceContextPanel } from '@/features/student-services/components/StudentServiceContextPanel'
 import { roleLabels } from '@/shared/constants/user-roles'
@@ -18,6 +19,7 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
     academicPerformancePlaceholders[item.id] ?? studentServicePlaceholders[item.id]
   const isAcademicPerformanceModule = Boolean(academicPerformancePlaceholders[item.id])
   const isStudentServiceModule = Boolean(studentServicePlaceholders[item.id])
+  const shouldShowPerformanceOfferings = item.id === 'attendance' || item.id === 'marks'
   const roleEmptyState = moduleDetails?.emptyStates?.[user.role]
   const stats = moduleDetails?.stats?.[user.role] ?? modulePlaceholderStats[user.role]
   const emptyTitle = roleEmptyState?.emptyTitle ?? modulePlaceholderContent.emptyTitle
@@ -85,6 +87,9 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
       </Card>
 
       {isAcademicPerformanceModule ? <AcademicPerformanceContextPanel moduleId={item.id} /> : null}
+      {shouldShowPerformanceOfferings ? (
+        <AcademicPerformanceOfferingsPanel moduleId={item.id} user={user} />
+      ) : null}
       {isStudentServiceModule ? <StudentServiceContextPanel /> : null}
 
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">

@@ -459,7 +459,88 @@ describe('App', () => {
 
   it('renders Tayabba phase 1 academic performance placeholders for teachers', async () => {
     window.history.pushState(null, '', '/marks')
-    getSpy.mockResolvedValueOnce({ data: { user: activeTeacher } })
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeTeacher } })
+      }
+
+      if (url === '/academic-performance/context') {
+        return Promise.resolve({
+          data: {
+            currentSemester: null,
+            activeSections: [],
+            studentSection: null,
+            students: [],
+            canResolveStudentSection: false,
+          },
+        })
+      }
+
+      if (url === '/academic-performance/offerings') {
+        return Promise.resolve({
+          data: {
+            offerings: [
+              {
+                id: 'offering-1',
+                course: {
+                  id: 'course-1',
+                  code: 'PF',
+                  title: 'Programming Fundamentals',
+                  creditHours: 3,
+                  department: {
+                    id: 'department-1',
+                    name: 'Computer Science',
+                    code: 'CS',
+                    isActive: true,
+                  },
+                  program: {
+                    id: 'program-1',
+                    name: 'BS Computer Science',
+                    code: 'BSCS',
+                    isActive: true,
+                  },
+                  semester: {
+                    id: 'semester-1',
+                    name: 'Fall Semester',
+                    academicYear: '2026-2027',
+                    isActive: true,
+                    isClosed: false,
+                  },
+                  isActive: true,
+                },
+                section: {
+                  id: 'section-1',
+                  name: 'A',
+                  program: {
+                    id: 'program-1',
+                    name: 'BS Computer Science',
+                    code: 'BSCS',
+                    isActive: true,
+                  },
+                  semester: {
+                    id: 'semester-1',
+                    name: 'Fall Semester',
+                    academicYear: '2026-2027',
+                    isActive: true,
+                    isClosed: false,
+                  },
+                  isActive: true,
+                },
+                teacher: {
+                  id: activeTeacher.id,
+                  fullName: activeTeacher.name,
+                  email: activeTeacher.email,
+                },
+                studentCount: 28,
+                isActive: true,
+              },
+            ],
+          },
+        })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
 
     render(<App />)
 
@@ -470,7 +551,10 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /marks/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /results/i })).toBeInTheDocument()
     expect(screen.getByText(/no marks records available yet/i)).toBeInTheDocument()
-    expect(screen.getByText(/marks api/i)).toBeInTheDocument()
+    expect(await screen.findByText(/programming fundamentals/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/only course sections assigned to your teacher account/i)
+    ).toBeInTheDocument()
   })
 
   it('opens the profile menu and logs out from the portal shell', async () => {

@@ -2,6 +2,7 @@ import type {
   Section,
   Semester,
 } from '@/features/academic-structure/types/academic-structure.types'
+import type { CourseOffering } from '@/features/courses/types/course.types'
 
 export type AcademicPerformanceContext = {
   currentSemester: Semester | null
@@ -29,4 +30,13 @@ export type AcademicPerformanceStudent = {
   batch: AcademicPerformanceStudentRelation | null
   semester: AcademicPerformanceStudentRelation | null
   section: AcademicPerformanceStudentRelation | null
+}
+
+export type AcademicPerformanceOfferingsResponse = {
+  offerings: CourseOffering[]
+}
+
+export type AcademicPerformanceOfferingStudentsResponse = {
+  offering: CourseOffering
+  students: AcademicPerformanceStudent[]
 }
