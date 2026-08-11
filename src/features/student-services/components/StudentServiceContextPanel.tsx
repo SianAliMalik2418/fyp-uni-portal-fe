@@ -4,15 +4,19 @@ import {
   AiMagicIcon,
   Calendar03Icon,
   SchoolReportCardIcon,
+  UserIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { studentServiceContextQueryOptions } from '../api/student-services-queries'
 import type {
   StudentServiceContext,
+  StudentServiceRelation,
+  StudentServiceStudentContext,
   StudentServiceStructureScope,
 } from '../types/student-services.types'
 
@@ -34,6 +38,18 @@ function scopeLabel(scope: StudentServiceStructureScope) {
   ].filter(Boolean).length
 
   return `${readyCount}/3 references ready`
+}
+
+function relationLabel(relation: StudentServiceRelation | null) {
+  if (!relation) {
+    return 'Pending'
+  }
+
+  if (relation.code) {
+    return `${relation.name} (${relation.code})`
+  }
+
+  return relation.academicYear ? `${relation.name} - ${relation.academicYear}` : relation.name
 }
 
 function StudentServiceContextSkeleton() {
@@ -85,6 +101,55 @@ function ServiceScopeCard({
   )
 }
 
+function StudentIdentityCard({ student }: { student: StudentServiceStudentContext | null }) {
+  if (!student) {
+    return (
+      <div className="border-border bg-muted/20 rounded-md border p-4 md:col-span-3">
+        <p className="text-muted-foreground text-sm">
+          Student identity will resolve here for signed-in student accounts.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="border-border grid gap-4 rounded-md border p-4 md:col-span-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-md">
+            <HugeiconsIcon icon={UserIcon} strokeWidth={2} className="size-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-foreground text-sm font-semibold">{student.name}</p>
+            <p className="text-muted-foreground truncate text-sm">{student.email}</p>
+          </div>
+        </div>
+        <Badge variant="outline">{student.registrationNumber ?? 'No registration no.'}</Badge>
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        <div>
+          <p className="text-muted-foreground text-xs font-medium">Program</p>
+          <p className="text-foreground mt-1 text-sm font-semibold">
+            {relationLabel(student.program)}
+          </p>
+        </div>
+        <div>
+          <p className="text-muted-foreground text-xs font-medium">Semester</p>
+          <p className="text-foreground mt-1 text-sm font-semibold">
+            {relationLabel(student.semester)}
+          </p>
+        </div>
+        <div>
+          <p className="text-muted-foreground text-xs font-medium">Section</p>
+          <p className="text-foreground mt-1 text-sm font-semibold">
+            {relationLabel(student.section)}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function StudentServiceContextPanel() {
   const contextQuery = useQuery(studentServiceContextQueryOptions)
 
@@ -129,6 +194,7 @@ export function StudentServiceContextPanel() {
         </div>
       </CardHeader>
       <CardContent className="grid gap-4">
+        <StudentIdentityCard student={context.student} />
         <div className="grid gap-3 md:grid-cols-3">
           <ServiceScopeCard
             icon={Calendar03Icon}
