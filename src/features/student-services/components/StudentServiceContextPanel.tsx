@@ -19,6 +19,7 @@ import type {
   StudentServiceStudentContext,
   StudentServiceStructureScope,
 } from '../types/student-services.types'
+import type { CourseOffering } from '@/features/courses/types/course.types'
 
 function uniquePrograms(context: StudentServiceContext) {
   const programs = new Map<string, string>()
@@ -150,7 +151,58 @@ function StudentIdentityCard({ student }: { student: StudentServiceStudentContex
   )
 }
 
-export function StudentServiceContextPanel() {
+function EnrolledCoursesCard({ courses }: { courses: CourseOffering[] }) {
+  return (
+    <div className="border-border grid gap-4 rounded-md border p-4 md:col-span-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-foreground text-sm font-semibold">Enrolled course context</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Materials and AI can reference these student-owned courses and assigned teachers.
+          </p>
+        </div>
+        <Badge variant="outline">
+          {courses.length} course{courses.length === 1 ? '' : 's'}
+        </Badge>
+      </div>
+
+      {courses.length ? (
+        <div className="grid gap-3 md:grid-cols-2">
+          {courses.map((offering) => (
+            <div key={offering.id} className="bg-muted/20 rounded-md border p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-foreground truncate text-sm font-semibold">
+                    {offering.course.title}
+                  </p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    {offering.course.code} - {offering.section.program.code} Section{' '}
+                    {offering.section.name}
+                  </p>
+                </div>
+                <Badge variant="secondary">{offering.course.creditHours} cr</Badge>
+              </div>
+              <div className="text-muted-foreground mt-3 grid gap-1 text-xs">
+                <span>
+                  {offering.section.semester.name} {offering.section.semester.academicYear}
+                </span>
+                <span>Teacher: {offering.teacher?.fullName ?? 'Unassigned'}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-muted/30 rounded-md border border-dashed p-4 text-center">
+          <p className="text-muted-foreground text-sm">
+            Enrolled courses will appear after course assignment and enrollment are complete.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function StudentServiceContextPanel({ moduleId }: { moduleId?: string }) {
   const contextQuery = useQuery(studentServiceContextQueryOptions)
 
   if (contextQuery.isPending) {
@@ -177,6 +229,7 @@ export function StudentServiceContextPanel() {
   const semesterLabel = context.currentSemester
     ? `${context.currentSemester.name} - ${context.currentSemester.academicYear}`
     : 'No active semester'
+  const shouldShowCourses = moduleId === 'materials'
 
   return (
     <Card className="bg-background">
@@ -195,6 +248,7 @@ export function StudentServiceContextPanel() {
       </CardHeader>
       <CardContent className="grid gap-4">
         <StudentIdentityCard student={context.student} />
+        {shouldShowCourses ? <EnrolledCoursesCard courses={context.enrolledCourses} /> : null}
         <div className="grid gap-3 md:grid-cols-3">
           <ServiceScopeCard
             icon={Calendar03Icon}

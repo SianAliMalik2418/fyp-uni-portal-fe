@@ -557,6 +557,132 @@ describe('App', () => {
     ).toBeInTheDocument()
   })
 
+  it('renders Hammad phase 4 student courses for materials and AI placeholders', async () => {
+    window.history.pushState(null, '', '/materials')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({
+          data: { user: { ...temporaryStudent, passwordChangeRequired: false } },
+        })
+      }
+
+      if (url === '/student-services/context') {
+        return Promise.resolve({
+          data: {
+            currentSemester: {
+              id: 'semester-1',
+              name: 'Fall Semester',
+              academicYear: '2026-2027',
+              isActive: true,
+              isClosed: false,
+            },
+            availableSections: [],
+            student: {
+              userId: temporaryStudent.id,
+              name: temporaryStudent.name,
+              email: temporaryStudent.email,
+              registrationNumber: 'NCBAE-2026-CS-001',
+              program: {
+                id: 'program-1',
+                name: 'BS Computer Science',
+                code: 'BSCS',
+              },
+              semester: {
+                id: 'semester-1',
+                name: 'Fall Semester',
+                academicYear: '2026-2027',
+              },
+              section: {
+                id: 'section-1',
+                name: 'A',
+              },
+            },
+            enrolledCourses: [
+              {
+                id: 'offering-1',
+                course: {
+                  id: 'course-1',
+                  code: 'AI',
+                  title: 'Artificial Intelligence',
+                  creditHours: 3,
+                  department: {
+                    id: 'department-1',
+                    name: 'Computer Science',
+                    code: 'CS',
+                    isActive: true,
+                  },
+                  program: {
+                    id: 'program-1',
+                    name: 'BS Computer Science',
+                    code: 'BSCS',
+                    isActive: true,
+                  },
+                  semester: {
+                    id: 'semester-1',
+                    name: 'Fall Semester',
+                    academicYear: '2026-2027',
+                    isActive: true,
+                    isClosed: false,
+                  },
+                  isActive: true,
+                },
+                section: {
+                  id: 'section-1',
+                  name: 'A',
+                  program: {
+                    id: 'program-1',
+                    name: 'BS Computer Science',
+                    code: 'BSCS',
+                    isActive: true,
+                  },
+                  semester: {
+                    id: 'semester-1',
+                    name: 'Fall Semester',
+                    academicYear: '2026-2027',
+                    isActive: true,
+                    isClosed: false,
+                  },
+                  isActive: true,
+                },
+                teacher: {
+                  id: 'teacher-1',
+                  fullName: 'Hammad Teacher',
+                  email: 'hammad.teacher@example.com',
+                },
+                studentCount: 36,
+                isActive: true,
+              },
+            ],
+            timetableScope: {
+              canReferenceProgram: true,
+              canReferenceSemester: true,
+              canReferenceSection: true,
+            },
+            examScope: {
+              canReferenceProgram: true,
+              canReferenceSemester: true,
+              canReferenceSection: true,
+            },
+            aiScope: {
+              canReferenceProgram: true,
+              canReferenceSemester: true,
+              canReferenceSection: true,
+            },
+          },
+        })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(<App />)
+
+    expect(await screen.findByText(/enrolled course context/i)).toBeInTheDocument()
+    expect(screen.getByText(/artificial intelligence/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/hammad teacher/i).length).toBeGreaterThan(0)
+    expect(screen.getByText(/1 enrolled course ready for future ai context/i)).toBeInTheDocument()
+  })
+
   it('opens the profile menu and logs out from the portal shell', async () => {
     const user = userEvent.setup()
     getSpy.mockResolvedValueOnce({ data: { user: activeAdmin } })

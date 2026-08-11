@@ -90,7 +90,7 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
       {shouldShowPerformanceOfferings ? (
         <AcademicPerformanceOfferingsPanel moduleId={item.id} user={user} />
       ) : null}
-      {isStudentServiceModule ? <StudentServiceContextPanel /> : null}
+      {isStudentServiceModule ? <StudentServiceContextPanel moduleId={item.id} /> : null}
 
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
         <Card className="bg-background">

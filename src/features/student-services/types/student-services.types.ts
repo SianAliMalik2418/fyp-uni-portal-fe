@@ -2,6 +2,7 @@ import type {
   Section,
   Semester,
 } from '@/features/academic-structure/types/academic-structure.types'
+import type { CourseOffering } from '@/features/courses/types/course.types'
 
 export type StudentServiceStructureScope = {
   canReferenceProgram: boolean
@@ -30,6 +31,7 @@ export type StudentServiceContext = {
   currentSemester: Semester | null
   availableSections: Section[]
   student: StudentServiceStudentContext | null
+  enrolledCourses: CourseOffering[]
   timetableScope: StudentServiceStructureScope
   examScope: StudentServiceStructureScope
   aiScope: StudentServiceStructureScope
