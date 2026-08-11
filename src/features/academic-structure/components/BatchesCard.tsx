@@ -1,7 +1,19 @@
-import { Delete02Icon, Edit02Icon, UserGroupIcon } from '@hugeicons/core-free-icons'
+import {
+  Delete02Icon,
+  Edit02Icon,
+  MoreVerticalIcon,
+  UserGroupIcon,
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -47,14 +59,14 @@ export function BatchesCard({
                 <TableHead>Years</TableHead>
                 <TableHead>Sections</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-28 text-right">Actions</TableHead>
+                <TableHead className="w-16 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {batches.map((batch) => (
                 <TableRow key={batch.id}>
                   <TableCell className="font-medium">{batch.name}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <span className="block">{batch.program.name}</span>
                     <span className="text-muted-foreground text-sm">{batch.program.code}</span>
                   </TableCell>
@@ -66,26 +78,31 @@ export function BatchesCard({
                     <AcademicStatusText active={batch.isActive} />
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Edit ${batch.name}`}
-                        onClick={() => onEdit(batch)}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={<Button type="button" variant="ghost" size="icon-sm" />}
+                        aria-label={`Open actions for ${batch.name}`}
                       >
-                        <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Delete ${batch.name}`}
-                        onClick={() => onDelete({ kind: 'batch', id: batch.id, label: batch.name })}
-                      >
-                        <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
-                      </Button>
-                    </div>
+                        <HugeiconsIcon icon={MoreVerticalIcon} strokeWidth={2} />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-36">
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem onClick={() => onEdit(batch)}>
+                            <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() =>
+                              onDelete({ kind: 'batch', id: batch.id, label: batch.name })
+                            }
+                          >
+                            <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}

@@ -1,5 +1,6 @@
 import { Logout03Icon, UserIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { useNavigate } from 'react-router-dom'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { roleLabels } from '@/shared/constants/user-roles'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -23,6 +24,8 @@ function initials(name: string) {
 }
 
 export function ProfileMenu({ user, onLogout }: { user: PortalUser; onLogout: () => void }) {
+  const navigate = useNavigate()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -46,7 +49,7 @@ export function ProfileMenu({ user, onLogout }: { user: PortalUser; onLogout: ()
             <span className="block truncate">{user.email}</span>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate('/profile')}>
             <HugeiconsIcon icon={UserIcon} strokeWidth={2} />
             Account profile
           </DropdownMenuItem>

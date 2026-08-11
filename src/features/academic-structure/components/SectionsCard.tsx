@@ -1,7 +1,14 @@
-import { Add01Icon, Delete02Icon, Edit02Icon } from '@hugeicons/core-free-icons'
+import { Add01Icon, Delete02Icon, Edit02Icon, MoreVerticalIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -40,14 +47,14 @@ export function SectionsCard({ onDelete, onEdit, query, sections }: SectionsCard
                 <TableHead>Batch</TableHead>
                 <TableHead>Semester</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-28 text-right">Actions</TableHead>
+                <TableHead className="w-16 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sections.map((section) => (
                 <TableRow key={section.id}>
                   <TableCell className="font-medium">{section.name}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <span className="block">{section.program.name}</span>
                     <span className="text-muted-foreground text-sm">{section.program.code}</span>
                   </TableCell>
@@ -62,32 +69,35 @@ export function SectionsCard({ onDelete, onEdit, query, sections }: SectionsCard
                     <AcademicStatusText active={section.isActive} />
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Edit ${section.name}`}
-                        onClick={() => onEdit(section)}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={<Button type="button" variant="ghost" size="icon-sm" />}
+                        aria-label={`Open actions for ${section.name}`}
                       >
-                        <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Delete ${section.name}`}
-                        onClick={() =>
-                          onDelete({
-                            kind: 'section',
-                            id: section.id,
-                            label: section.name,
-                          })
-                        }
-                      >
-                        <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
-                      </Button>
-                    </div>
+                        <HugeiconsIcon icon={MoreVerticalIcon} strokeWidth={2} />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-36">
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem onClick={() => onEdit(section)}>
+                            <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() =>
+                              onDelete({
+                                kind: 'section',
+                                id: section.id,
+                                label: section.name,
+                              })
+                            }
+                          >
+                            <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}

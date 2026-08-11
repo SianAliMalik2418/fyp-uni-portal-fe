@@ -1,10 +1,22 @@
 import { type ReactNode } from 'react'
-import { Delete02Icon, Edit02Icon, Mortarboard01Icon } from '@hugeicons/core-free-icons'
+import {
+  Delete02Icon,
+  Edit02Icon,
+  MoreVerticalIcon,
+  Mortarboard01Icon,
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
 import {
   Table,
@@ -55,13 +67,13 @@ export function ProgramsCard({
             <TableHead>Department</TableHead>
             <TableHead>Structure</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="w-32 text-right">Actions</TableHead>
+            <TableHead className="w-16 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {programs.map((program) => (
             <TableRow key={program.id}>
-              <TableCell>
+              <TableCell className="text-right">
                 <span className="text-foreground block font-medium">{program.name}</span>
                 <span className="text-muted-foreground mt-1 block text-sm">{program.code}</span>
               </TableCell>
@@ -83,27 +95,30 @@ export function ProgramsCard({
                 </span>
               </TableCell>
               <TableCell>
-                <div className="flex justify-end gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`Edit ${program.name}`}
-                    onClick={() => onEdit(program)}
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={<Button type="button" variant="ghost" size="icon-sm" />}
+                    aria-label={`Open actions for ${program.name}`}
                   >
-                    <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`Delete ${program.name}`}
-                    disabled={isDeleting}
-                    onClick={() => onDelete(program)}
-                  >
-                    <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
-                  </Button>
-                </div>
+                    <HugeiconsIcon icon={MoreVerticalIcon} strokeWidth={2} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-36">
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem onClick={() => onEdit(program)}>
+                        <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        disabled={isDeleting}
+                        onClick={() => onDelete(program)}
+                      >
+                        <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}

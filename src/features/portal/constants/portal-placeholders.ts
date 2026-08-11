@@ -23,7 +23,7 @@ export const modulePlaceholderStats: Record<UserRole, ModulePlaceholderStat[]> =
   ],
   admin: [
     { label: 'Students', value: '0' },
-    { label: 'Teachers', value: '0' },
+    { label: 'Academic Staff', value: '0' },
     { label: 'Departments', value: '0' },
   ],
 }

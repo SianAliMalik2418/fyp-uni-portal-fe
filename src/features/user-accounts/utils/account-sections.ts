@@ -71,10 +71,37 @@ export function defaultAccountValues(sectionId: string): CreateUserAccountFormVa
   return {
     fullName: '',
     email: '',
+    phoneNumber: '',
     role: defaultRoleForSection(sectionId),
     registrationNumber: '',
     employeeId: '',
+    departmentId: '',
+    programId: '',
+    batchId: '',
+    semesterId: '',
+    sectionId: '',
+    academicStatus: sectionId === 'students' ? 'active' : undefined,
+    designation: '',
     isActive: true,
+  }
+}
+
+export function accountToFormValues(account: ProvisionedUserAccount): CreateUserAccountFormValues {
+  return {
+    fullName: account.fullName,
+    email: account.email,
+    phoneNumber: account.phoneNumber ?? '',
+    role: account.role,
+    registrationNumber: account.registrationNumber ?? '',
+    employeeId: account.employeeId ?? '',
+    departmentId: account.department?.id ?? '',
+    programId: account.program?.id ?? '',
+    batchId: account.batch?.id ?? '',
+    semesterId: account.semester?.id ?? '',
+    sectionId: account.section?.id ?? '',
+    academicStatus: account.academicStatus,
+    designation: account.designation ?? '',
+    isActive: account.isActive,
   }
 }
 

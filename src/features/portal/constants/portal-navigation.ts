@@ -49,7 +49,7 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
   admin: [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardCircleIcon },
     { id: 'students', label: 'Students', icon: UserGroupIcon },
-    { id: 'teachers', label: 'Teachers', icon: TeacherIcon },
+    { id: 'teachers', label: 'Academic Staff', icon: TeacherIcon },
     { id: 'departments', label: 'Departments', icon: Building01Icon },
     { id: 'programs', label: 'Programs', icon: Mortarboard01Icon },
     { id: 'academic-structure', label: 'Academic Structure', icon: SchoolReportCardIcon },

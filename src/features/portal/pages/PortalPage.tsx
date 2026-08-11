@@ -1,10 +1,11 @@
 import { useParams } from 'react-router-dom'
-import { ShieldUserIcon } from '@hugeicons/core-free-icons'
+import { ShieldUserIcon, UserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AcademicStructurePage } from '@/features/academic-structure/pages/AcademicStructurePage'
 import { DepartmentsPage } from '@/features/departments/pages/DepartmentsPage'
 import { ProgramsPage } from '@/features/programs/pages/ProgramsPage'
 import { StudentDashboardPage } from '@/features/student-dashboard/pages/StudentDashboardPage'
+import { CurrentUserProfilePage } from '@/features/user-accounts/pages/CurrentUserProfilePage'
 import { UserAccountsPage } from '@/features/user-accounts/pages/UserAccountsPage'
 import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
 import { FloatingChatbot } from '@/features/portal/components/FloatingChatbot'
@@ -31,6 +32,10 @@ function isAcademicStructureSection(user: PortalUser, sectionId: string) {
 }
 
 function portalModuleFor(user: PortalUser, activeItem: NavItem) {
+  if (activeItem.id === 'profile') {
+    return <CurrentUserProfilePage />
+  }
+
   if (user.role === 'student' && activeItem.id === 'dashboard') {
     return <StudentDashboardPage user={user} />
   }
@@ -58,7 +63,9 @@ export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () 
   const params = useParams()
   const activeSection = params.sectionId ?? 'dashboard'
   const navigation = roleNavigation[user.role]
-  const activeItem = navigation.find((item) => item.id === activeSection)
+  const profileItem = { id: 'profile', label: 'Account profile', icon: UserIcon }
+  const activeItem =
+    activeSection === 'profile' ? profileItem : navigation.find((item) => item.id === activeSection)
   const isAuthorized = Boolean(activeItem)
   const displayItem = activeItem ?? {
     id: 'unauthorized',

@@ -60,13 +60,13 @@ export function SemestersCard({
                 <TableHead>Semester</TableHead>
                 <TableHead>Dates</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-32 text-right">Actions</TableHead>
+                <TableHead className="w-16 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {semesters.map((semester) => (
                 <TableRow key={semester.id}>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <span className="block font-medium">{semester.name}</span>
                     <span className="text-muted-foreground text-sm">{semester.academicYear}</span>
                   </TableCell>
@@ -77,60 +77,47 @@ export function SemestersCard({
                     <AcademicStatusText active={semester.isActive} closed={semester.isClosed} />
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Edit ${semester.name}`}
-                        onClick={() => onEdit(semester)}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={<Button type="button" variant="ghost" size="icon-sm" />}
+                        aria-label={`Open actions for ${semester.name}`}
                       >
-                        <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Delete ${semester.name}`}
-                        onClick={() =>
-                          onDelete({
-                            kind: 'semester',
-                            id: semester.id,
-                            label: semester.name,
-                          })
-                        }
-                      >
-                        <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          className="hover:bg-muted focus-visible:ring-ring/30 flex size-8 items-center justify-center rounded-md outline-none focus-visible:ring-2"
-                          aria-label={`Open actions for ${semester.name}`}
-                        >
-                          <HugeiconsIcon
-                            icon={MoreVerticalIcon}
-                            strokeWidth={2}
-                            className="size-4"
-                          />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-36">
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              disabled={semester.isActive || semester.isClosed}
-                              onClick={() => onActivate(semester.id)}
-                            >
-                              Activate
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              disabled={semester.isClosed}
-                              onClick={() => onClose(semester.id)}
-                            >
-                              Close
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                        <HugeiconsIcon icon={MoreVerticalIcon} strokeWidth={2} />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem onClick={() => onEdit(semester)}>
+                            <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={semester.isActive || semester.isClosed}
+                            onClick={() => onActivate(semester.id)}
+                          >
+                            Activate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={semester.isClosed}
+                            onClick={() => onClose(semester.id)}
+                          >
+                            Close
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() =>
+                              onDelete({
+                                kind: 'semester',
+                                id: semester.id,
+                                label: semester.name,
+                              })
+                            }
+                          >
+                            <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}

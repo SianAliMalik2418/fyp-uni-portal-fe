@@ -665,55 +665,6 @@ Support:
 * Registration-number uniqueness
 * Email uniqueness
 
----
-
-## 2. Bulk Student Import
-
-### Sian — FE
-
-Build:
-
-* Upload file interface
-* Import button
-* Processing state
-* Import result summary
-
-Show:
-
-* Total rows
-* Successful rows
-* Failed rows
-
-Failed row list should show:
-
-* Row number
-* Student information where available
-* Failure reason
-
----
-
-### Sian — BE
-
-Bulk import must:
-
-* Accept CSV/Excel student data.
-* Validate every row.
-* Import valid rows.
-* Skip invalid rows.
-* Prevent duplicates.
-* Return detailed result summary.
-
-Possible failures:
-
-* Duplicate registration
-* Duplicate email
-* Missing name
-* Invalid program
-* Invalid semester
-* Invalid section
-* Missing required fields
-
----
 
 ## 3. Teacher Management
 

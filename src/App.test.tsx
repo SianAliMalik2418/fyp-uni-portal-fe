@@ -72,6 +72,147 @@ describe('App', () => {
     return within(await screen.findByRole('dialog', { name: /create account/i }))
   }
 
+  function mockAdminUserAccountGets(initialUsers: unknown[], refreshedUsers = initialUsers) {
+    let usersRequestCount = 0
+
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeAdmin } })
+      }
+
+      if (url === '/users') {
+        usersRequestCount += 1
+        return Promise.resolve({
+          data: { users: usersRequestCount === 1 ? initialUsers : refreshedUsers },
+        })
+      }
+
+      if (url === '/departments') {
+        return Promise.resolve({
+          data: {
+            departments: [
+              { id: 'department-1', name: 'Computer Science', code: 'CS', isActive: true },
+            ],
+          },
+        })
+      }
+
+      if (url === '/programs') {
+        return Promise.resolve({
+          data: {
+            programs: [
+              {
+                id: 'program-1',
+                name: 'BS Computer Science',
+                code: 'BSCS',
+                department: {
+                  id: 'department-1',
+                  name: 'Computer Science',
+                  code: 'CS',
+                  isActive: true,
+                },
+                totalSemesters: 8,
+                duration: 4,
+                durationUnit: 'years',
+                isActive: true,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/batches') {
+        return Promise.resolve({
+          data: {
+            batches: [
+              {
+                id: 'batch-1',
+                name: 'Fall 2026',
+                program: {
+                  id: 'program-1',
+                  name: 'BS Computer Science',
+                  code: 'BSCS',
+                  isActive: true,
+                },
+                startingYear: 2026,
+                expectedGraduationYear: 2030,
+                isActive: true,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/semesters') {
+        return Promise.resolve({
+          data: {
+            semesters: [
+              {
+                id: 'semester-1',
+                name: 'Fall Semester',
+                academicYear: '2026-2027',
+                isActive: true,
+                isClosed: false,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/sections') {
+        return Promise.resolve({
+          data: {
+            sections: [
+              {
+                id: 'section-1',
+                name: 'A',
+                program: {
+                  id: 'program-1',
+                  name: 'BS Computer Science',
+                  code: 'BSCS',
+                  isActive: true,
+                },
+                batch: {
+                  id: 'batch-1',
+                  name: 'Fall 2026',
+                  startingYear: 2026,
+                  expectedGraduationYear: 2030,
+                  isActive: true,
+                },
+                semester: {
+                  id: 'semester-1',
+                  name: 'Fall Semester',
+                  academicYear: '2026-2027',
+                  isActive: true,
+                  isClosed: false,
+                },
+                isActive: true,
+              },
+            ],
+          },
+        })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+  }
+
+  async function selectStudentAcademicProfile(
+    user: ReturnType<typeof userEvent.setup>,
+    sheet: ReturnType<typeof within>
+  ) {
+    await user.click(sheet.getByRole('combobox', { name: /department/i }))
+    await user.click(await screen.findByRole('option', { name: /computer science \(cs\)/i }))
+    await user.click(sheet.getByRole('combobox', { name: /program/i }))
+    await user.click(await screen.findByRole('option', { name: /bs computer science \(bscs\)/i }))
+    await user.click(sheet.getByRole('combobox', { name: /batch/i }))
+    await user.click(await screen.findByRole('option', { name: /fall 2026/i }))
+    await user.click(sheet.getByRole('combobox', { name: /^semester$/i }))
+    await user.click(await screen.findByRole('option', { name: /fall semester/i }))
+    await user.click(sheet.getByRole('combobox', { name: /section/i }))
+    await user.click(await screen.findByRole('option', { name: /^a$/i }))
+  }
+
   it('shows email/password login and signs in with the backend auth contract', async () => {
     const user = userEvent.setup()
     getSpy.mockRejectedValueOnce(new Error('Authentication required'))
@@ -351,25 +492,21 @@ describe('App', () => {
   it('lets admins provision accounts with a temporary password', async () => {
     const user = userEvent.setup()
     window.history.pushState(null, '', '/students')
-    getSpy
-      .mockResolvedValueOnce({ data: { user: activeAdmin } })
-      .mockResolvedValueOnce({ data: { users: [] } })
-      .mockResolvedValueOnce({
-        data: {
-          users: [
-            {
-              id: 'student-2',
-              fullName: 'New Student',
-              email: 'new.student@example.com',
-              role: 'student',
-              registrationNumber: 'REG-001',
-              accountStatus: 'active',
-              isActive: true,
-              passwordChangeRequired: true,
-            },
-          ],
+    mockAdminUserAccountGets(
+      [],
+      [
+        {
+          id: 'student-2',
+          fullName: 'New Student',
+          email: 'new.student@example.com',
+          role: 'student',
+          registrationNumber: 'REG-001',
+          accountStatus: 'active',
+          isActive: true,
+          passwordChangeRequired: true,
         },
-      })
+      ]
+    )
     postSpy.mockResolvedValueOnce({
       data: {
         message: 'User account created',
@@ -398,6 +535,7 @@ describe('App', () => {
     await user.type(sheet.getByLabelText(/full name/i), 'New Student')
     await user.type(sheet.getByLabelText(/email/i), 'new.student@example.com')
     await user.type(sheet.getByLabelText(/registration no/i), 'REG-001')
+    await selectStudentAcademicProfile(user, sheet)
     await user.click(sheet.getByRole('button', { name: /create account/i }))
 
     await screen.findByText(/temporary password issued/i)
@@ -406,8 +544,16 @@ describe('App', () => {
       fullName: 'New Student',
       email: 'new.student@example.com',
       role: 'student',
+      phoneNumber: undefined,
       registrationNumber: 'REG-001',
       employeeId: undefined,
+      departmentId: 'department-1',
+      programId: 'program-1',
+      batchId: 'batch-1',
+      semesterId: 'semester-1',
+      sectionId: 'section-1',
+      academicStatus: 'active',
+      designation: undefined,
       isActive: true,
     })
     expect(screen.getByText(/@Abc1234/i)).toBeInTheDocument()
@@ -420,9 +566,7 @@ describe('App', () => {
   it('clears required account errors after visible form values are entered', async () => {
     const user = userEvent.setup()
     window.history.pushState(null, '', '/students')
-    getSpy
-      .mockResolvedValueOnce({ data: { user: activeAdmin } })
-      .mockResolvedValueOnce({ data: { users: [] } })
+    mockAdminUserAccountGets([])
     postSpy.mockResolvedValueOnce({
       data: {
         message: 'User account created',
@@ -447,6 +591,7 @@ describe('App', () => {
     expect(await screen.findByText(/full name is required/i)).toBeInTheDocument()
     expect(await screen.findByText(/email is required|valid email/i)).toBeInTheDocument()
     expect(await screen.findByText(/registration no. is required/i)).toBeInTheDocument()
+    expect(await screen.findByText(/department is required/i)).toBeInTheDocument()
 
     await user.type(sheet.getByLabelText(/full name/i), 'Sian Malik')
     expect(screen.queryByText(/full name is required/i)).not.toBeInTheDocument()
@@ -454,6 +599,8 @@ describe('App', () => {
     expect(screen.queryByText(/email is required|valid email/i)).not.toBeInTheDocument()
     await user.type(sheet.getByLabelText(/registration no/i), 'BSCS-F22-51')
     expect(screen.queryByText(/registration no. is required/i)).not.toBeInTheDocument()
+    await selectStudentAcademicProfile(user, sheet)
+    expect(screen.queryByText(/department is required/i)).not.toBeInTheDocument()
     await user.click(sheet.getByRole('button', { name: /create account/i }))
 
     await screen.findByText(/temporary password issued/i)
@@ -462,8 +609,16 @@ describe('App', () => {
       fullName: 'Sian Malik',
       email: 'sianalimalik2418@gmail.com',
       role: 'student',
+      phoneNumber: undefined,
       registrationNumber: 'BSCS-F22-51',
       employeeId: undefined,
+      departmentId: 'department-1',
+      programId: 'program-1',
+      batchId: 'batch-1',
+      semesterId: 'semester-1',
+      sectionId: 'section-1',
+      academicStatus: 'active',
+      designation: undefined,
       isActive: true,
     })
   })
