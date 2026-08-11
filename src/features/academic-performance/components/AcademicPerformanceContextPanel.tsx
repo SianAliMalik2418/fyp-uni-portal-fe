@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { academicPerformanceContextQueryOptions } from '../api/academic-performance-queries'
 import type { AcademicPerformanceContext } from '../types/academic-performance.types'
+import { AcademicPerformanceStudentTable } from './AcademicPerformanceStudentTable'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 
 function uniquePrograms(context: AcademicPerformanceContext) {
@@ -52,7 +53,7 @@ function ContextMetric({
   )
 }
 
-export function AcademicPerformanceContextPanel() {
+export function AcademicPerformanceContextPanel({ moduleId }: { moduleId?: string }) {
   const contextQuery = useQuery(academicPerformanceContextQueryOptions)
 
   if (contextQuery.isPending) {
@@ -75,6 +76,7 @@ export function AcademicPerformanceContextPanel() {
   }
 
   const context = contextQuery.data
+  const shouldShowStudentTable = moduleId === 'attendance' || moduleId === 'results'
   const programs = uniquePrograms(context)
   const currentSemester = context.currentSemester
   const sectionLabel = context.studentSection
@@ -82,57 +84,66 @@ export function AcademicPerformanceContextPanel() {
     : `${context.activeSections.length} active section${context.activeSections.length === 1 ? '' : 's'}`
 
   return (
-    <Card className="bg-background">
-      <CardHeader className="border-border border-b">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <HugeiconsIcon icon={Layers01Icon} strokeWidth={2} className="size-4" />
-              Academic structure context
-            </CardTitle>
-            <CardDescription>
-              Performance modules can read the current semester and section hierarchy.
-            </CardDescription>
+    <div className="grid gap-5">
+      <Card className="bg-background">
+        <CardHeader className="border-border border-b">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <HugeiconsIcon icon={Layers01Icon} strokeWidth={2} className="size-4" />
+                Academic structure context
+              </CardTitle>
+              <CardDescription>
+                Performance modules can read the current semester and section hierarchy.
+              </CardDescription>
+            </div>
+            <span className="text-muted-foreground text-sm">
+              {context.canResolveStudentSection ? 'Student link ready' : 'Student link pending'}
+            </span>
           </div>
-          <span className="text-muted-foreground text-sm">
-            {context.canResolveStudentSection ? 'Student link ready' : 'Student link pending'}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className="grid gap-3 md:grid-cols-3">
-        <ContextMetric
-          label="Program"
-          value={programs.length > 0 ? programs.join(', ') : 'No active program sections'}
-          description="Attendance and results can filter through section program relationships."
+        </CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-3">
+          <ContextMetric
+            label="Program"
+            value={programs.length > 0 ? programs.join(', ') : 'No active program sections'}
+            description="Attendance and results can filter through section program relationships."
+          />
+          <ContextMetric
+            label="Semester"
+            value={
+              currentSemester
+                ? `${currentSemester.name} - ${currentSemester.academicYear}`
+                : 'No active semester'
+            }
+            description="Later records can bind to the one active academic semester."
+          />
+          <ContextMetric
+            label="Section"
+            value={sectionLabel}
+            description={
+              context.studentSection
+                ? 'The signed-in student section is available for student-owned records.'
+                : 'Student-specific sections will resolve after student profiles are created.'
+            }
+          />
+          <div className="border-border bg-muted/20 flex items-start gap-3 rounded-md border p-4 md:col-span-3">
+            <span className="bg-background text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-md border">
+              <HugeiconsIcon icon={Books01Icon} strokeWidth={2} className="size-4" />
+            </span>
+            <p className="text-muted-foreground text-sm leading-6">
+              Program, semester, section, and student identifiers are now visible from the
+              academic-performance area without creating attendance or result records yet.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {shouldShowStudentTable ? (
+        <AcademicPerformanceStudentTable
+          moduleLabel={moduleId === 'attendance' ? 'Attendance' : 'Results'}
+          students={context.students}
         />
-        <ContextMetric
-          label="Semester"
-          value={
-            currentSemester
-              ? `${currentSemester.name} - ${currentSemester.academicYear}`
-              : 'No active semester'
-          }
-          description="Later records can bind to the one active academic semester."
-        />
-        <ContextMetric
-          label="Section"
-          value={sectionLabel}
-          description={
-            context.studentSection
-              ? 'The signed-in student section is available for student-owned records.'
-              : 'Student-specific sections will resolve after student profiles are created.'
-          }
-        />
-        <div className="border-border bg-muted/20 flex items-start gap-3 rounded-md border p-4 md:col-span-3">
-          <span className="bg-background text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-md border">
-            <HugeiconsIcon icon={Books01Icon} strokeWidth={2} className="size-4" />
-          </span>
-          <p className="text-muted-foreground text-sm leading-6">
-            Program, semester, and section data is now visible from the academic-performance area
-            without creating attendance or result records yet.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+      ) : null}
+    </div>
   )
 }

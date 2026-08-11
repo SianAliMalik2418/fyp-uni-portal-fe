@@ -84,7 +84,7 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
         </CardContent>
       </Card>
 
-      {isAcademicPerformanceModule ? <AcademicPerformanceContextPanel /> : null}
+      {isAcademicPerformanceModule ? <AcademicPerformanceContextPanel moduleId={item.id} /> : null}
       {isStudentServiceModule ? <StudentServiceContextPanel /> : null}
 
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
