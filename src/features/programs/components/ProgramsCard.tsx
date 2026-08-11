@@ -73,7 +73,7 @@ export function ProgramsCard({
         <TableBody>
           {programs.map((program) => (
             <TableRow key={program.id}>
-              <TableCell className="text-right">
+              <TableCell>
                 <span className="text-foreground block font-medium">{program.name}</span>
                 <span className="text-muted-foreground mt-1 block text-sm">{program.code}</span>
               </TableCell>

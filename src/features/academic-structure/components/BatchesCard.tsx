@@ -66,7 +66,7 @@ export function BatchesCard({
               {batches.map((batch) => (
                 <TableRow key={batch.id}>
                   <TableCell className="font-medium">{batch.name}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell>
                     <span className="block">{batch.program.name}</span>
                     <span className="text-muted-foreground text-sm">{batch.program.code}</span>
                   </TableCell>

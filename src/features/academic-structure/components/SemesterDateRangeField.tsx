@@ -1,6 +1,6 @@
 import { Calendar03Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import type { DateRange } from 'react-day-picker'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -15,29 +15,46 @@ type SemesterDateRangeFieldProps = {
 
 export function SemesterDateRangeField({ form }: SemesterDateRangeFieldProps) {
   const {
+    control,
     formState: { errors },
     setValue,
-    watch,
   } = form
-  const startsAt = watch('startsAt')
-  const endsAt = watch('endsAt')
+  const startsAt = useWatch({ control, name: 'startsAt' })
+  const endsAt = useWatch({ control, name: 'endsAt' })
   const selectedRange: DateRange = {
     from: parseAppDate(startsAt) ?? undefined,
     to: parseAppDate(endsAt) ?? undefined,
   }
   const hasDateError = Boolean(errors.startsAt) || Boolean(errors.endsAt)
 
-  function handleRangeChange(range?: DateRange) {
-    setValue('startsAt', formatInputDate(range?.from), {
+  function setDateRange(start?: Date, end?: Date) {
+    setValue('startsAt', formatInputDate(start), {
       shouldDirty: true,
       shouldTouch: true,
       shouldValidate: true,
     })
-    setValue('endsAt', formatInputDate(range?.to), {
+    setValue('endsAt', formatInputDate(end), {
       shouldDirty: true,
       shouldTouch: true,
       shouldValidate: true,
     })
+  }
+
+  function handleDayClick(selectedDay: Date) {
+    const currentStart = parseAppDate(startsAt) ?? undefined
+    const currentEnd = parseAppDate(endsAt) ?? undefined
+
+    if (!currentStart || currentEnd) {
+      setDateRange(selectedDay)
+      return
+    }
+
+    if (selectedDay.getTime() < currentStart.getTime()) {
+      setDateRange(selectedDay, currentStart)
+      return
+    }
+
+    setDateRange(currentStart, selectedDay)
   }
 
   return (
@@ -60,7 +77,7 @@ export function SemesterDateRangeField({ form }: SemesterDateRangeFieldProps) {
           }
         />
         <PopoverContent align="start" className="w-auto p-0">
-          <Calendar mode="range" selected={selectedRange} onSelect={handleRangeChange} />
+          <Calendar mode="range" selected={selectedRange} onDayClick={handleDayClick} />
         </PopoverContent>
       </Popover>
       <FieldError id="semesterDateRange-error" errors={[errors.startsAt, errors.endsAt]} />

@@ -96,7 +96,7 @@ export function AccountsCard({
               <TableCell>{identifierForAccount(account)}</TableCell>
               <TableCell>{account.department?.code ?? '-'}</TableCell>
               <TableCell>{profileSummary(account)}</TableCell>
-              <TableCell className="text-right">
+              <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     render={<Button type="button" variant="ghost" size="icon-sm" />}

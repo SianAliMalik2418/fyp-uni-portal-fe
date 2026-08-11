@@ -2,6 +2,9 @@ import { useParams } from 'react-router-dom'
 import { ShieldUserIcon, UserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AcademicStructurePage } from '@/features/academic-structure/pages/AcademicStructurePage'
+import { CourseManagementPage } from '@/features/courses/pages/CourseManagementPage'
+import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
+import { TeacherCoursesPage } from '@/features/courses/pages/TeacherCoursesPage'
 import { DepartmentsPage } from '@/features/departments/pages/DepartmentsPage'
 import { ProgramsPage } from '@/features/programs/pages/ProgramsPage'
 import { StudentDashboardPage } from '@/features/student-dashboard/pages/StudentDashboardPage'
@@ -31,6 +34,16 @@ function isAcademicStructureSection(user: PortalUser, sectionId: string) {
   return user.role === 'admin' && sectionId === 'academic-structure'
 }
 
+function isCoursesSection(user: PortalUser, sectionId: string) {
+  return (
+    sectionId === 'courses' &&
+    (user.role === 'admin' ||
+      user.role === 'hod' ||
+      user.role === 'student' ||
+      user.role === 'teacher')
+  )
+}
+
 function portalModuleFor(user: PortalUser, activeItem: NavItem) {
   if (activeItem.id === 'profile') {
     return <CurrentUserProfilePage />
@@ -54,6 +67,18 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
 
   if (isAcademicStructureSection(user, activeItem.id)) {
     return <AcademicStructurePage title={activeItem.label} />
+  }
+
+  if (isCoursesSection(user, activeItem.id)) {
+    if (user.role === 'student') {
+      return <StudentCoursesPage title={activeItem.label} />
+    }
+
+    if (user.role === 'teacher') {
+      return <TeacherCoursesPage title={activeItem.label} />
+    }
+
+    return <CourseManagementPage title={activeItem.label} user={user} />
   }
 
   return <PlaceholderModule user={user} item={activeItem} />

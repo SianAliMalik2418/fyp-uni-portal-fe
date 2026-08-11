@@ -842,8 +842,6 @@ Admin should:
 * Select courses
 * Save assignment
 
-Display currently assigned courses.
-
 ### Sian — BE
 
 Support:

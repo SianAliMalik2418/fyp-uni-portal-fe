@@ -66,7 +66,7 @@ export function SemestersCard({
             <TableBody>
               {semesters.map((semester) => (
                 <TableRow key={semester.id}>
-                  <TableCell className="text-right">
+                  <TableCell>
                     <span className="block font-medium">{semester.name}</span>
                     <span className="text-muted-foreground text-sm">{semester.academicYear}</span>
                   </TableCell>

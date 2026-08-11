@@ -54,7 +54,7 @@ export function SectionsCard({ onDelete, onEdit, query, sections }: SectionsCard
               {sections.map((section) => (
                 <TableRow key={section.id}>
                   <TableCell className="font-medium">{section.name}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell>
                     <span className="block">{section.program.name}</span>
                     <span className="text-muted-foreground text-sm">{section.program.code}</span>
                   </TableCell>

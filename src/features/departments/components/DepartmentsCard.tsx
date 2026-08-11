@@ -74,7 +74,7 @@ export function DepartmentsCard({
         <TableBody>
           {departments.map((department) => (
             <TableRow key={department.id}>
-              <TableCell className="text-right">
+              <TableCell>
                 <span className="text-foreground block font-medium">{department.name}</span>
                 <span className="text-muted-foreground block">
                   {department.description ?? 'No description'}
