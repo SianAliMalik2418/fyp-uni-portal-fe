@@ -50,12 +50,14 @@ describe('App', () => {
   let getSpy: ReturnType<typeof vi.spyOn>
   let patchSpy: ReturnType<typeof vi.spyOn>
   let postSpy: ReturnType<typeof vi.spyOn>
+  let putSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     toast.close()
     getSpy = vi.spyOn(apiClient, 'get')
     patchSpy = vi.spyOn(apiClient, 'patch')
     postSpy = vi.spyOn(apiClient, 'post')
+    putSpy = vi.spyOn(apiClient, 'put')
     window.history.pushState(null, '', '/')
   })
 
@@ -320,6 +322,45 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /students/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /academic structure/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /announcements/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /attendance settings/i })).toBeInTheDocument()
+  })
+
+  it('lets Sian configure the phase 5 attendance threshold', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', '/attendance')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeAdmin } })
+      }
+
+      if (url === '/attendance/configuration') {
+        return Promise.resolve({
+          data: { configuration: { minimumAttendancePercentage: 75 } },
+        })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+    putSpy.mockResolvedValueOnce({
+      data: {
+        message: 'Attendance settings updated.',
+        configuration: { minimumAttendancePercentage: 80 },
+      },
+    })
+
+    render(<App />)
+
+    expect(await screen.findByRole('heading', { name: /attendance settings/i })).toBeInTheDocument()
+    const thresholdInput = await screen.findByLabelText(/minimum attendance percentage/i)
+    await user.clear(thresholdInput)
+    await user.type(thresholdInput, '80')
+    await user.click(screen.getByRole('button', { name: /save setting/i }))
+
+    await waitFor(() => {
+      expect(putSpy).toHaveBeenCalledWith('/attendance/configuration', {
+        minimumAttendancePercentage: 80,
+      })
+    })
   })
 
   it('renders the Sian phase 2 academic structure workspace', async () => {

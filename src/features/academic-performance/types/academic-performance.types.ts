@@ -6,6 +6,21 @@ import type { CourseOffering } from '@/features/courses/types/course.types'
 
 export type AttendanceStatus = 'present' | 'absent' | 'leave'
 
+export type AttendanceConfiguration = {
+  minimumAttendancePercentage: number
+  updatedAt?: string
+}
+
+export type AttendanceConfigurationPayload = Pick<
+  AttendanceConfiguration,
+  'minimumAttendancePercentage'
+>
+
+export type AttendanceConfigurationResponse = {
+  configuration: AttendanceConfiguration
+  message?: string
+}
+
 export type AcademicPerformanceContext = {
   currentSemester: Semester | null
   activeSections: Section[]

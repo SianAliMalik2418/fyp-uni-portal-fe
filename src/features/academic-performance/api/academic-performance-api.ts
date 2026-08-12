@@ -3,12 +3,29 @@ import type {
   AcademicPerformanceContext,
   AcademicPerformanceOfferingStudentsResponse,
   AcademicPerformanceOfferingsResponse,
+  AttendanceConfigurationPayload,
+  AttendanceConfigurationResponse,
   AttendanceSessionPayload,
   AttendanceSessionResponse,
   AttendanceSessionsResponse,
   AttendanceShortagesResponse,
   StudentAttendanceResponse,
 } from '../types/academic-performance.types'
+
+export async function getAttendanceConfiguration() {
+  const { data } = await apiClient.get<AttendanceConfigurationResponse>(
+    '/attendance/configuration'
+  )
+  return data
+}
+
+export async function updateAttendanceConfiguration(payload: AttendanceConfigurationPayload) {
+  const { data } = await apiClient.put<AttendanceConfigurationResponse>(
+    '/attendance/configuration',
+    payload
+  )
+  return data
+}
 
 export async function getAcademicPerformanceContext() {
   const { data } = await apiClient.get<AcademicPerformanceContext>('/academic-performance/context')

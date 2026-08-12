@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 import {
   getStudentAttendanceSummaries,
+  getAttendanceConfiguration,
   getAcademicPerformanceContext,
   listAttendanceSessions,
   listAttendanceShortages,
@@ -18,6 +19,7 @@ export const academicPerformanceKeys = {
     [...academicPerformanceKeys.all, 'attendance-sessions', offeringId ?? 'all'] as const,
   studentAttendance: () => [...academicPerformanceKeys.all, 'student-attendance'] as const,
   attendanceShortages: () => [...academicPerformanceKeys.all, 'attendance-shortages'] as const,
+  configuration: () => [...academicPerformanceKeys.all, 'attendance-configuration'] as const,
 }
 
 export const academicPerformanceContextQueryOptions = queryOptions({
@@ -52,4 +54,9 @@ export const studentAttendanceQueryOptions = queryOptions({
 export const attendanceShortagesQueryOptions = queryOptions({
   queryKey: academicPerformanceKeys.attendanceShortages(),
   queryFn: listAttendanceShortages,
+})
+
+export const attendanceConfigurationQueryOptions = queryOptions({
+  queryKey: academicPerformanceKeys.configuration(),
+  queryFn: getAttendanceConfiguration,
 })

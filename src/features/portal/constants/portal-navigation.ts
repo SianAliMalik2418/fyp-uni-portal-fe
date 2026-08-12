@@ -54,6 +54,7 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
     { id: 'programs', label: 'Programs', icon: Mortarboard01Icon },
     { id: 'academic-structure', label: 'Academic Structure', icon: SchoolReportCardIcon },
     { id: 'courses', label: 'Courses', icon: CourseIcon },
+    { id: 'attendance', label: 'Attendance Settings', icon: Calendar03Icon },
     { id: 'fees', label: 'Fees', icon: Invoice01Icon },
     { id: 'timetables', label: 'Timetables', icon: Calendar03Icon },
     { id: 'exams', label: 'Exams', icon: File02Icon },

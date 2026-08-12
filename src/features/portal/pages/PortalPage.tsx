@@ -48,7 +48,10 @@ function isCoursesSection(user: PortalUser, sectionId: string) {
 function isAttendanceSection(user: PortalUser, sectionId: string) {
   return (
     sectionId === 'attendance' &&
-    (user.role === 'student' || user.role === 'teacher' || user.role === 'hod')
+    (user.role === 'student' ||
+      user.role === 'teacher' ||
+      user.role === 'hod' ||
+      user.role === 'admin')
   )
 }
 
