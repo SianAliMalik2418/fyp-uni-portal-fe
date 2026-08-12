@@ -10,7 +10,8 @@ import type {
   AttendanceSessionsResponse,
   AttendanceShortagesResponse,
   StudentAttendanceResponse,
-  AssessmentCategoriesResponse,
+  AssessmentStructurePayload,
+  AssessmentStructureResponse,
   AssessmentPayload,
   AssessmentResponse,
   AssessmentsResponse,
@@ -83,8 +84,16 @@ export async function listAttendanceShortages() {
   return data
 }
 
-export async function getAssessmentCategories() {
-  const { data } = await apiClient.get<AssessmentCategoriesResponse>('/assessments/categories')
+export async function getAssessmentStructure() {
+  const { data } = await apiClient.get<AssessmentStructureResponse>('/assessments/structure')
+  return data
+}
+
+export async function updateAssessmentStructure(payload: AssessmentStructurePayload) {
+  const { data } = await apiClient.put<AssessmentStructureResponse>(
+    '/assessments/structure',
+    payload
+  )
   return data
 }
 

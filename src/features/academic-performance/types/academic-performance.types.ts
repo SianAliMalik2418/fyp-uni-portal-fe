@@ -15,6 +15,12 @@ export type AssessmentCategoryDefinition = {
   weightPercentage: number
 }
 
+export type AssessmentStructure = {
+  categories: AssessmentCategoryDefinition[]
+  totalPercentage: number
+  updatedAt?: string
+}
+
 export type Assessment = {
   id: string
   offering: CourseOffering
@@ -32,8 +38,13 @@ export type AssessmentPayload = {
   maximumMarks: number
 }
 
-export type AssessmentCategoriesResponse = {
-  categories: AssessmentCategoryDefinition[]
+export type AssessmentStructureResponse = {
+  structure: AssessmentStructure
+  message?: string
+}
+
+export type AssessmentStructurePayload = {
+  categories: Array<Pick<AssessmentCategoryDefinition, 'id' | 'weightPercentage'>>
 }
 
 export type AssessmentsResponse = {

@@ -300,3 +300,61 @@ test('teacher enters assessment marks and saves a draft', async ({ page }) => {
     records: [{ studentId: 'student-1', obtainedMarks: 8.5 }],
   })
 })
+
+test('admin updates the university assessment structure with a 100 percent total', async ({
+  page,
+}) => {
+  const categories = [
+    { id: 'quiz', label: 'Quizzes', weightPercentage: 10 },
+    { id: 'assignment', label: 'Assignments', weightPercentage: 10 },
+    { id: 'attendance', label: 'Attendance', weightPercentage: 10 },
+    { id: 'presentation', label: 'Presentation', weightPercentage: 10 },
+    { id: 'midterm', label: 'Midterm', weightPercentage: 25 },
+    { id: 'final', label: 'Final', weightPercentage: 35 },
+  ]
+  let savedStructure: unknown
+
+  await page.route('**/api/auth/me', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ user: adminUser }),
+    })
+  })
+  await page.route('**/api/assessments/structure', async (route) => {
+    if (route.request().method() === 'PUT') {
+      savedStructure = route.request().postDataJSON()
+    }
+
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        message: 'Assessment structure updated.',
+        structure: { categories, totalPercentage: 100 },
+      }),
+    })
+  })
+
+  await page.goto('/assessment-structure')
+
+  await expect(page.getByText('Total weightage')).toBeVisible()
+  await expect(page.getByText('100%', { exact: true })).toBeVisible()
+
+  await page.getByLabel('Final').fill('30')
+  await expect(page.getByRole('button', { name: 'Save structure' })).toBeDisabled()
+  await expect(page.getByText('95%')).toBeVisible()
+
+  await page.getByLabel('Presentation').fill('15')
+  await page.getByRole('button', { name: 'Save structure' }).click()
+
+  await expect(page.getByText('Assessment structure updated.')).toBeVisible()
+  expect(savedStructure).toEqual({
+    categories: [
+      { id: 'quiz', weightPercentage: 10 },
+      { id: 'assignment', weightPercentage: 10 },
+      { id: 'attendance', weightPercentage: 10 },
+      { id: 'presentation', weightPercentage: 15 },
+      { id: 'midterm', weightPercentage: 25 },
+      { id: 'final', weightPercentage: 30 },
+    ],
+  })
+})

@@ -4,6 +4,7 @@ import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AcademicStructurePage } from '@/features/academic-structure/pages/AcademicStructurePage'
 import { AttendancePage } from '@/features/academic-performance/pages/AttendancePage'
 import { AssessmentsPage } from '@/features/academic-performance/pages/AssessmentsPage'
+import { AssessmentStructureSettingsPage } from '@/features/academic-performance/pages/AssessmentStructureSettingsPage'
 import { MarksPage } from '@/features/academic-performance/pages/MarksPage'
 import { CourseManagementPage } from '@/features/courses/pages/CourseManagementPage'
 import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
@@ -96,6 +97,10 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
 
   if (isAttendanceSection(user, activeItem.id)) {
     return <AttendancePage title={activeItem.label} user={user} />
+  }
+
+  if (user.role === 'admin' && activeItem.id === 'assessment-structure') {
+    return <AssessmentStructureSettingsPage title={activeItem.label} />
   }
 
   if (user.role === 'teacher' && activeItem.id === 'assessments') {

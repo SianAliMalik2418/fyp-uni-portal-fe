@@ -7,7 +7,7 @@ import {
   listAttendanceShortages,
   listAcademicPerformanceOfferingStudents,
   listAcademicPerformanceOfferings,
-  getAssessmentCategories,
+  getAssessmentStructure,
   getMarkSheet,
   listAssessments,
 } from './academic-performance-api'
@@ -23,7 +23,7 @@ export const academicPerformanceKeys = {
   studentAttendance: () => [...academicPerformanceKeys.all, 'student-attendance'] as const,
   attendanceShortages: () => [...academicPerformanceKeys.all, 'attendance-shortages'] as const,
   configuration: () => [...academicPerformanceKeys.all, 'attendance-configuration'] as const,
-  assessmentCategories: () => [...academicPerformanceKeys.all, 'assessment-categories'] as const,
+  assessmentStructure: () => [...academicPerformanceKeys.all, 'assessment-structure'] as const,
   assessments: (offeringId: string) =>
     [...academicPerformanceKeys.all, 'assessments', offeringId] as const,
   markSheet: (assessmentId: string) =>
@@ -69,9 +69,9 @@ export const attendanceConfigurationQueryOptions = queryOptions({
   queryFn: getAttendanceConfiguration,
 })
 
-export const assessmentCategoriesQueryOptions = queryOptions({
-  queryKey: academicPerformanceKeys.assessmentCategories(),
-  queryFn: getAssessmentCategories,
+export const assessmentStructureQueryOptions = queryOptions({
+  queryKey: academicPerformanceKeys.assessmentStructure(),
+  queryFn: getAssessmentStructure,
   staleTime: 5 * 60 * 1000,
 })
 

@@ -10,7 +10,7 @@ import { createAssessment } from '../api/academic-performance-api'
 import {
   academicPerformanceKeys,
   academicPerformanceOfferingsQueryOptions,
-  assessmentCategoriesQueryOptions,
+  assessmentStructureQueryOptions,
   assessmentsQueryOptions,
 } from '../api/academic-performance-queries'
 import { AssessmentCategoriesCard } from '../components/AssessmentCategoriesCard'
@@ -22,12 +22,12 @@ import type { AssessmentFormValues } from '../schemas/assessment.schemas'
 export function AssessmentsPage({ title }: { title: string }) {
   const queryClient = useQueryClient()
   const offeringsQuery = useQuery(academicPerformanceOfferingsQueryOptions)
-  const categoriesQuery = useQuery(assessmentCategoriesQueryOptions)
+  const structureQuery = useQuery(assessmentStructureQueryOptions)
   const [selectedOfferingId, setSelectedOfferingId] = useState<string>()
   const offerings = offeringsQuery.data?.offerings ?? []
   const activeOfferingId = selectedOfferingId ?? offerings[0]?.id ?? ''
   const assessmentsQuery = useQuery(assessmentsQueryOptions(activeOfferingId))
-  const categories = categoriesQuery.data?.categories ?? []
+  const categories = structureQuery.data?.structure.categories ?? []
   const createMutation = useMutation({
     mutationFn: createAssessment,
     onSuccess: (response) => {
@@ -53,14 +53,14 @@ export function AssessmentsPage({ title }: { title: string }) {
     createMutation.mutate({ offeringId: activeOfferingId, ...values }, { onSuccess: reset })
   }
 
-  if (offeringsQuery.isError || categoriesQuery.isError) {
+  if (offeringsQuery.isError || structureQuery.isError) {
     return (
       <Alert variant="destructive">
         <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
         <AlertTitle>Assessments unavailable</AlertTitle>
         <AlertDescription>
           {getApiErrorMessage(
-            offeringsQuery.error ?? categoriesQuery.error,
+            offeringsQuery.error ?? structureQuery.error,
             'Unable to load the assessment workspace.'
           )}
         </AlertDescription>
@@ -70,7 +70,7 @@ export function AssessmentsPage({ title }: { title: string }) {
 
   return (
     <div className="grid gap-5">
-      <AssessmentCategoriesCard categories={categories} isLoading={categoriesQuery.isPending} />
+      <AssessmentCategoriesCard categories={categories} isLoading={structureQuery.isPending} />
 
       <Card className="bg-background">
         <CardHeader className="border-border border-b">
