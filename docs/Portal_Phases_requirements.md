@@ -1164,7 +1164,6 @@ Supported status values:
 
 * Absent
 * Exempted
-* Result Withheld
 
 Provide:
 
