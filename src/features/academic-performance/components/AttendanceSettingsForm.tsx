@@ -21,11 +21,7 @@ type AttendanceSettingsFormProps = {
   onSubmit: (values: AttendanceSettingsFormValues) => void
 }
 
-export function AttendanceSettingsForm({
-  form,
-  isSaving,
-  onSubmit,
-}: AttendanceSettingsFormProps) {
+export function AttendanceSettingsForm({ form, isSaving, onSubmit }: AttendanceSettingsFormProps) {
   const {
     control,
     formState: { errors, isDirty },

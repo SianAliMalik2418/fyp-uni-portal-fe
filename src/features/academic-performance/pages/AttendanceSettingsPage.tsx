@@ -29,8 +29,7 @@ export function AttendanceSettingsPage({ title }: { title: string }) {
     defaultValues: defaultAttendanceSettings,
   })
   const { reset } = form
-  const configuredPercentage =
-    configurationQuery.data?.configuration.minimumAttendancePercentage
+  const configuredPercentage = configurationQuery.data?.configuration.minimumAttendancePercentage
 
   useEffect(() => {
     if (configuredPercentage !== undefined) {
@@ -50,7 +49,7 @@ export function AttendanceSettingsPage({ title }: { title: string }) {
         description: `The minimum attendance requirement is now ${response.configuration.minimumAttendancePercentage}%.`,
         type: 'success',
       })
-      await queryClient.invalidateQueries({ queryKey: academicPerformanceKeys.configuration() })
+      await queryClient.invalidateQueries({ queryKey: academicPerformanceKeys.all })
     },
     onError: (error) => {
       toast.add({
@@ -86,10 +85,7 @@ export function AttendanceSettingsPage({ title }: { title: string }) {
         <Alert variant="destructive">
           <AlertTitle>Attendance setting unavailable</AlertTitle>
           <AlertDescription>
-            {getApiErrorMessage(
-              configurationQuery.error,
-              'Unable to load the attendance setting'
-            )}
+            {getApiErrorMessage(configurationQuery.error, 'Unable to load the attendance setting')}
           </AlertDescription>
         </Alert>
       ) : (

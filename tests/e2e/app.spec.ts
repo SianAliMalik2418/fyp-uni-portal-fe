@@ -77,3 +77,42 @@ test('opens the profile menu and logs out', async ({ page }) => {
 
   await expect(page.getByRole('button', { name: 'Login' })).toBeVisible()
 })
+
+test('updates the admin attendance threshold', async ({ page }) => {
+  let minimumAttendancePercentage = 75
+
+  await page.route('**/api/auth/me', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ user: adminUser }),
+    })
+  })
+
+  await page.route('**/api/attendance/configuration', async (route) => {
+    if (route.request().method() === 'PUT') {
+      const payload = route.request().postDataJSON() as {
+        minimumAttendancePercentage: number
+      }
+      minimumAttendancePercentage = payload.minimumAttendancePercentage
+    }
+
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        message: 'Attendance settings updated.',
+        configuration: { minimumAttendancePercentage },
+      }),
+    })
+  })
+
+  await page.goto('/attendance')
+
+  const input = page.getByLabel('Minimum attendance percentage')
+  await expect(input).toHaveValue('75')
+  await input.fill('80')
+  await page.getByRole('button', { name: 'Save setting' }).click()
+
+  await expect(input).toHaveValue('80')
+  await expect(page.getByText('The minimum attendance requirement is now 80%.')).toBeVisible()
+  expect(minimumAttendancePercentage).toBe(80)
+})

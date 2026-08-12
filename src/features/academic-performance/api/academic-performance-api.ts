@@ -13,9 +13,7 @@ import type {
 } from '../types/academic-performance.types'
 
 export async function getAttendanceConfiguration() {
-  const { data } = await apiClient.get<AttendanceConfigurationResponse>(
-    '/attendance/configuration'
-  )
+  const { data } = await apiClient.get<AttendanceConfigurationResponse>('/attendance/configuration')
   return data
 }
 
