@@ -162,6 +162,30 @@ test('shows student attendance warnings and opens attendance details', async ({ 
             },
           ],
         },
+        academics: {
+          recentMarks: [
+            {
+              assessment: {
+                id: 'assessment-1',
+                name: 'Quiz 1',
+                category: 'quiz',
+                maximumMarks: 10,
+              },
+              offering: {
+                id: 'offering-1',
+                course: { code: 'PF', title: 'Programming Fundamentals' },
+              },
+              obtainedMarks: 8,
+              percentage: 80,
+            },
+          ],
+          summary: {
+            publishedAssessments: 1,
+            coursesWithMarks: 1,
+            averagePercentage: 80,
+            weightedPercentage: 8,
+          },
+        },
       }),
     })
   })
@@ -176,6 +200,11 @@ test('shows student attendance warnings and opens attendance details', async ({ 
   await page.goto('/dashboard')
 
   await expect(page.getByText('Low-attendance warning')).toBeVisible()
+  await expect(page.getByText('Recent marks')).toBeVisible()
+  await expect(page.getByText('Quiz 1')).toBeVisible()
+  await expect(page.getByText('8 / 10')).toBeVisible()
+  await expect(page.getByText('Academic summary')).toBeVisible()
+  await expect(page.getByText('80%', { exact: true })).toBeVisible()
   await page.getByRole('link', { name: 'View attendance' }).click()
   await expect(page).toHaveURL(/\/attendance$/)
 })

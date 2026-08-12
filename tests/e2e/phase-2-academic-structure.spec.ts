@@ -38,7 +38,7 @@ test.describe('phase 2 - academic structure', () => {
     await page.getByLabel('Program code').fill(program.code)
     await selectByLabel(page, 'Department', /Computer Science \(CS\)/)
     await page.getByLabel('Total semesters').fill(String(program.totalSemesters))
-    await page.getByLabel('Duration', { exact: true }).fill(String(program.duration))
+    await page.locator('#programDurationValue').fill(String(program.duration))
     await page.getByRole('button', { name: 'Add program' }).click()
 
     await expect(page.getByText('Program created')).toBeVisible()
@@ -75,6 +75,7 @@ test.describe('phase 2 - academic structure', () => {
     await page.getByRole('button', { name: 'Add semester' }).click()
     await page.getByLabel('Semester name').fill(semester.name)
     await page.getByLabel('Academic year').fill(semester.academicYear)
+    await page.getByRole('switch', { name: 'Active semester' }).click()
     await page.getByRole('button', { name: 'Add semester' }).click()
 
     await expect(page.getByText('Semester saved')).toBeVisible()

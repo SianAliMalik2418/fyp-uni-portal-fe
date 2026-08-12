@@ -47,7 +47,7 @@ test.describe('phase 5 - attendance management', () => {
     await expect(page.getByText(academicStudent.name)).toBeVisible()
     await page.getByRole('button', { name: 'Save attendance' }).click()
 
-    await expect(page.getByText('Attendance saved')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Attendance saved' })).toBeVisible()
     expect(attendancePayload).toMatchObject({
       offeringId: offering.id,
       records: [{ studentId: academicStudent.id, status: 'present' }],

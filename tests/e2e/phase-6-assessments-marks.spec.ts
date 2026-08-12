@@ -37,17 +37,19 @@ test.describe('phase 6 - assessments and marks', () => {
     })
 
     await page.goto('/assessment-structure')
-    await expect(page.getByLabel('Assignments')).toHaveValue('20')
+    await expect(page.getByLabel('Assignments')).toHaveValue('15')
     await page.getByLabel('Quizzes').fill('10')
     await page.getByRole('button', { name: 'Save structure' }).click()
 
-    await expect(page.getByText('Assessment structure saved')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Assessment structure saved' })).toBeVisible()
     expect(structurePayload).toEqual({
       categories: [
-        { id: 'assignment', weightPercentage: 20 },
+        { id: 'assignment', weightPercentage: 15 },
         { id: 'quiz', weightPercentage: 10 },
+        { id: 'attendance', weightPercentage: 10 },
+        { id: 'presentation', weightPercentage: 5 },
         { id: 'midterm', weightPercentage: 30 },
-        { id: 'final', weightPercentage: 40 },
+        { id: 'final', weightPercentage: 30 },
       ],
     })
 
@@ -81,7 +83,7 @@ test.describe('phase 6 - assessments and marks', () => {
     await page.getByLabel('Maximum marks').fill(String(assessment.maximumMarks))
     await page.getByRole('button', { name: 'Create assessment' }).click()
 
-    await expect(page.getByText('Assessment created')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Assessment created' })).toBeVisible()
     expect(assessmentPayload).toMatchObject({
       offeringId: offering.id,
       name: assessment.name,
@@ -133,7 +135,7 @@ test.describe('phase 6 - assessments and marks', () => {
     await page.getByRole('spinbutton', { name: `Marks for ${academicStudent.name}` }).fill('8.5')
     await page.getByRole('button', { name: 'Save draft' }).click()
 
-    await expect(page.getByText('Marks draft saved')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Marks draft saved' })).toBeVisible()
     expect(marksPayload).toEqual({
       records: [{ studentId: academicStudent.id, obtainedMarks: 8.5 }],
     })

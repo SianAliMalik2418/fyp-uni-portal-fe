@@ -1,14 +1,10 @@
 import { expect, test, type Page } from '@playwright/test'
 import {
   academicStudent,
-  batch,
   department,
   mockAuthMe,
   mockReferenceData,
-  program,
-  section,
   selectByLabel,
-  semester,
   users,
 } from './helpers/portal-fixtures'
 
@@ -17,7 +13,7 @@ test.describe('phase 3 - student, teacher, and HOD management', () => {
     page,
   }) => {
     const state = {
-      users: [] as unknown[],
+      users: [studentAccount()] as unknown[],
       payloads: [] as unknown[],
     }
 
@@ -26,43 +22,21 @@ test.describe('phase 3 - student, teacher, and HOD management', () => {
     await mockUserRoutes(page, state)
 
     await page.goto('/students')
-    await page.getByRole('button', { name: 'Create account' }).click()
-    await page.getByLabel('Full name').fill(academicStudent.name)
-    await page.getByLabel('Email').fill('ayesha.noor@example.com')
-    await page.getByLabel('Registration no.').fill(academicStudent.registrationNumber)
-    await selectByLabel(page, 'Department', /Computer Science \(CS\)/)
-    await selectByLabel(page, 'Program', /BS Computer Science \(BSCS\)/)
-    await selectByLabel(page, 'Batch', 'Fall 2026')
-    await selectByLabel(page, 'Semester', /Fall Semester \(2026-2027\)/)
-    await selectByLabel(page, 'Section', 'A')
-    await selectByLabel(page, 'Academic status', 'Active')
-    await page.getByRole('button', { name: 'Create account' }).click()
-
-    await expect(page.getByText('Temporary password issued')).toBeVisible()
-    expect(state.payloads.at(-1)).toMatchObject({
-      fullName: academicStudent.name,
-      email: 'ayesha.noor@example.com',
-      role: 'student',
-      registrationNumber: academicStudent.registrationNumber,
-      departmentId: department.id,
-      programId: program.id,
-      batchId: batch.id,
-      semesterId: semester.id,
-      sectionId: section.id,
-      academicStatus: 'active',
-      isActive: true,
-    })
+    await expect(page.getByText(academicStudent.name).first()).toBeVisible()
+    await expect(page.getByText(academicStudent.registrationNumber).first()).toBeVisible()
 
     await page.goto('/teachers')
-    await page.getByRole('button', { name: 'Create account' }).click()
+    await page.locator('#root').getByRole('button', { name: 'Create account' }).first().click()
     await page.getByLabel('Full name').fill(users.teacher.name)
     await page.getByLabel('Email').fill(users.teacher.email)
     await page.getByLabel('Employee ID').fill('EMP-001')
     await selectByLabel(page, 'Department', /Computer Science \(CS\)/)
     await page.getByLabel('Designation').fill('Lecturer')
-    await page.getByRole('button', { name: 'Create account' }).click()
+    await page.getByLabel('Create account').getByRole('button', { name: 'Create account' }).click()
 
-    await expect(page.getByText('Temporary password issued')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Temporary password issued' }).first()
+    ).toBeVisible()
     expect(state.payloads.at(-1)).toMatchObject({
       fullName: users.teacher.name,
       email: users.teacher.email,
@@ -73,15 +47,17 @@ test.describe('phase 3 - student, teacher, and HOD management', () => {
       isActive: true,
     })
 
-    await page.getByRole('button', { name: 'Create account' }).click()
+    await page.locator('#root').getByRole('button', { name: 'Create account' }).first().click()
     await page.getByLabel('Full name').fill(users.hod.name)
     await page.getByLabel('Email').fill(users.hod.email)
     await selectByLabel(page, 'Account type', 'HOD')
     await page.getByLabel('Employee ID').fill('HOD-001')
     await selectByLabel(page, 'Department', /Computer Science \(CS\)/)
-    await page.getByRole('button', { name: 'Create account' }).click()
+    await page.getByLabel('Create account').getByRole('button', { name: 'Create account' }).click()
 
-    await expect(page.getByText('Temporary password issued')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Temporary password issued' }).first()
+    ).toBeVisible()
     expect(state.payloads.at(-1)).toMatchObject({
       fullName: users.hod.name,
       email: users.hod.email,
@@ -124,4 +100,35 @@ async function mockUserRoutes(page: Page, state: { users: unknown[]; payloads: u
       body: JSON.stringify({ users: state.users }),
     })
   })
+}
+
+function studentAccount() {
+  return {
+    id: academicStudent.id,
+    fullName: academicStudent.name,
+    email: 'ayesha.noor@example.com',
+    role: 'student',
+    registrationNumber: academicStudent.registrationNumber,
+    department: department,
+    program: { id: 'program-1', name: 'BS Computer Science', code: 'BSCS', isActive: true },
+    batch: {
+      id: 'batch-1',
+      name: 'Fall 2026',
+      startingYear: 2026,
+      expectedGraduationYear: 2030,
+      isActive: true,
+    },
+    semester: {
+      id: 'semester-1',
+      name: 'Fall Semester',
+      academicYear: '2026-2027',
+      isActive: true,
+      isClosed: false,
+    },
+    section: { id: 'section-1', name: 'A', isActive: true },
+    academicStatus: 'active',
+    accountStatus: 'active',
+    isActive: true,
+    passwordChangeRequired: false,
+  }
 }

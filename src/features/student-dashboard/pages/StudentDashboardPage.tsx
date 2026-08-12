@@ -6,6 +6,8 @@ import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { studentDashboardQueryOptions } from '../api/student-dashboard-queries'
 import { StudentAttendanceOverview } from '../components/StudentAttendanceOverview'
+import { StudentAcademicSummary } from '../components/StudentAcademicSummary'
+import { StudentRecentMarks } from '../components/StudentRecentMarks'
 
 const studentDashboardStats = [
   { label: 'Due fees', value: '0', sectionId: 'fees' },
@@ -59,6 +61,21 @@ export function StudentDashboardPage({ user }: { user: PortalUser }) {
           isPending={dashboardQuery.isPending}
         />
         <NotificationPanel />
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <StudentRecentMarks
+          marks={dashboardQuery.data?.academics?.recentMarks}
+          error={dashboardQuery.error}
+          isError={dashboardQuery.isError}
+          isPending={dashboardQuery.isPending}
+        />
+        <StudentAcademicSummary
+          summary={dashboardQuery.data?.academics?.summary}
+          error={dashboardQuery.error}
+          isError={dashboardQuery.isError}
+          isPending={dashboardQuery.isPending}
+        />
       </div>
     </div>
   )

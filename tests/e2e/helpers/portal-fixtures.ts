@@ -96,10 +96,12 @@ export const academicStudent = {
 
 export const assessmentStructure = {
   categories: [
-    { id: 'assignment', label: 'Assignments', weightPercentage: 20 },
+    { id: 'assignment', label: 'Assignments', weightPercentage: 15 },
     { id: 'quiz', label: 'Quizzes', weightPercentage: 10 },
+    { id: 'attendance', label: 'Attendance', weightPercentage: 10 },
+    { id: 'presentation', label: 'Presentations', weightPercentage: 5 },
     { id: 'midterm', label: 'Midterm', weightPercentage: 30 },
-    { id: 'final', label: 'Final', weightPercentage: 40 },
+    { id: 'final', label: 'Final', weightPercentage: 30 },
   ],
   totalPercentage: 100,
 }
@@ -204,12 +206,11 @@ export async function mockCourses(page: Page) {
 }
 
 export async function selectByLabel(page: Page, label: string | RegExp, option: string | RegExp) {
-  await page.getByLabel(label).click()
-  await page.getByRole('option', { name: option }).click()
-}
-
-export async function expectToast(page: Page, title: string | RegExp) {
-  await expect(page.getByText(title).first()).toBeVisible()
+  await page.getByRole('combobox', { name: label }).click()
+  const visibleOptions = page.locator('[role="listbox"]:visible [role="option"]')
+  await visibleOptions
+    .filter({ hasText: option })
+    .evaluate((element) => (element as HTMLElement).click())
 }
 
 function user(role: 'admin' | 'hod' | 'teacher' | 'student', name: string, email: string) {

@@ -20,7 +20,7 @@ test.describe('phase 1 - basic project user flow', () => {
 
     await page.goto('/students')
 
-    await expect(page.getByRole('heading', { name: 'Unauthorized section' })).toBeVisible()
+    await expect(page.getByText('Access blocked')).toBeVisible()
     await expect(page.getByText(/Student accounts cannot access "students"/)).toBeVisible()
   })
 
@@ -44,7 +44,7 @@ test.describe('phase 1 - basic project user flow', () => {
 
     await page.goto('/')
 
-    await expect(page.getByRole('heading', { name: 'Change temporary password' })).toBeVisible()
+    await expect(page.getByText('Change temporary password')).toBeVisible()
     await page.getByLabel('Current temporary password').fill('@Abc1234')
     await page.getByLabel('New password').fill('Permanent123!')
     await page.getByLabel('Confirm password').fill('Permanent123!')
@@ -79,7 +79,7 @@ test.describe('phase 1 - basic project user flow', () => {
     await page.getByLabel(/^Password$/).fill('@Abc1234')
     await page.getByRole('button', { name: 'Login' }).click()
 
-    await expect(page.getByText('Inactive account')).toBeVisible()
-    await expect(page.getByText('Account is inactive.')).toBeVisible()
+    await expect(page.getByRole('alert')).toContainText('Inactive account')
+    await expect(page.getByRole('alert')).toContainText('Account is inactive.')
   })
 })

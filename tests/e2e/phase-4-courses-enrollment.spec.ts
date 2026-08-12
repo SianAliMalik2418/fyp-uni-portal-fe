@@ -52,7 +52,7 @@ test.describe('phase 4 - courses, teacher assignment, and enrollment', () => {
     })
 
     await selectByLabel(page, 'Section', /BSCS .* Fall Semester .* A/)
-    await page.getByLabel(`${course.code} · ${course.title}`).check()
+    await page.getByRole('checkbox', { name: `${course.code} · ${course.title}` }).check()
     await page.getByRole('button', { name: 'Save assignment' }).click()
 
     await expect(page.getByText('Assignment saved')).toBeVisible()
