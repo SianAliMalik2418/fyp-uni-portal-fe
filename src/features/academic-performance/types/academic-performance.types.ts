@@ -4,6 +4,8 @@ import type {
 } from '@/features/academic-structure/types/academic-structure.types'
 import type { CourseOffering } from '@/features/courses/types/course.types'
 
+export type AttendanceStatus = 'present' | 'absent' | 'leave'
+
 export type AcademicPerformanceContext = {
   currentSemester: Semester | null
   activeSections: Section[]
@@ -39,4 +41,62 @@ export type AcademicPerformanceOfferingsResponse = {
 export type AcademicPerformanceOfferingStudentsResponse = {
   offering: CourseOffering
   students: AcademicPerformanceStudent[]
+}
+
+export type AttendanceRecordPayload = {
+  studentId: string
+  status: AttendanceStatus
+}
+
+export type AttendanceSessionPayload = {
+  offeringId: string
+  date: string
+  records: AttendanceRecordPayload[]
+}
+
+export type AttendanceRecord = {
+  student: AcademicPerformanceStudent
+  status: AttendanceStatus
+}
+
+export type AttendanceSession = {
+  id: string
+  offering: CourseOffering
+  date: string
+  records: AttendanceRecord[]
+  studentCount: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+export type AttendanceSessionResponse = {
+  message: string
+  session: AttendanceSession
+}
+
+export type AttendanceSessionsResponse = {
+  sessions: AttendanceSession[]
+}
+
+export type AttendanceCourseSummary = {
+  offering: CourseOffering
+  totalClasses: number
+  present: number
+  absent: number
+  leave: number
+  attendancePercentage: number
+  requiredPercentage: number
+  isBelowThreshold: boolean
+}
+
+export type StudentAttendanceResponse = {
+  summaries: AttendanceCourseSummary[]
+}
+
+export type AttendanceShortage = AttendanceCourseSummary & {
+  student: AcademicPerformanceStudent
+}
+
+export type AttendanceShortagesResponse = {
+  shortages: AttendanceShortage[]
 }

@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { ShieldUserIcon, UserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AcademicStructurePage } from '@/features/academic-structure/pages/AcademicStructurePage'
+import { AttendancePage } from '@/features/academic-performance/pages/AttendancePage'
 import { CourseManagementPage } from '@/features/courses/pages/CourseManagementPage'
 import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
 import { TeacherCoursesPage } from '@/features/courses/pages/TeacherCoursesPage'
@@ -44,6 +45,13 @@ function isCoursesSection(user: PortalUser, sectionId: string) {
   )
 }
 
+function isAttendanceSection(user: PortalUser, sectionId: string) {
+  return (
+    sectionId === 'attendance' &&
+    (user.role === 'student' || user.role === 'teacher' || user.role === 'hod')
+  )
+}
+
 function portalModuleFor(user: PortalUser, activeItem: NavItem) {
   if (activeItem.id === 'profile') {
     return <CurrentUserProfilePage />
@@ -79,6 +87,10 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
     }
 
     return <CourseManagementPage title={activeItem.label} user={user} />
+  }
+
+  if (isAttendanceSection(user, activeItem.id)) {
+    return <AttendancePage title={activeItem.label} user={user} />
   }
 
   return <PlaceholderModule user={user} item={activeItem} />

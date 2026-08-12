@@ -24,6 +24,7 @@
 - When a page needs a form, table/list card, sheet/dialog, empty/loading/error state, or repeated domain UI, create a focused component under that feature's `components/` directory.
 - Prefer one clear component per file once a component grows beyond a small helper. For example, use `BatchForm.tsx`, `BatchesCard.tsx`, and `DeleteBatchDialog.tsx` instead of one large `AcademicStructurePage.tsx` or one catch-all component file.
 - Keep feature schemas under `src/features/*/schemas`, API calls under `src/features/*/api`, TanStack Query options under `src/features/*/api`, domain types under `src/features/*/types`, and payload/form mappers under `src/features/*/utils`.
+- Reuse existing components, shared helpers, feature utilities, and established UI patterns before creating new ones. Add a new frontend component, helper, or interaction pattern only when the codebase does not already provide a suitable option.
 - Before adding frontend code, inspect a similar completed feature such as `departments`, `programs`, or `user-accounts`, and mirror its structure unless the current feature has a concrete reason to differ.
 - Keep auth-specific API functions, TanStack Query options, schemas, types, pages, and components under `src/features/auth`.
 - Keep portal-specific pages, shell components, navigation, constants, and types under `src/features/portal`.

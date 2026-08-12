@@ -1,6 +1,9 @@
 import { queryOptions } from '@tanstack/react-query'
 import {
+  getStudentAttendanceSummaries,
   getAcademicPerformanceContext,
+  listAttendanceSessions,
+  listAttendanceShortages,
   listAcademicPerformanceOfferingStudents,
   listAcademicPerformanceOfferings,
 } from './academic-performance-api'
@@ -11,6 +14,10 @@ export const academicPerformanceKeys = {
   offerings: () => [...academicPerformanceKeys.all, 'offerings'] as const,
   offeringStudents: (offeringId: string) =>
     [...academicPerformanceKeys.offerings(), offeringId, 'students'] as const,
+  attendanceSessions: (offeringId?: string) =>
+    [...academicPerformanceKeys.all, 'attendance-sessions', offeringId ?? 'all'] as const,
+  studentAttendance: () => [...academicPerformanceKeys.all, 'student-attendance'] as const,
+  attendanceShortages: () => [...academicPerformanceKeys.all, 'attendance-shortages'] as const,
 }
 
 export const academicPerformanceContextQueryOptions = queryOptions({
@@ -29,3 +36,20 @@ export const academicPerformanceOfferingStudentsQueryOptions = (offeringId: stri
     queryFn: () => listAcademicPerformanceOfferingStudents(offeringId),
     enabled: Boolean(offeringId),
   })
+
+export const attendanceSessionsQueryOptions = (offeringId?: string, enabled = true) =>
+  queryOptions({
+    queryKey: academicPerformanceKeys.attendanceSessions(offeringId),
+    queryFn: () => listAttendanceSessions(offeringId),
+    enabled,
+  })
+
+export const studentAttendanceQueryOptions = queryOptions({
+  queryKey: academicPerformanceKeys.studentAttendance(),
+  queryFn: getStudentAttendanceSummaries,
+})
+
+export const attendanceShortagesQueryOptions = queryOptions({
+  queryKey: academicPerformanceKeys.attendanceShortages(),
+  queryFn: listAttendanceShortages,
+})

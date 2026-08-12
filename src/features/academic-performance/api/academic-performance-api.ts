@@ -3,6 +3,11 @@ import type {
   AcademicPerformanceContext,
   AcademicPerformanceOfferingStudentsResponse,
   AcademicPerformanceOfferingsResponse,
+  AttendanceSessionPayload,
+  AttendanceSessionResponse,
+  AttendanceSessionsResponse,
+  AttendanceShortagesResponse,
+  StudentAttendanceResponse,
 } from '../types/academic-performance.types'
 
 export async function getAcademicPerformanceContext() {
@@ -21,5 +26,38 @@ export async function listAcademicPerformanceOfferingStudents(offeringId: string
   const { data } = await apiClient.get<AcademicPerformanceOfferingStudentsResponse>(
     `/academic-performance/offerings/${offeringId}/students`
   )
+  return data
+}
+
+export async function listAttendanceSessions(offeringId?: string) {
+  const { data } = await apiClient.get<AttendanceSessionsResponse>('/attendance/sessions', {
+    params: { offeringId },
+  })
+  return data
+}
+
+export async function saveAttendanceSession(payload: AttendanceSessionPayload) {
+  const { data } = await apiClient.post<AttendanceSessionResponse>('/attendance/sessions', payload)
+  return data
+}
+
+export async function updateAttendanceSession(
+  sessionId: string,
+  payload: AttendanceSessionPayload
+) {
+  const { data } = await apiClient.put<AttendanceSessionResponse>(
+    `/attendance/sessions/${sessionId}`,
+    payload
+  )
+  return data
+}
+
+export async function getStudentAttendanceSummaries() {
+  const { data } = await apiClient.get<StudentAttendanceResponse>('/attendance/student')
+  return data
+}
+
+export async function listAttendanceShortages() {
+  const { data } = await apiClient.get<AttendanceShortagesResponse>('/attendance/shortages')
   return data
 }
