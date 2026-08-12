@@ -1,8 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { NotificationPanel } from '@/features/portal/components/NotificationPanel'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { studentDashboardQueryOptions } from '../api/student-dashboard-queries'
+import { StudentAttendanceOverview } from '../components/StudentAttendanceOverview'
 
 const studentDashboardStats = [
   { label: 'Due fees', value: '0', sectionId: 'fees' },
@@ -13,6 +16,7 @@ const studentDashboardStats = [
 
 export function StudentDashboardPage({ user }: { user: PortalUser }) {
   const navigation = roleNavigation.student
+  const dashboardQuery = useQuery(studentDashboardQueryOptions)
 
   return (
     <div className="mx-auto grid max-w-6xl gap-5">
@@ -48,14 +52,12 @@ export function StudentDashboardPage({ user }: { user: PortalUser }) {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <Card className="bg-background">
-          <CardHeader>
-            <CardTitle>Student services</CardTitle>
-            <CardDescription>
-              Fees, timetable, exams, materials, and announcements are ready for data integration.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <StudentAttendanceOverview
+          summaries={dashboardQuery.data?.attendance.summaries}
+          error={dashboardQuery.error}
+          isError={dashboardQuery.isError}
+          isPending={dashboardQuery.isPending}
+        />
         <NotificationPanel />
       </div>
     </div>

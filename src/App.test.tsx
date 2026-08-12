@@ -724,6 +724,53 @@ describe('App', () => {
     expect(screen.getByText(/1 enrolled course ready for future ai context/i)).toBeInTheDocument()
   })
 
+  it('renders Hammad phase 5 attendance on the student dashboard', async () => {
+    window.history.pushState(null, '', '/dashboard')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({
+          data: { user: { ...temporaryStudent, passwordChangeRequired: false } },
+        })
+      }
+
+      if (url === '/student-dashboard') {
+        return Promise.resolve({
+          data: {
+            attendance: {
+              summaries: [
+                {
+                  offering: {
+                    id: 'offering-1',
+                    course: { code: 'PF', title: 'Programming Fundamentals' },
+                  },
+                  totalClasses: 8,
+                  present: 5,
+                  absent: 2,
+                  leave: 1,
+                  attendancePercentage: 62.5,
+                  requiredPercentage: 75,
+                  isBelowThreshold: true,
+                },
+              ],
+            },
+          },
+        })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(<App />)
+
+    expect(await screen.findByText(/attendance summary/i)).toBeInTheDocument()
+    expect(await screen.findByText(/low-attendance warning/i)).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent(/pf: 62.50%, required 75%/i)
+    expect(screen.getByRole('link', { name: /view attendance/i })).toHaveAttribute(
+      'href',
+      '/attendance'
+    )
+  })
+
   it('opens the profile menu and logs out from the portal shell', async () => {
     const user = userEvent.setup()
     getSpy.mockResolvedValueOnce({ data: { user: activeAdmin } })

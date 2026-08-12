@@ -10,6 +10,14 @@ const adminUser = {
   passwordChangeRequired: false,
 }
 
+const studentUser = {
+  ...adminUser,
+  id: 'student-1',
+  name: 'Hammad Student',
+  email: 'student@example.com',
+  role: 'student',
+}
+
 test('logs in with email/password and shows the admin portal shell', async ({ page }) => {
   await page.route('**/api/auth/me', async (route) => {
     await route.fulfill({
@@ -115,4 +123,51 @@ test('updates the admin attendance threshold', async ({ page }) => {
   await expect(input).toHaveValue('80')
   await expect(page.getByText('The minimum attendance requirement is now 80%.')).toBeVisible()
   expect(minimumAttendancePercentage).toBe(80)
+})
+
+test('shows student attendance warnings and opens attendance details', async ({ page }) => {
+  await page.route('**/api/auth/me', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ user: studentUser }),
+    })
+  })
+
+  await page.route('**/api/student-dashboard', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        attendance: {
+          summaries: [
+            {
+              offering: {
+                id: 'offering-1',
+                course: { code: 'PF', title: 'Programming Fundamentals' },
+              },
+              totalClasses: 8,
+              present: 5,
+              absent: 2,
+              leave: 1,
+              attendancePercentage: 62.5,
+              requiredPercentage: 75,
+              isBelowThreshold: true,
+            },
+          ],
+        },
+      }),
+    })
+  })
+
+  await page.route('**/api/attendance/student', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ summaries: [] }),
+    })
+  })
+
+  await page.goto('/dashboard')
+
+  await expect(page.getByText('Low-attendance warning')).toBeVisible()
+  await page.getByRole('link', { name: 'View attendance' }).click()
+  await expect(page).toHaveURL(/\/attendance$/)
 })
