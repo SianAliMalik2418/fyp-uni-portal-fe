@@ -123,34 +123,61 @@ export async function mockAuthMe(page: Page, portalUser = users.admin) {
 
 export async function mockReferenceData(page: Page) {
   await page.route('**/api/departments', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ departments: [department] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ departments: [department] }),
+    })
   })
   await page.route('**/api/programs', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ programs: [program] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ programs: [program] }),
+    })
   })
   await page.route('**/api/batches', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ batches: [batch] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ batches: [batch] }),
+    })
   })
   await page.route('**/api/semesters', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ semesters: [semester] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ semesters: [semester] }),
+    })
   })
   await page.route('**/api/sections', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ sections: [section] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ sections: [section] }),
+    })
   })
 }
 
 export async function mockCourses(page: Page) {
   await page.route('**/api/courses', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ courses: [course] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ courses: [course] }),
+    })
   })
   await page.route('**/api/courses/offerings', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ offerings: [offering] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ offerings: [offering] }),
+    })
   })
   await page.route('**/api/courses/me/student', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ offerings: [offering] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ offerings: [offering] }),
+    })
   })
   await page.route('**/api/courses/me/teacher', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ offerings: [offering] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ offerings: [offering] }),
+    })
   })
   await page.route('**/api/courses/teachers', async (route) => {
     await route.fulfill({
@@ -169,7 +196,10 @@ export async function mockCourses(page: Page) {
     })
   })
   await page.route('**/api/courses/sections/*/offerings', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ offerings: [offering] }) })
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ offerings: [offering] }),
+    })
   })
 }
 
