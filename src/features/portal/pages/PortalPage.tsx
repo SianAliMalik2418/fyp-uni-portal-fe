@@ -6,6 +6,7 @@ import { AttendancePage } from '@/features/academic-performance/pages/Attendance
 import { AssessmentsPage } from '@/features/academic-performance/pages/AssessmentsPage'
 import { AssessmentStructureSettingsPage } from '@/features/academic-performance/pages/AssessmentStructureSettingsPage'
 import { MarksPage } from '@/features/academic-performance/pages/MarksPage'
+import { ResultsPage } from '@/features/academic-performance/pages/ResultsPage'
 import { CourseManagementPage } from '@/features/courses/pages/CourseManagementPage'
 import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
 import { TeacherCoursesPage } from '@/features/courses/pages/TeacherCoursesPage'
@@ -109,6 +110,10 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
 
   if (user.role === 'teacher' && activeItem.id === 'marks') {
     return <MarksPage title={activeItem.label} />
+  }
+
+  if (activeItem.id === 'results') {
+    return <ResultsPage title={activeItem.label} user={user} />
   }
 
   return <PlaceholderModule user={user} item={activeItem} />

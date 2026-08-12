@@ -10,6 +10,8 @@ import {
   getAssessmentStructure,
   getMarkSheet,
   listAssessments,
+  getCourseResult,
+  getPublishedStudentResults,
 } from './academic-performance-api'
 
 export const academicPerformanceKeys = {
@@ -28,6 +30,9 @@ export const academicPerformanceKeys = {
     [...academicPerformanceKeys.all, 'assessments', offeringId] as const,
   markSheet: (assessmentId: string) =>
     [...academicPerformanceKeys.all, 'mark-sheet', assessmentId] as const,
+  courseResult: (offeringId: string) =>
+    [...academicPerformanceKeys.all, 'course-result', offeringId] as const,
+  studentResults: () => [...academicPerformanceKeys.all, 'student-results'] as const,
 }
 
 export const academicPerformanceContextQueryOptions = queryOptions({
@@ -88,3 +93,15 @@ export const markSheetQueryOptions = (assessmentId: string) =>
     queryFn: () => getMarkSheet(assessmentId),
     enabled: Boolean(assessmentId),
   })
+
+export const courseResultQueryOptions = (offeringId: string) =>
+  queryOptions({
+    queryKey: academicPerformanceKeys.courseResult(offeringId),
+    queryFn: () => getCourseResult(offeringId),
+    enabled: Boolean(offeringId),
+  })
+
+export const studentResultsQueryOptions = queryOptions({
+  queryKey: academicPerformanceKeys.studentResults(),
+  queryFn: getPublishedStudentResults,
+})

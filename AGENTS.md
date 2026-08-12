@@ -70,9 +70,14 @@ Before handing off frontend work, verify:
 
 ## Frontend Testing
 
+- Add or update frontend tests with every new feature or meaningful UI behavior change unless the user explicitly says not to. Do not leave a feature covered only by manual verification when it has reusable logic, form behavior, permissions, routing, or a critical user workflow.
 - Use Vitest for unit tests, React Testing Library for component behavior, and Playwright for critical end-to-end browser flows.
 - Put frontend unit and component tests next to the code they cover using `*.test.ts` or `*.test.tsx`.
 - Put Playwright specs under `tests/e2e`.
+- Use unit tests for validators, mappers, permission helpers, query option helpers, and other pure frontend logic.
+- Use component tests for forms, tables, dialogs, loading/error/empty states, and role-specific rendering.
+- Add or update Playwright specs when the feature changes auth, routing, navigation, protected pages, browser-only behavior, or a phase/final-state user objective.
+- Keep the default mocked e2e suite focused on fast phase and browser-flow coverage. Use `bun run test:e2e:full` for live frontend + backend + MongoDB final-state coverage when a feature changes the implemented cross-stack objective.
 - Prefer behavior-focused tests based on user flows, validators, API contracts, accessibility roles, and edge cases.
 - Mock only slow, external, nondeterministic, paid, or network-only services.
 - Every test must have meaningful assertions.

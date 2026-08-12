@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test'
+import { type Page } from '@playwright/test'
 
 export const users = {
   admin: user('admin', 'Sian Admin', 'admin@example.com'),

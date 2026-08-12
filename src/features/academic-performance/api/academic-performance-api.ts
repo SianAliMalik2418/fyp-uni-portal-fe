@@ -17,6 +17,9 @@ import type {
   AssessmentsResponse,
   MarkSheetPayload,
   MarkSheetResponse,
+  CourseResultResponse,
+  PublishedStudentResultsResponse,
+  ResultCommentPayload,
 } from '../types/academic-performance.types'
 
 export async function getAttendanceConfiguration() {
@@ -116,5 +119,43 @@ export async function getMarkSheet(assessmentId: string) {
 
 export async function saveMarkSheetDraft(assessmentId: string, payload: MarkSheetPayload) {
   const { data } = await apiClient.put<MarkSheetResponse>(`/marks/${assessmentId}/draft`, payload)
+  return data
+}
+
+export async function getCourseResult(offeringId: string) {
+  const { data } = await apiClient.get<CourseResultResponse>(`/results/course/${offeringId}`)
+  return data
+}
+
+export async function submitCourseResult(offeringId: string) {
+  const { data } = await apiClient.post<CourseResultResponse>(
+    `/results/course/${offeringId}/submit`
+  )
+  return data
+}
+
+export async function approveCourseResult(resultId: string) {
+  const { data } = await apiClient.post<CourseResultResponse>(`/results/${resultId}/approve`)
+  return data
+}
+
+export async function returnCourseResult(resultId: string, payload: ResultCommentPayload) {
+  const { data } = await apiClient.post<CourseResultResponse>(
+    `/results/${resultId}/return`,
+    payload
+  )
+  return data
+}
+
+export async function reopenCourseResult(resultId: string, payload: ResultCommentPayload) {
+  const { data } = await apiClient.post<CourseResultResponse>(
+    `/results/${resultId}/reopen`,
+    payload
+  )
+  return data
+}
+
+export async function getPublishedStudentResults() {
+  const { data } = await apiClient.get<PublishedStudentResultsResponse>('/results/student')
   return data
 }

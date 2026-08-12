@@ -8,6 +8,7 @@ export type AttendanceStatus = 'present' | 'absent' | 'leave'
 export type AssessmentCategory =
   'quiz' | 'assignment' | 'attendance' | 'presentation' | 'midterm' | 'final'
 export type MarkStatus = 'absent' | 'exempted' | 'result_withheld'
+export type ResultStatus = 'draft' | 'pending' | 'returned' | 'approved'
 
 export type AssessmentCategoryDefinition = {
   id: AssessmentCategory
@@ -84,6 +85,75 @@ export type MarkSheetPayload = {
 export type MarkSheetResponse = {
   message?: string
   sheet: MarkSheet
+}
+
+export type ResultCategoryTotal = {
+  category: AssessmentCategory
+  obtainedMarks: number
+  maximumMarks: number
+  percentage: number
+  weightedMarks: number
+}
+
+export type ResultRecord = {
+  student: AcademicPerformanceStudent
+  categories: ResultCategoryTotal[]
+  finalPercentage: number
+  letterGrade: string
+  gradePoint: number
+}
+
+export type ResultStatistics = {
+  studentCount: number
+  averagePercentage: number
+  highestPercentage: number
+  lowestPercentage: number
+  passCount: number
+}
+
+export type CourseResult = {
+  id?: string
+  offering: CourseOffering
+  status: ResultStatus
+  records: ResultRecord[]
+  statistics: ResultStatistics
+  submissionReady: boolean
+  hodComment?: string
+  reopenReason?: string
+  submittedAt?: string
+  approvedAt?: string
+  returnedAt?: string
+  reopenedAt?: string
+  updatedAt?: string
+}
+
+export type CourseResultResponse = {
+  message?: string
+  result: CourseResult
+}
+
+export type ResultCommentPayload = {
+  comment: string
+}
+
+export type StudentCourseResult = {
+  id: string
+  offering: CourseOffering
+  finalPercentage: number
+  letterGrade: string
+  gradePoint: number
+  approvedAt?: string
+}
+
+export type StudentSemesterResult = {
+  semester: Semester
+  gpa: number
+  courses: StudentCourseResult[]
+}
+
+export type PublishedStudentResultsResponse = {
+  semesters: StudentSemesterResult[]
+  cgpa: number
 }
 
 export type AttendanceConfiguration = {

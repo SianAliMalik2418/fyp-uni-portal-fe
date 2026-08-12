@@ -6,7 +6,6 @@ import {
   mockReferenceData,
   offering,
   program,
-  section,
   selectByLabel,
   semester,
   users,
