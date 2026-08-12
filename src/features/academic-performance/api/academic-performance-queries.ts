@@ -12,6 +12,7 @@ import {
   listAssessments,
   getCourseResult,
   getPublishedStudentResults,
+  getGradingScale,
 } from './academic-performance-api'
 
 export const academicPerformanceKeys = {
@@ -30,9 +31,11 @@ export const academicPerformanceKeys = {
     [...academicPerformanceKeys.all, 'assessments', offeringId] as const,
   markSheet: (assessmentId: string) =>
     [...academicPerformanceKeys.all, 'mark-sheet', assessmentId] as const,
+  courseResults: () => [...academicPerformanceKeys.all, 'course-result'] as const,
   courseResult: (offeringId: string) =>
-    [...academicPerformanceKeys.all, 'course-result', offeringId] as const,
+    [...academicPerformanceKeys.courseResults(), offeringId] as const,
   studentResults: () => [...academicPerformanceKeys.all, 'student-results'] as const,
+  gradingScale: () => [...academicPerformanceKeys.all, 'grading-scale'] as const,
 }
 
 export const academicPerformanceContextQueryOptions = queryOptions({
@@ -104,4 +107,10 @@ export const courseResultQueryOptions = (offeringId: string) =>
 export const studentResultsQueryOptions = queryOptions({
   queryKey: academicPerformanceKeys.studentResults(),
   queryFn: getPublishedStudentResults,
+})
+
+export const gradingScaleQueryOptions = queryOptions({
+  queryKey: academicPerformanceKeys.gradingScale(),
+  queryFn: getGradingScale,
+  staleTime: 5 * 60 * 1000,
 })

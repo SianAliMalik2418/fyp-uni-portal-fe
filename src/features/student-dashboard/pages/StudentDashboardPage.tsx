@@ -1,13 +1,20 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { NotificationPanel } from '@/features/portal/components/NotificationPanel'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { studentDashboardQueryOptions } from '../api/student-dashboard-queries'
+import {
+  studentDashboardKeys,
+  studentDashboardQueryOptions,
+} from '../api/student-dashboard-queries'
+import { markNotificationRead } from '../api/student-dashboard-api'
 import { StudentAttendanceOverview } from '../components/StudentAttendanceOverview'
 import { StudentAcademicSummary } from '../components/StudentAcademicSummary'
 import { StudentRecentMarks } from '../components/StudentRecentMarks'
+import { StudentLatestResult } from '../components/StudentLatestResult'
+import { toast } from '@/components/ui/toast-manager'
+import { getApiErrorMessage } from '@/shared/api/http-client'
 
 const studentDashboardStats = [
   { label: 'Due fees', value: '0', sectionId: 'fees' },
@@ -17,8 +24,22 @@ const studentDashboardStats = [
 ]
 
 export function StudentDashboardPage({ user }: { user: PortalUser }) {
+  const queryClient = useQueryClient()
   const navigation = roleNavigation.student
   const dashboardQuery = useQuery(studentDashboardQueryOptions)
+  const readMutation = useMutation({
+    mutationFn: markNotificationRead,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: studentDashboardKeys.summary() })
+    },
+    onError: (error) => {
+      toast.add({
+        title: 'Notification not updated',
+        description: getApiErrorMessage(error, 'Unable to mark the notification as read.'),
+        type: 'error',
+      })
+    },
+  })
 
   return (
     <div className="mx-auto grid max-w-6xl gap-5">
@@ -60,8 +81,17 @@ export function StudentDashboardPage({ user }: { user: PortalUser }) {
           isError={dashboardQuery.isError}
           isPending={dashboardQuery.isPending}
         />
-        <NotificationPanel />
+        <NotificationPanel
+          notifications={dashboardQuery.data?.notifications}
+          markingId={readMutation.isPending ? readMutation.variables : undefined}
+          onMarkRead={(notificationId) => readMutation.mutate(notificationId)}
+        />
       </div>
+
+      <StudentLatestResult
+        results={dashboardQuery.data?.results}
+        isPending={dashboardQuery.isPending}
+      />
 
       <div className="grid gap-5 lg:grid-cols-2">
         <StudentRecentMarks

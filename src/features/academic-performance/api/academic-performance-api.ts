@@ -20,6 +20,8 @@ import type {
   CourseResultResponse,
   PublishedStudentResultsResponse,
   ResultCommentPayload,
+  GradingScalePayload,
+  GradingScaleResponse,
 } from '../types/academic-performance.types'
 
 export async function getAttendanceConfiguration() {
@@ -157,5 +159,15 @@ export async function reopenCourseResult(resultId: string, payload: ResultCommen
 
 export async function getPublishedStudentResults() {
   const { data } = await apiClient.get<PublishedStudentResultsResponse>('/results/student')
+  return data
+}
+
+export async function getGradingScale() {
+  const { data } = await apiClient.get<GradingScaleResponse>('/results/grading-scale')
+  return data
+}
+
+export async function updateGradingScale(payload: GradingScalePayload) {
+  const { data } = await apiClient.put<GradingScaleResponse>('/results/grading-scale', payload)
   return data
 }

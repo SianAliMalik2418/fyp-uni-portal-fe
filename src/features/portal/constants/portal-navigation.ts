@@ -56,6 +56,7 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
     { id: 'courses', label: 'Courses', icon: CourseIcon },
     { id: 'attendance', label: 'Attendance Settings', icon: Calendar03Icon },
     { id: 'assessment-structure', label: 'Assessment Structure', icon: ChartEvaluationIcon },
+    { id: 'grading-scale', label: 'Grading Scale', icon: SchoolReportCardIcon },
     { id: 'results', label: 'Results', icon: SchoolReportCardIcon },
     { id: 'fees', label: 'Fees', icon: Invoice01Icon },
     { id: 'timetables', label: 'Timetables', icon: Calendar03Icon },

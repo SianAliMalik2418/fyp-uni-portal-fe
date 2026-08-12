@@ -7,6 +7,7 @@ import { AssessmentsPage } from '@/features/academic-performance/pages/Assessmen
 import { AssessmentStructureSettingsPage } from '@/features/academic-performance/pages/AssessmentStructureSettingsPage'
 import { MarksPage } from '@/features/academic-performance/pages/MarksPage'
 import { ResultsPage } from '@/features/academic-performance/pages/ResultsPage'
+import { GradingScaleSettingsPage } from '@/features/academic-performance/pages/GradingScaleSettingsPage'
 import { CourseManagementPage } from '@/features/courses/pages/CourseManagementPage'
 import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
 import { TeacherCoursesPage } from '@/features/courses/pages/TeacherCoursesPage'
@@ -102,6 +103,10 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
 
   if (user.role === 'admin' && activeItem.id === 'assessment-structure') {
     return <AssessmentStructureSettingsPage title={activeItem.label} />
+  }
+
+  if (user.role === 'admin' && activeItem.id === 'grading-scale') {
+    return <GradingScaleSettingsPage title={activeItem.label} />
   }
 
   if (user.role === 'teacher' && activeItem.id === 'assessments') {

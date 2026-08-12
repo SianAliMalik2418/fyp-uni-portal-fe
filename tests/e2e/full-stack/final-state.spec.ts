@@ -43,6 +43,10 @@ test.describe('full-stack final state', () => {
     await expect(page.getByLabel('Final')).toHaveValue('35')
     await expect(page.getByText('100%', { exact: true })).toBeVisible()
 
+    await page.goto('/grading-scale')
+    await expect(page.getByLabel('Minimum percentage for A', { exact: true })).toHaveValue('85')
+    await expect(page.getByLabel('Grade point for A', { exact: true })).toHaveValue('4')
+
     await page.goto('/fees')
     await expect(page.getByText('Fees workspace', { exact: true })).toBeVisible()
     await expect(page.getByText('No fee batches available yet.')).toBeVisible()
@@ -133,6 +137,11 @@ test.describe('full-stack final state', () => {
     await expect(page.getByText('0.00 CGPA')).toBeVisible()
     await expect(page.getByText('GPA 0.00')).toBeVisible()
     await expect(page.getByText('Programming Fundamentals')).toBeVisible()
+
+    await page.goto('/dashboard')
+    await expect(page.getByText('Latest published result')).toBeVisible()
+    await expect(page.getByText('Result published')).toBeVisible()
+    await expect(page.getByText('0.00 GPA')).toBeVisible()
   })
 })
 

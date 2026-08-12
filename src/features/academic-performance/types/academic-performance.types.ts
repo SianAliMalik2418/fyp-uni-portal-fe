@@ -10,6 +10,25 @@ export type AssessmentCategory =
 export type MarkStatus = 'absent' | 'exempted' | 'result_withheld'
 export type ResultStatus = 'draft' | 'pending' | 'returned' | 'approved'
 
+export type GradeRange = {
+  minimumPercentage: number
+  maximumPercentage: number
+  letterGrade: string
+  gradePoint: number
+}
+
+export type GradingScale = {
+  ranges: GradeRange[]
+  updatedAt?: string
+}
+
+export type GradingScaleResponse = {
+  gradingScale: GradingScale
+  message?: string
+}
+
+export type GradingScalePayload = Pick<GradingScale, 'ranges'>
+
 export type AssessmentCategoryDefinition = {
   id: AssessmentCategory
   label: string

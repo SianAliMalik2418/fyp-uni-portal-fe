@@ -4,6 +4,17 @@ import type {
   MarkStatus,
 } from '@/features/academic-performance/types/academic-performance.types'
 import type { CourseOffering } from '@/features/courses/types/course.types'
+import type { StudentCourseResult } from '@/features/academic-performance/types/academic-performance.types'
+
+export type StudentNotification = {
+  id: string
+  type: 'result_published'
+  title: string
+  message: string
+  resultId?: string
+  isRead: boolean
+  createdAt?: string
+}
 
 export type PublishedStudentMark = {
   assessment: {
@@ -34,4 +45,15 @@ export type StudentDashboardResponse = {
     recentMarks: PublishedStudentMark[]
     summary: StudentAcademicSummary
   }
+  results: {
+    latest: StudentCourseResult | null
+    gpa: number
+    cgpa: number
+  }
+  notifications: StudentNotification[]
+}
+
+export type NotificationResponse = {
+  message: string
+  notification: StudentNotification
 }
