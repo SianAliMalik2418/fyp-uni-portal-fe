@@ -498,23 +498,11 @@ describe('App', () => {
     })
   })
 
-  it('renders Tayabba phase 1 academic performance placeholders for teachers', async () => {
+  it('renders Tayabba phase 6 marks entry for teachers', async () => {
     window.history.pushState(null, '', '/marks')
     getSpy.mockImplementation((url) => {
       if (url === '/auth/me') {
         return Promise.resolve({ data: { user: activeTeacher } })
-      }
-
-      if (url === '/academic-performance/context') {
-        return Promise.resolve({
-          data: {
-            currentSemester: null,
-            activeSections: [],
-            studentSection: null,
-            students: [],
-            canResolveStudentSection: false,
-          },
-        })
       }
 
       if (url === '/academic-performance/offerings') {
@@ -580,6 +568,49 @@ describe('App', () => {
         })
       }
 
+      if (url === '/assessments') {
+        return Promise.resolve({
+          data: {
+            assessments: [
+              {
+                id: 'assessment-1',
+                offering: { id: 'offering-1' },
+                name: 'Quiz 1',
+                category: 'quiz',
+                maximumMarks: 10,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/marks/assessment-1') {
+        return Promise.resolve({
+          data: {
+            sheet: {
+              assessment: {
+                id: 'assessment-1',
+                name: 'Quiz 1',
+                category: 'quiz',
+                maximumMarks: 10,
+              },
+              records: [
+                {
+                  student: {
+                    id: 'student-1',
+                    name: 'Ayesha Noor',
+                    registrationNumber: 'NCBAE-2026-CS-001',
+                  },
+                  missing: true,
+                },
+              ],
+              isDraft: true,
+              missingCount: 1,
+            },
+          },
+        })
+      }
+
       return Promise.reject(new Error(`Unexpected GET ${url}`))
     })
 
@@ -591,11 +622,11 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /assessments/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /marks/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /results/i })).toBeInTheDocument()
-    expect(screen.getByText(/no marks records available yet/i)).toBeInTheDocument()
-    expect(await screen.findByText(/programming fundamentals/i)).toBeInTheDocument()
-    expect(
-      screen.getByText(/only course sections assigned to your teacher account/i)
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Quiz 1')).toBeInTheDocument()
+    expect(screen.getByText('Ayesha Noor')).toBeInTheDocument()
+    expect(screen.getByText('NCBAE-2026-CS-001')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /save draft/i })).toBeInTheDocument()
+    expect(screen.getByText(/1 missing/i)).toBeInTheDocument()
   })
 
   it('renders Hammad phase 4 student courses for materials and AI placeholders', async () => {

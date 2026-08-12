@@ -3,6 +3,8 @@ import { ShieldUserIcon, UserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AcademicStructurePage } from '@/features/academic-structure/pages/AcademicStructurePage'
 import { AttendancePage } from '@/features/academic-performance/pages/AttendancePage'
+import { AssessmentsPage } from '@/features/academic-performance/pages/AssessmentsPage'
+import { MarksPage } from '@/features/academic-performance/pages/MarksPage'
 import { CourseManagementPage } from '@/features/courses/pages/CourseManagementPage'
 import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
 import { TeacherCoursesPage } from '@/features/courses/pages/TeacherCoursesPage'
@@ -94,6 +96,14 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
 
   if (isAttendanceSection(user, activeItem.id)) {
     return <AttendancePage title={activeItem.label} user={user} />
+  }
+
+  if (user.role === 'teacher' && activeItem.id === 'assessments') {
+    return <AssessmentsPage title={activeItem.label} />
+  }
+
+  if (user.role === 'teacher' && activeItem.id === 'marks') {
+    return <MarksPage title={activeItem.label} />
   }
 
   return <PlaceholderModule user={user} item={activeItem} />

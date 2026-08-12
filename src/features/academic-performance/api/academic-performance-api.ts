@@ -10,6 +10,12 @@ import type {
   AttendanceSessionsResponse,
   AttendanceShortagesResponse,
   StudentAttendanceResponse,
+  AssessmentCategoriesResponse,
+  AssessmentPayload,
+  AssessmentResponse,
+  AssessmentsResponse,
+  MarkSheetPayload,
+  MarkSheetResponse,
 } from '../types/academic-performance.types'
 
 export async function getAttendanceConfiguration() {
@@ -74,5 +80,32 @@ export async function getStudentAttendanceSummaries() {
 
 export async function listAttendanceShortages() {
   const { data } = await apiClient.get<AttendanceShortagesResponse>('/attendance/shortages')
+  return data
+}
+
+export async function getAssessmentCategories() {
+  const { data } = await apiClient.get<AssessmentCategoriesResponse>('/assessments/categories')
+  return data
+}
+
+export async function listAssessments(offeringId: string) {
+  const { data } = await apiClient.get<AssessmentsResponse>('/assessments', {
+    params: { offeringId },
+  })
+  return data
+}
+
+export async function createAssessment(payload: AssessmentPayload) {
+  const { data } = await apiClient.post<AssessmentResponse>('/assessments', payload)
+  return data
+}
+
+export async function getMarkSheet(assessmentId: string) {
+  const { data } = await apiClient.get<MarkSheetResponse>(`/marks/${assessmentId}`)
+  return data
+}
+
+export async function saveMarkSheetDraft(assessmentId: string, payload: MarkSheetPayload) {
+  const { data } = await apiClient.put<MarkSheetResponse>(`/marks/${assessmentId}/draft`, payload)
   return data
 }

@@ -5,6 +5,75 @@ import type {
 import type { CourseOffering } from '@/features/courses/types/course.types'
 
 export type AttendanceStatus = 'present' | 'absent' | 'leave'
+export type AssessmentCategory =
+  'quiz' | 'assignment' | 'attendance' | 'presentation' | 'midterm' | 'final'
+export type MarkStatus = 'absent' | 'exempted' | 'result_withheld'
+
+export type AssessmentCategoryDefinition = {
+  id: AssessmentCategory
+  label: string
+  weightPercentage: number
+}
+
+export type Assessment = {
+  id: string
+  offering: CourseOffering
+  name: string
+  category: AssessmentCategory
+  maximumMarks: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+export type AssessmentPayload = {
+  offeringId: string
+  name: string
+  category: AssessmentCategory
+  maximumMarks: number
+}
+
+export type AssessmentCategoriesResponse = {
+  categories: AssessmentCategoryDefinition[]
+}
+
+export type AssessmentsResponse = {
+  assessments: Assessment[]
+}
+
+export type AssessmentResponse = {
+  message: string
+  assessment: Assessment
+}
+
+export type MarkRecordPayload = {
+  studentId: string
+  obtainedMarks?: number
+  status?: MarkStatus
+}
+
+export type MarkRecord = {
+  student: AcademicPerformanceStudent
+  obtainedMarks?: number
+  status?: MarkStatus
+  missing: boolean
+}
+
+export type MarkSheet = {
+  assessment: Assessment
+  records: MarkRecord[]
+  isDraft: true
+  missingCount: number
+  updatedAt?: string
+}
+
+export type MarkSheetPayload = {
+  records: MarkRecordPayload[]
+}
+
+export type MarkSheetResponse = {
+  message?: string
+  sheet: MarkSheet
+}
 
 export type AttendanceConfiguration = {
   minimumAttendancePercentage: number

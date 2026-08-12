@@ -7,6 +7,9 @@ import {
   listAttendanceShortages,
   listAcademicPerformanceOfferingStudents,
   listAcademicPerformanceOfferings,
+  getAssessmentCategories,
+  getMarkSheet,
+  listAssessments,
 } from './academic-performance-api'
 
 export const academicPerformanceKeys = {
@@ -20,6 +23,11 @@ export const academicPerformanceKeys = {
   studentAttendance: () => [...academicPerformanceKeys.all, 'student-attendance'] as const,
   attendanceShortages: () => [...academicPerformanceKeys.all, 'attendance-shortages'] as const,
   configuration: () => [...academicPerformanceKeys.all, 'attendance-configuration'] as const,
+  assessmentCategories: () => [...academicPerformanceKeys.all, 'assessment-categories'] as const,
+  assessments: (offeringId: string) =>
+    [...academicPerformanceKeys.all, 'assessments', offeringId] as const,
+  markSheet: (assessmentId: string) =>
+    [...academicPerformanceKeys.all, 'mark-sheet', assessmentId] as const,
 }
 
 export const academicPerformanceContextQueryOptions = queryOptions({
@@ -60,3 +68,23 @@ export const attendanceConfigurationQueryOptions = queryOptions({
   queryKey: academicPerformanceKeys.configuration(),
   queryFn: getAttendanceConfiguration,
 })
+
+export const assessmentCategoriesQueryOptions = queryOptions({
+  queryKey: academicPerformanceKeys.assessmentCategories(),
+  queryFn: getAssessmentCategories,
+  staleTime: 5 * 60 * 1000,
+})
+
+export const assessmentsQueryOptions = (offeringId: string) =>
+  queryOptions({
+    queryKey: academicPerformanceKeys.assessments(offeringId),
+    queryFn: () => listAssessments(offeringId),
+    enabled: Boolean(offeringId),
+  })
+
+export const markSheetQueryOptions = (assessmentId: string) =>
+  queryOptions({
+    queryKey: academicPerformanceKeys.markSheet(assessmentId),
+    queryFn: () => getMarkSheet(assessmentId),
+    enabled: Boolean(assessmentId),
+  })

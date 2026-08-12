@@ -18,6 +18,14 @@ const studentUser = {
   role: 'student',
 }
 
+const teacherUser = {
+  ...adminUser,
+  id: 'teacher-1',
+  name: 'Tayabba Teacher',
+  email: 'teacher@example.com',
+  role: 'teacher',
+}
+
 test('logs in with email/password and shows the admin portal shell', async ({ page }) => {
   await page.route('**/api/auth/me', async (route) => {
     await route.fulfill({
@@ -170,4 +178,125 @@ test('shows student attendance warnings and opens attendance details', async ({ 
   await expect(page.getByText('Low-attendance warning')).toBeVisible()
   await page.getByRole('link', { name: 'View attendance' }).click()
   await expect(page).toHaveURL(/\/attendance$/)
+})
+
+test('teacher enters assessment marks and saves a draft', async ({ page }) => {
+  const offering = {
+    id: 'offering-1',
+    course: {
+      id: 'course-1',
+      code: 'PF',
+      title: 'Programming Fundamentals',
+      creditHours: 3,
+      department: { id: 'department-1', name: 'Computer Science', code: 'CS', isActive: true },
+      program: { id: 'program-1', name: 'BS Computer Science', code: 'BSCS', isActive: true },
+      semester: {
+        id: 'semester-1',
+        name: 'Fall Semester',
+        academicYear: '2026-2027',
+        isActive: true,
+        isClosed: false,
+      },
+      isActive: true,
+    },
+    section: {
+      id: 'section-1',
+      name: 'A',
+      program: { id: 'program-1', name: 'BS Computer Science', code: 'BSCS', isActive: true },
+      semester: {
+        id: 'semester-1',
+        name: 'Fall Semester',
+        academicYear: '2026-2027',
+        isActive: true,
+        isClosed: false,
+      },
+      isActive: true,
+    },
+    studentCount: 1,
+    isActive: true,
+  }
+  const assessment = {
+    id: 'assessment-1',
+    offering,
+    name: 'Quiz 1',
+    category: 'quiz',
+    maximumMarks: 10,
+  }
+  let savedMarks: unknown
+
+  await page.route('**/api/auth/me', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ user: teacherUser }),
+    })
+  })
+  await page.route('**/api/academic-performance/offerings', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ offerings: [offering] }),
+    })
+  })
+  await page.route('**/api/assessments?*', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ assessments: [assessment] }),
+    })
+  })
+  await page.route('**/api/marks/assessment-1/draft', async (route) => {
+    savedMarks = route.request().postDataJSON()
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        message: 'Marks draft saved successfully.',
+        sheet: {
+          assessment,
+          records: [
+            {
+              student: {
+                id: 'student-1',
+                name: 'Ayesha Noor',
+                registrationNumber: 'NCBAE-2026-CS-001',
+              },
+              obtainedMarks: 8.5,
+              missing: false,
+            },
+          ],
+          isDraft: true,
+          missingCount: 0,
+          updatedAt: '2026-08-12T00:00:00.000Z',
+        },
+      }),
+    })
+  })
+  await page.route('**/api/marks/assessment-1', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        sheet: {
+          assessment,
+          records: [
+            {
+              student: {
+                id: 'student-1',
+                name: 'Ayesha Noor',
+                registrationNumber: 'NCBAE-2026-CS-001',
+              },
+              missing: true,
+            },
+          ],
+          isDraft: true,
+          missingCount: 1,
+        },
+      }),
+    })
+  })
+
+  await page.goto('/marks')
+  await page.getByRole('spinbutton', { name: 'Marks for Ayesha Noor' }).fill('8.5')
+  await page.getByRole('button', { name: 'Save draft' }).click()
+
+  await expect(page.getByText('Marks draft saved successfully.')).toBeVisible()
+  expect(savedMarks).toEqual({
+    records: [{ studentId: 'student-1', obtainedMarks: 8.5 }],
+  })
 })
