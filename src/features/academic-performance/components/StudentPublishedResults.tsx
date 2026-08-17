@@ -1,6 +1,7 @@
-import { SchoolReportCardIcon } from '@hugeicons/core-free-icons'
+import { SchoolReportCardIcon, ViewIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -11,7 +12,13 @@ import {
 } from '@/components/ui/table'
 import type { PublishedStudentResultsResponse } from '../types/academic-performance.types'
 
-export function StudentPublishedResults({ data }: { data: PublishedStudentResultsResponse }) {
+export function StudentPublishedResults({
+  data,
+  onViewResultCard,
+}: {
+  data: PublishedStudentResultsResponse
+  onViewResultCard: (semesterId: string) => void
+}) {
   if (!data.semesters.length) {
     return (
       <div className="bg-muted/30 grid min-h-52 place-items-center rounded-md border border-dashed px-4 text-center">
@@ -46,9 +53,19 @@ export function StudentPublishedResults({ data }: { data: PublishedStudentResult
                 <CardTitle className="text-base">{semesterResult.semester.name}</CardTitle>
                 <CardDescription>{semesterResult.semester.academicYear}</CardDescription>
               </div>
-              <p className="text-lg font-semibold tabular-nums">
-                GPA {semesterResult.gpa.toFixed(2)}
-              </p>
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                <p className="text-lg font-semibold tabular-nums">
+                  GPA {semesterResult.gpa.toFixed(2)}
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onViewResultCard(semesterResult.semester.id)}
+                >
+                  <HugeiconsIcon icon={ViewIcon} strokeWidth={2} className="size-4" />
+                  View result card
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>

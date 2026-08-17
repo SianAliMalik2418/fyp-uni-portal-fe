@@ -28,6 +28,7 @@ import { ResultRecordsTable } from '../components/ResultRecordsTable'
 import { ResultStatisticsCards } from '../components/ResultStatisticsCards'
 import { ResultStatusBadge } from '../components/ResultStatusBadge'
 import { StudentPublishedResults } from '../components/StudentPublishedResults'
+import { StudentResultCardDialog } from '../components/StudentResultCardDialog'
 import type {
   CourseResultResponse,
   ResultCommentPayload,
@@ -44,6 +45,7 @@ export function ResultsPage({ title, user }: { title: string; user: PortalUser }
 }
 
 function StudentResultsPage({ title }: { title: string }) {
+  const [resultCardSemesterId, setResultCardSemesterId] = useState('')
   const resultsQuery = useQuery(studentResultsQueryOptions)
 
   if (resultsQuery.isPending) return <TableSkeleton columns={5} rows={5} />
@@ -67,7 +69,17 @@ function StudentResultsPage({ title }: { title: string }) {
           Approved course grades, semester GPA, and CGPA.
         </p>
       </div>
-      <StudentPublishedResults data={resultsQuery.data} />
+      <StudentPublishedResults
+        data={resultsQuery.data}
+        onViewResultCard={setResultCardSemesterId}
+      />
+      <StudentResultCardDialog
+        semesterId={resultCardSemesterId}
+        open={Boolean(resultCardSemesterId)}
+        onOpenChange={(open) => {
+          if (!open) setResultCardSemesterId('')
+        }}
+      />
     </section>
   )
 }

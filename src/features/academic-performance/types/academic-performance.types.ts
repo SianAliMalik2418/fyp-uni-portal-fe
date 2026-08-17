@@ -175,6 +175,34 @@ export type PublishedStudentResultsResponse = {
   cgpa: number
 }
 
+export type StudentResultCard = {
+  student: {
+    name: string
+    registrationNumber: string
+  }
+  program: {
+    id: string
+    name: string
+    code: string
+  }
+  semester: Semester
+  courses: Array<{
+    resultId: string
+    code: string
+    title: string
+    creditHours: number
+    marks: number
+    grade: string
+    gradePoint: number
+  }>
+  totalCreditHours: number
+  gpa: number
+}
+
+export type StudentResultCardResponse = {
+  resultCard: StudentResultCard
+}
+
 export type AttendanceConfiguration = {
   minimumAttendancePercentage: number
   updatedAt?: string

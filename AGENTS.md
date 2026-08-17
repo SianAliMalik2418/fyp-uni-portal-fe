@@ -1,83 +1,104 @@
 # Frontend Agent Instructions
 
-## Required Reading
+The frontend is a React 19 and TypeScript portal built with Vite, TanStack Query, React Router, React Hook Form, Zod, shadcn/Tailwind, and Hugeicons.
 
-- Before frontend work, read `docs/TECHNICAL_OVERVIEW.md`.
-- For phase ownership or product requirements, read the relevant files under `docs/`.
+## Required Reading and Scope
 
-## Package Scope
+- Before frontend work, read `docs/TECHNICAL_OVERVIEW.md` from `FE/`.
+- For phase ownership or product requirements, read only the relevant files under `docs/`.
+- Work from `FE/` for frontend package commands. Use Bun and keep `FE/bun.lock` as the package lockfile.
+- For Git-only requests, do only the requested Git workflow. Do not run checks unless the user asks for verification.
 
-- Work from the `FE/` directory for frontend package commands.
-- Use Bun for frontend dependency and script execution.
-- Keep `FE/bun.lock` as the frontend package lockfile.
-- For git-only requests such as commit, push, or commit and push, do only the requested Git workflow. Do not run lint, tests, builds, or format checks unless the user explicitly asks for verification.
+## Ask Before You Assume
+
+- Ask when a request could reasonably target different screens, roles, navigation behavior, API behavior, or failure states.
+- Ask before changing routes, public API payloads, auth/session behavior, role visibility, design tokens, or shared UI primitives.
+- Do not invent copy, empty-state behavior, permissions, or responsive behavior when requirements and existing patterns do not resolve them.
+- Do not expand a page redesign into adjacent pages or refactor unrelated feature code without authorization.
 
 ## Frontend Architecture
 
-- Follow the feature-based structure described in `docs/TECHNICAL_OVERVIEW.md`.
-- Keep app providers and route wiring under `src/app`.
-- Keep frontend API transport under `src/shared/api`.
-- Keep cross-feature constants under `src/shared/constants`.
-- Keep feature route-entry components under `src/features/*/pages`.
-- Keep reusable feature/domain components under `src/features/*/components`, and have pages compose those components.
-- Do not dump feature UI, forms, tables, dialogs, or helper components into a single page file. Route pages should orchestrate data, mutations, routing state, and high-level layout only.
-- When a page needs a form, table/list card, sheet/dialog, empty/loading/error state, or repeated domain UI, create a focused component under that feature's `components/` directory.
-- Prefer one clear component per file once a component grows beyond a small helper. For example, use `BatchForm.tsx`, `BatchesCard.tsx`, and `DeleteBatchDialog.tsx` instead of one large `AcademicStructurePage.tsx` or one catch-all component file.
-- Keep feature schemas under `src/features/*/schemas`, API calls under `src/features/*/api`, TanStack Query options under `src/features/*/api`, domain types under `src/features/*/types`, and payload/form mappers under `src/features/*/utils`.
-- Reuse existing components, shared helpers, feature utilities, and established UI patterns before creating new ones. Add a new frontend component, helper, or interaction pattern only when the codebase does not already provide a suitable option.
-- Before adding frontend code, inspect a similar completed feature such as `departments`, `programs`, or `user-accounts`, and mirror its structure unless the current feature has a concrete reason to differ.
-- Keep auth-specific API functions, TanStack Query options, schemas, types, pages, and components under `src/features/auth`.
-- Keep portal-specific pages, shell components, navigation, constants, and types under `src/features/portal`.
-- Keep reusable shadcn UI primitives under `src/components/ui`.
-- Put feature/domain components outside `src/components/ui` so generated shadcn files stay easy to update.
+The request path is: route page → feature component/hook → TanStack Query → feature API function → shared Axios client → backend.
 
-## Frontend Structure Checklist
+- Keep providers and route wiring under `src/app`.
+- Keep cross-feature HTTP transport under `src/shared/api` and constants under `src/shared/constants`.
+- Keep route-entry components under `src/features/*/pages`.
+- Keep reusable domain UI under `src/features/*/components`, schemas under `schemas`, API calls/query options under `api`, domain types under `types`, and mappers under `utils`.
+- Route pages orchestrate queries, mutations, routing state, and high-level layout. They do not contain large forms, tables, dialogs, or repeated domain UI.
+- Prefer one focused component per file once it grows beyond a small helper.
+- Keep auth code under `src/features/auth` and portal shell/navigation code under `src/features/portal`.
+- Keep reusable shadcn primitives under `src/components/ui`; feature/domain components do not belong there.
+- Inspect a comparable completed feature such as `departments`, `programs`, or `user-accounts` before creating a new structure or interaction pattern.
 
-Before handing off frontend work, verify:
+Before handoff, confirm that route pages compose feature components, feature code lives with its owner, forms use schemas and typed payload mappers, and equivalent pages retain equivalent layout patterns.
 
-- Route pages under `src/features/*/pages` compose feature components instead of containing most markup directly.
-- No page file contains large inline forms, data tables, confirmation dialogs, or repeated UI blocks that should be feature components.
-- New components live in the owning feature's `components/` directory, not in `src/components/ui` unless they are reusable shadcn-style primitives.
-- Forms use feature schemas, payload mappers, and typed API functions instead of ad hoc inline payload shaping.
-- The implementation still matches the layout pattern already used by equivalent pages, such as the list card plus right-side sheet pattern used by departments and programs.
+## API, State, Routing, and Forms
 
-## API, Routing, and Forms
+- Use `react-router-dom` for routing and TanStack Query for every server-state read or mutation.
+- Use the shared Axios client in `src/shared/api/http-client.ts`; do not create feature-specific Axios instances.
+- Treat backend responses as untrusted boundary data. Define explicit domain/API types and narrow unknown error payloads instead of using `any` or blind casts.
+- When an HTTP contract changes, update the backend validator/controller, frontend API function/types, and relevant tests together.
+- Use React Hook Form with feature-owned Zod schemas for forms. Use typed mappers instead of ad hoc inline payload shaping.
+- Use toasts from `src/components/ui/toast` for mutation success/failure. Keep field errors inline and persistent query/page errors visible where ongoing context is needed.
+- Give user-facing text inputs clear placeholders and every password input a show/hide control.
+- Do not store sensitive auth tokens in browser storage. Authentication relies on backend-managed HTTP-only cookies.
 
-- Use `react-router-dom` for frontend routing.
-- Use TanStack Query for all server-state reads and mutations.
-- Use the shared Axios client for HTTP transport.
-- Use `react-hook-form` with Zod schemas for form validation.
-- Use toasts from `src/components/ui/toast` for form submit success/failure feedback; do not render inline success/error alert blocks above forms for mutation results. Keep field-level validation errors inline by their inputs, and keep persistent page/query load errors inline when the user needs ongoing context.
-- Give every user-facing text-like form input a clear placeholder.
-- Use a password field with a show/hide option for every password input.
-- Do not store sensitive auth tokens in browser storage.
+## Type Safety and Naming
 
-## Design System
+- Type errors are failures. Do not weaken TypeScript configuration or lint rules.
+- Do not introduce `any`, unsafe non-null assertions, or casts used only to silence an error. Use `unknown`, schemas, type guards, and proper narrowing.
+- Do not duplicate a handwritten type next to a schema when it can be inferred safely from that schema.
+- Components and files use UpperCamelCase (`UserAccountsPage.tsx`); hooks use `use...`; booleans read as assertions (`isLoading`, `hasAccess`, `canEdit`).
+- Pages end in `Page`; reusable UI names describe their domain role (`UserAccountForm`, `CoursesTable`, `DeleteProgramDialog`). Avoid vague names such as `Data`, `Thing`, or `handleData`.
+- User-facing copy uses sentence case and existing portal vocabulary. Reuse established role and academic-domain labels instead of coining synonyms.
+- Test files sit beside source as `*.test.ts` or `*.test.tsx`; Playwright specs live under `tests/e2e`.
 
-- Treat `components.json` and `src/index.css` as the source of truth for frontend design tokens.
-- Use only design-system tokens for colors, borders, rings, backgrounds, foregrounds, radius, shadows, and semantic states.
-- Do not introduce raw color values or arbitrary Tailwind color classes in application components unless they are already part of token definitions.
-- Use only free Hugeicons for icons. Do not add Lucide or another icon library unless the user explicitly approves it.
-- Use the existing shadcn/Tailwind/Hugeicons system.
-- Use skeletons for page, section, card, and table content loading states. Use spinners for short-lived inline actions such as form submits, deletes, uploads, or blocking button actions. Avoid replacing UI with plain loading text such as `Loading...`, `Saving...`, or `Deleting...`.
-- Do not force marketing-page taste patterns onto dense dashboards, admin tables, forms, or backend-driven product workflows.
+## Design System and UI Quality
 
-## Frontend Verification
+- Treat `components.json` and `src/index.css` as the source of truth for design tokens.
+- Use token-based colors, borders, rings, backgrounds, foregrounds, radii, shadows, and semantic states. Do not add raw colors or arbitrary Tailwind palette classes in application components.
+- Use the existing shadcn/Tailwind system and only free Hugeicons. Ask before adding another icon or UI library.
+- Use skeletons for page, section, card, and table loading. Use spinners for brief button-level actions. Do not replace structured UI with plain `Loading...`, `Saving...`, or `Deleting...` text.
+- Every changed screen includes deliberate loading, empty, error, disabled, and success behavior as applicable.
+- Do not apply marketing-page patterns to dense dashboards, tables, or operational forms.
+- For lists large enough to affect responsiveness, paginate or virtualize based on the established API/UI pattern; do not render an unbounded server collection.
 
-- After frontend changes, run the relevant Bun-backed scripts from `FE/`, such as `bun run test`, `bun run build`, `bun run lint`, and `bun run format:check`.
-- Run `bun run test:e2e` when a change affects routing, auth, critical user flows, or browser-only behavior.
-- Always use the `simplify` skill before handing frontend work over for review.
+## Verification and Testing
 
-## Frontend Testing
+Use the smallest relevant command while iterating and complete the affected loop before handoff:
 
-- Add or update frontend tests with every new feature or meaningful UI behavior change unless the user explicitly says not to. Do not leave a feature covered only by manual verification when it has reusable logic, form behavior, permissions, routing, or a critical user workflow.
-- Use Vitest for unit tests, React Testing Library for component behavior, and Playwright for critical end-to-end browser flows.
-- Put frontend unit and component tests next to the code they cover using `*.test.ts` or `*.test.tsx`.
-- Put Playwright specs under `tests/e2e`.
-- Use unit tests for validators, mappers, permission helpers, query option helpers, and other pure frontend logic.
-- Use component tests for forms, tables, dialogs, loading/error/empty states, and role-specific rendering.
-- Add or update Playwright specs when the feature changes auth, routing, navigation, protected pages, browser-only behavior, or a phase/final-state user objective.
-- Keep the default mocked e2e suite focused on fast phase and browser-flow coverage. Use `bun run test:e2e:full` for live frontend + backend + MongoDB final-state coverage when a feature changes the implemented cross-stack objective.
-- Prefer behavior-focused tests based on user flows, validators, API contracts, accessibility roles, and edge cases.
-- Mock only slow, external, nondeterministic, paid, or network-only services.
-- Every test must have meaningful assertions.
+```bash
+bun run build
+bun run lint
+bun run format:check
+bun run test
+bun run test:e2e       # routing, auth, critical flows, browser-only behavior
+bun run test:e2e:full  # live frontend + backend + MongoDB final state
+```
+
+- Start meaningful behavior changes with a failing Vitest/component/Playwright test when that layer can express the behavior.
+- Use Vitest for pure logic, React Testing Library for component behavior, and Playwright for critical user flows.
+- Cover forms, permissions, routing, dialogs, loading/error/empty states, and important edge cases at the smallest useful layer.
+- Keep the default mocked e2e suite fast. Update the full-stack seed/spec when frontend work changes a cross-stack objective.
+- Mock only slow, external, nondeterministic, paid, or network-only services. Every test needs meaningful behavior-focused assertions.
+- Never skip or weaken a test to get green. If a test expectation is wrong, explain the contract change before updating it.
+- Do not use `bun run dev`, `bun run preview`, or watch mode as final verification.
+- Always use the `simplify` skill after the implementation and automated checks are green, before handoff.
+
+## Visual and Browser QA
+
+For every screen changed materially:
+
+- Exercise the real interaction in a browser, not only through unit tests.
+- Capture and inspect at least one screenshot before declaring the screen complete.
+- Check the narrow mobile layout and a wide desktop layout; also check dark mode when the application supports it.
+- Use realistic seeded data, including long labels, empty states, and enough rows to expose overflow or pagination issues.
+- Look for clipped text, overlaps, horizontal overflow, inaccessible focus/labels, hidden validation, and missing loading/error/empty states.
+- Report the path exercised and what was observed. Preserve and report failures instead of working around them.
+
+## Frontend Failure Log
+
+- Do not place feature forms, tables, or dialogs in `src/components/ui`; keep generated primitives separate from domain UI.
+- Do not show mutation outcomes as inline page banners; use the established toast system while retaining field validation and persistent query errors inline.
+- Do not persist session tokens in local or session storage; the backend owns the HTTP-only session cookie.
+- Do not use plain loading text for structured content; use skeletons, and reserve spinners for short inline actions.

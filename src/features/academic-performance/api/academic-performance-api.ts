@@ -19,6 +19,7 @@ import type {
   MarkSheetResponse,
   CourseResultResponse,
   PublishedStudentResultsResponse,
+  StudentResultCardResponse,
   ResultCommentPayload,
   GradingScalePayload,
   GradingScaleResponse,
@@ -159,6 +160,13 @@ export async function reopenCourseResult(resultId: string, payload: ResultCommen
 
 export async function getPublishedStudentResults() {
   const { data } = await apiClient.get<PublishedStudentResultsResponse>('/results/student')
+  return data
+}
+
+export async function getStudentResultCard(semesterId: string) {
+  const { data } = await apiClient.get<StudentResultCardResponse>(
+    `/results/student/result-card/${semesterId}`
+  )
   return data
 }
 
