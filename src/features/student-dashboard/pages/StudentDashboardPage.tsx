@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
+import { StudentResultCardDialog } from '@/features/academic-performance/components/StudentResultCardDialog'
 import { NotificationPanel } from '@/features/portal/components/NotificationPanel'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,6 +26,7 @@ const studentDashboardStats = [
 ]
 
 export function StudentDashboardPage({ user }: { user: PortalUser }) {
+  const [resultCardSemesterId, setResultCardSemesterId] = useState('')
   const queryClient = useQueryClient()
   const navigation = roleNavigation.student
   const dashboardQuery = useQuery(studentDashboardQueryOptions)
@@ -91,6 +94,14 @@ export function StudentDashboardPage({ user }: { user: PortalUser }) {
       <StudentLatestResult
         results={dashboardQuery.data?.results}
         isPending={dashboardQuery.isPending}
+        onViewResultCard={setResultCardSemesterId}
+      />
+      <StudentResultCardDialog
+        semesterId={resultCardSemesterId}
+        open={Boolean(resultCardSemesterId)}
+        onOpenChange={(open) => {
+          if (!open) setResultCardSemesterId('')
+        }}
       />
 
       <div className="grid gap-5 lg:grid-cols-2">

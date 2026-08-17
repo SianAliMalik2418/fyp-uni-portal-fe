@@ -142,6 +142,9 @@ test.describe('full-stack final state', () => {
     await expect(page.getByText('Latest published result')).toBeVisible()
     await expect(page.getByText('Result published')).toBeVisible()
     await expect(page.getByText('0.00 GPA')).toBeVisible()
+    await page.getByRole('button', { name: 'View result card' }).click()
+    await expect(page.getByRole('dialog')).toContainText('Ayesha Noor')
+    await expect(page.getByRole('dialog')).toContainText('Programming Fundamentals')
   })
 })
 

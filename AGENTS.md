@@ -83,18 +83,8 @@ bun run test:e2e:full  # live frontend + backend + MongoDB final state
 - Mock only slow, external, nondeterministic, paid, or network-only services. Every test needs meaningful behavior-focused assertions.
 - Never skip or weaken a test to get green. If a test expectation is wrong, explain the contract change before updating it.
 - Do not use `bun run dev`, `bun run preview`, or watch mode as final verification.
+- Do not require manual visual QA, browser walkthroughs, or screenshots unless the user explicitly requests them.
 - Always use the `simplify` skill after the implementation and automated checks are green, before handoff.
-
-## Visual and Browser QA
-
-For every screen changed materially:
-
-- Exercise the real interaction in a browser, not only through unit tests.
-- Capture and inspect at least one screenshot before declaring the screen complete.
-- Check the narrow mobile layout and a wide desktop layout; also check dark mode when the application supports it.
-- Use realistic seeded data, including long labels, empty states, and enough rows to expose overflow or pagination issues.
-- Look for clipped text, overlaps, horizontal overflow, inaccessible focus/labels, hidden validation, and missing loading/error/empty states.
-- Report the path exercised and what was observed. Preserve and report failures instead of working around them.
 
 ## Frontend Failure Log
 

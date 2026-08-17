@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight01Icon, SchoolReportCardIcon } from '@hugeicons/core-free-icons'
+import { ArrowRight01Icon, FileViewIcon, SchoolReportCardIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Badge } from '@/components/ui/badge'
-import { buttonVariants } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { StudentDashboardResponse } from '../types/student-dashboard.types'
@@ -10,9 +10,11 @@ import type { StudentDashboardResponse } from '../types/student-dashboard.types'
 export function StudentLatestResult({
   results,
   isPending,
+  onViewResultCard,
 }: {
   results?: StudentDashboardResponse['results']
   isPending: boolean
+  onViewResultCard: (semesterId: string) => void
 }) {
   const latest = results?.latest
 
@@ -27,10 +29,22 @@ export function StudentLatestResult({
             </CardTitle>
             <CardDescription>Your newest HOD-approved course result.</CardDescription>
           </div>
-          <Link to="/results" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-            View results
-            <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} data-icon="inline-end" />
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            {latest ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onViewResultCard(latest.offering.course.semester.id)}
+              >
+                <HugeiconsIcon icon={FileViewIcon} strokeWidth={2} className="size-4" />
+                View result card
+              </Button>
+            ) : null}
+            <Link to="/results" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+              View results
+              <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} data-icon="inline-end" />
+            </Link>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

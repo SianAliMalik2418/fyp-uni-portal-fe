@@ -79,4 +79,71 @@ test.describe('phase 8 - student result card', () => {
     expect(download.suggestedFilename()).toBe('NCBAE-2026-CS-001-Fall-Semester-result-card.pdf')
     await expect(page.getByRole('heading', { name: 'Result card downloaded' })).toBeVisible()
   })
+
+  test('student opens the latest semester result card from the dashboard', async ({ page }) => {
+    await mockAuthMe(page, users.student)
+    await page.route('**/api/student-dashboard', async (route) => {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          attendance: { summaries: [] },
+          academics: {
+            recentMarks: [],
+            summary: {
+              publishedAssessments: 0,
+              coursesWithMarks: 0,
+              averagePercentage: 0,
+              weightedPercentage: 0,
+            },
+          },
+          results: {
+            latest: {
+              id: 'result-1',
+              offering,
+              finalPercentage: 86.5,
+              letterGrade: 'A',
+              gradePoint: 4,
+            },
+            gpa: 4,
+            cgpa: 4,
+          },
+          notifications: [],
+        }),
+      })
+    })
+    await page.route('**/api/results/student/result-card/*', async (route) => {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          resultCard: {
+            student: {
+              name: academicStudent.name,
+              registrationNumber: academicStudent.registrationNumber,
+            },
+            program: { id: program.id, name: program.name, code: program.code },
+            semester,
+            courses: [
+              {
+                resultId: 'result-1',
+                code: offering.course.code,
+                title: offering.course.title,
+                creditHours: offering.course.creditHours,
+                marks: 86.5,
+                grade: 'A',
+                gradePoint: 4,
+              },
+            ],
+            totalCreditHours: 3,
+            gpa: 4,
+          },
+        }),
+      })
+    })
+
+    await page.goto('/dashboard')
+    await page.getByRole('button', { name: 'View result card' }).click()
+
+    await expect(page.getByRole('dialog')).toContainText(academicStudent.name)
+    await expect(page.getByRole('dialog')).toContainText('Semester GPA 4.00')
+  })
 })
