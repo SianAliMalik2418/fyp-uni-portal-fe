@@ -84,6 +84,17 @@ test.describe('full-stack final state', () => {
     await page.getByRole('button', { name: 'Create exam' }).click()
     await expect(page.getByRole('heading', { name: 'Exam created' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Programming Fundamentals' })).toBeVisible()
+
+    await page.goto('/announcements')
+    await page.getByRole('button', { name: 'Create announcement' }).click()
+    await page.getByLabel('Title').fill('Semester registration deadline')
+    await page.getByLabel('Description').fill('Complete semester registration before Friday.')
+    await page.getByLabel('Publish date').fill('2026-08-17T08:00')
+    await page.getByLabel('Expiry date').fill('2027-08-25T08:00')
+    await page.getByRole('checkbox', { name: 'Pin announcement' }).click()
+    await page.getByRole('button', { name: 'Create announcement' }).last().click()
+    await expect(page.getByRole('heading', { name: 'Announcement created' })).toBeVisible()
+    await expect(page.getByText('Semester registration deadline')).toBeVisible()
   })
 
   test('teacher can use assigned course, attendance, assessment, and marks modules', async ({
@@ -173,6 +184,10 @@ test.describe('full-stack final state', () => {
     await expect(page.getByRole('heading', { name: 'Programming Fundamentals' })).toBeVisible()
     await expect(page.getByText('18 December 2026')).toBeVisible()
     await expect(page.getByText('Bring your student card')).toBeVisible()
+
+    await page.goto('/announcements')
+    await expect(page.getByText('Semester registration deadline')).toBeVisible()
+    await expect(page.getByText('Complete semester registration before Friday.')).toBeVisible()
   })
 
   test('HOD sees final-state attendance shortage data and blocked admin-only routes', async ({
@@ -208,6 +223,10 @@ test.describe('full-stack final state', () => {
     await expect(page.getByText('Latest published result')).toBeVisible()
     await expect(page.getByText('Result published')).toBeVisible()
     await expect(page.getByText('0.00 GPA')).toBeVisible()
+    await page.getByLabel(/Notifications, \d+ unread/).click()
+    await expect(page.getByText('Result published').last()).toBeVisible()
+    await page.getByRole('button', { name: 'Mark all as read' }).click()
+    await expect(page.getByLabel('Notifications, 0 unread')).toBeVisible()
     await page.getByRole('button', { name: 'View result card' }).click()
     await expect(page.getByRole('dialog')).toContainText('Ayesha Noor')
     await expect(page.getByRole('dialog')).toContainText('Programming Fundamentals')

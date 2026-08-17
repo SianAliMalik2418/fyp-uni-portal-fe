@@ -1209,21 +1209,28 @@ describe('App', () => {
   it('limits teacher page account roles to teacher and HOD', async () => {
     const user = userEvent.setup()
     window.history.pushState(null, '', '/teachers')
-    getSpy.mockResolvedValueOnce({ data: { user: activeAdmin } }).mockResolvedValueOnce({
-      data: {
-        users: [
-          {
-            id: 'teacher-2',
-            fullName: 'Visible Teacher',
-            email: 'visible.teacher@example.com',
-            role: 'teacher',
-            employeeId: 'EMP-002',
-            accountStatus: 'active',
-            isActive: true,
-            passwordChangeRequired: false,
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') return Promise.resolve({ data: { user: activeAdmin } })
+      if (url === '/notifications') return Promise.resolve({ data: { notifications: [] } })
+      if (url === '/users') {
+        return Promise.resolve({
+          data: {
+            users: [
+              {
+                id: 'teacher-2',
+                fullName: 'Visible Teacher',
+                email: 'visible.teacher@example.com',
+                role: 'teacher',
+                employeeId: 'EMP-002',
+                accountStatus: 'active',
+                isActive: true,
+                passwordChangeRequired: false,
+              },
+            ],
           },
-        ],
-      },
+        })
+      }
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
     })
 
     render(<App />)
@@ -1249,9 +1256,12 @@ describe('App', () => {
   it('requires an employee ID before creating teacher accounts', async () => {
     const user = userEvent.setup()
     window.history.pushState(null, '', '/teachers')
-    getSpy
-      .mockResolvedValueOnce({ data: { user: activeAdmin } })
-      .mockResolvedValueOnce({ data: { users: [] } })
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') return Promise.resolve({ data: { user: activeAdmin } })
+      if (url === '/notifications') return Promise.resolve({ data: { notifications: [] } })
+      if (url === '/users') return Promise.resolve({ data: { users: [] } })
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
 
     render(<App />)
 

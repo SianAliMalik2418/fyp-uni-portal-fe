@@ -10,13 +10,14 @@ import {
   studentDashboardKeys,
   studentDashboardQueryOptions,
 } from '../api/student-dashboard-queries'
-import { markNotificationRead } from '../api/student-dashboard-api'
+import { markNotificationRead } from '@/features/notifications/api/notifications-api'
 import { StudentAttendanceOverview } from '../components/StudentAttendanceOverview'
 import { StudentAcademicSummary } from '../components/StudentAcademicSummary'
 import { StudentRecentMarks } from '../components/StudentRecentMarks'
 import { StudentLatestResult } from '../components/StudentLatestResult'
 import { toast } from '@/components/ui/toast-manager'
 import { getApiErrorMessage } from '@/shared/api/http-client'
+import { notificationKeys } from '@/features/notifications/api/notification-queries'
 
 const studentDashboardStats = [
   { label: 'Due fees', value: '0', sectionId: 'fees' },
@@ -34,6 +35,7 @@ export function StudentDashboardPage({ user }: { user: PortalUser }) {
     mutationFn: markNotificationRead,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: studentDashboardKeys.summary() })
+      void queryClient.invalidateQueries({ queryKey: notificationKeys.all })
     },
     onError: (error) => {
       toast.add({

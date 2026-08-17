@@ -1660,17 +1660,6 @@ Ensure exam-course relationships remain compatible with academic modules.
 
 Correct student sees correct timetable and exams.
 
----
-
-# PHASE 11 — Course Materials
-
-## Objective
-
-Allow teachers to share academic resources.
-
----
-
----
 
 # PHASE 12 — Announcements and Notifications
 

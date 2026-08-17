@@ -3,6 +3,7 @@ import { ShieldUserIcon, UserIcon } from '@hugeicons/core-free-icons'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AcademicStructurePage } from '@/features/academic-structure/pages/AcademicStructurePage'
 import { AttendancePage } from '@/features/academic-performance/pages/AttendancePage'
+import { AnnouncementsPage } from '@/features/announcements/pages/AnnouncementsPage'
 import { AssessmentsPage } from '@/features/academic-performance/pages/AssessmentsPage'
 import { AssessmentStructureSettingsPage } from '@/features/academic-performance/pages/AssessmentStructureSettingsPage'
 import { MarksPage } from '@/features/academic-performance/pages/MarksPage'
@@ -140,6 +141,10 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
     (user.role === 'admin' || user.role === 'student' || user.role === 'teacher')
   ) {
     return <ExamsPage title={activeItem.label} user={user} />
+  }
+
+  if (activeItem.id === 'announcements') {
+    return <AnnouncementsPage title={activeItem.label} user={user} />
   }
 
   return <PlaceholderModule user={user} item={activeItem} />

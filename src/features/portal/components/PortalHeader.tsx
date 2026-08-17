@@ -2,6 +2,7 @@ import type { PortalUser } from '@/features/auth/types/auth.types'
 import type { NavItem } from '@/features/portal/types/portal.types'
 import { roleLabels } from '@/shared/constants/user-roles'
 import { ProfileMenu } from './ProfileMenu'
+import { NotificationMenuContainer } from '@/features/notifications/components/NotificationMenuContainer'
 
 export function PortalHeader({
   displayItem,
@@ -22,7 +23,10 @@ export function PortalHeader({
           {isAuthorized ? `${roleLabels[user.role]} protected area` : 'Access blocked'}
         </p>
       </div>
-      <ProfileMenu user={user} onLogout={onLogout} />
+      <div className="flex items-center gap-1">
+        <NotificationMenuContainer />
+        <ProfileMenu user={user} onLogout={onLogout} />
+      </div>
     </header>
   )
 }

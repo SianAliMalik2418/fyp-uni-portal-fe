@@ -39,6 +39,7 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
     { id: 'timetable', label: 'Timetable', icon: Calendar03Icon },
     { id: 'exams', label: 'Exams', icon: File02Icon },
     { id: 'materials', label: 'Materials', icon: BookOpen01Icon },
+    { id: 'announcements', label: 'Announcements', icon: Megaphone01Icon },
   ],
   hod: [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardCircleIcon },
@@ -47,6 +48,7 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
     { id: 'teachers', label: 'Teachers', icon: TeacherIcon },
     { id: 'attendance', label: 'Attendance', icon: Calendar03Icon },
     { id: 'results', label: 'Results', icon: SchoolReportCardIcon },
+    { id: 'announcements', label: 'Announcements', icon: Megaphone01Icon },
   ],
   admin: [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardCircleIcon },
