@@ -8,7 +8,7 @@ import {
   selectByLabel,
   semester,
   users,
-} from './helpers/portal-fixtures'
+} from './helpers/portal-fixtures.js'
 
 test.describe('phase 2 - academic structure', () => {
   test('admin creates the full academic structure used by later phases', async ({ page }) => {

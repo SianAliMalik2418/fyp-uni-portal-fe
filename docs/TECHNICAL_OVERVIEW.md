@@ -51,6 +51,18 @@ src/
       types/
     student-dashboard/
       pages/
+    timetable/
+      api/
+      components/
+      pages/
+      schemas/
+      types/
+    exams/
+      api/
+      components/
+      pages/
+      schemas/
+      types/
     user-accounts/
       api/
       components/
@@ -71,6 +83,9 @@ src/
 - `src/features/departments`: Department management page, API functions, TanStack Query options, form schema, domain types, table/form/dialog components, and payload mappers.
 - `src/features/user-accounts`: Admin account provisioning page, API functions, TanStack Query options, form schema, domain types, section helpers, and account form/table components.
 - `src/features/student-dashboard`: Student dashboard route module.
+- `src/features/timetable`: Configurable admin draft/publish workflow and scoped student/teacher weekly schedule views.
+- `src/features/exams`: Manual admin exam date-sheet CRUD and enrollment/assignment-scoped student and teacher views.
+- `src/features/academic-structure/components/AcademicReferenceSelect.tsx`: Reusable program, semester, section, and course reference selector used by scheduling workflows.
 - `src/features/*/pages`: Route-level page components for that feature. Pages compose feature components and wire screen-level behavior.
 - `src/features/*/components`: Reusable feature/domain components consumed by pages. Keep route entry components in `pages/`.
 - `src/shared/api`: Cross-feature HTTP client configuration and API error normalization.

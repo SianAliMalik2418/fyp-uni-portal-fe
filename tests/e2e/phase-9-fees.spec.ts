@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { mockAuthMe, users } from './helpers/portal-fixtures'
+import { mockAuthMe, users } from './helpers/portal-fixtures.js'
 
 const fee = {
   id: 'fee-1',

@@ -9,7 +9,7 @@ import {
   selectByLabel,
   semester,
   users,
-} from './helpers/portal-fixtures'
+} from './helpers/portal-fixtures.js'
 
 test.describe('phase 4 - courses, teacher assignment, and enrollment', () => {
   test('admin creates a course, assigns it to a section, and assigns the teacher', async ({

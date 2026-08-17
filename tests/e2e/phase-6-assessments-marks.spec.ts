@@ -6,7 +6,7 @@ import {
   mockAuthMe,
   offering,
   users,
-} from './helpers/portal-fixtures'
+} from './helpers/portal-fixtures.js'
 
 test.describe('phase 6 - assessments and marks', () => {
   test('admin configures structure and teacher creates assessment marks draft', async ({

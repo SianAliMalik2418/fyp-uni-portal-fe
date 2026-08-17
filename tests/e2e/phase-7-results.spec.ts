@@ -5,7 +5,7 @@ import {
   mockAuthMe,
   offering,
   users,
-} from './helpers/portal-fixtures'
+} from './helpers/portal-fixtures.js'
 
 const categories = assessmentStructure.categories.map((category) => ({
   category: category.id,

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { academicStudent, course, mockAuthMe, offering, users } from './helpers/portal-fixtures'
+import { academicStudent, course, mockAuthMe, offering, users } from './helpers/portal-fixtures.js'
 
 test.describe('phase 5 - attendance management', () => {
   test('teacher marks attendance, student sees percentage, and HOD sees shortage', async ({

@@ -6,7 +6,7 @@ import {
   mockReferenceData,
   selectByLabel,
   users,
-} from './helpers/portal-fixtures'
+} from './helpers/portal-fixtures.js'
 
 test.describe('phase 3 - student, teacher, and HOD management', () => {
   test('admin provisions student, teacher, and HOD accounts with the right relationships', async ({

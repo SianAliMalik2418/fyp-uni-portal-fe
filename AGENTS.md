@@ -85,6 +85,7 @@ bun run test:e2e:full  # live frontend + backend + MongoDB final state
 - Do not use `bun run dev`, `bun run preview`, or watch mode as final verification.
 - Do not require manual visual QA, browser walkthroughs, or screenshots unless the user explicitly requests them.
 - Always use the `simplify` skill after the implementation and automated checks are green, before handoff.
+- Check from skills installed globally in system and see what could be used in your speciifc scenario and use it
 
 ## Frontend Failure Log
 

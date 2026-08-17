@@ -56,6 +56,34 @@ test.describe('full-stack final state', () => {
     await page.getByLabel('Notes').fill('First installment received')
     await page.getByRole('button', { name: 'Save fee information' }).click()
     await expect(page.getByRole('heading', { name: 'Fee information saved' })).toBeVisible()
+
+    await page.goto('/timetables')
+    await expect(page.getByRole('heading', { name: 'Timetables' })).toBeVisible()
+    await page.getByRole('combobox', { name: 'Course offering 1' }).click()
+    await page.getByRole('option', { name: /programming fundamentals/i }).click()
+    await page.getByLabel('Start time').fill('09:00')
+    await page.getByLabel('End time').fill('10:30')
+    await page.getByLabel('Room').fill('Lab 1')
+    await page.getByLabel('Slot notes').fill('Bring your lab manuals')
+    await page.getByRole('button', { name: 'Save draft' }).click()
+    await expect(page.getByRole('heading', { name: 'Timetable draft saved' })).toBeVisible()
+    await page.getByRole('button', { name: 'Publish timetable' }).click()
+    await expect(page.getByRole('heading', { name: 'Timetable published' })).toBeVisible()
+    await expect(page.getByText('Current published timetable', { exact: true })).toBeVisible()
+
+    await page.goto('/exams')
+    await page.getByRole('button', { name: 'Add exam' }).click()
+    await page.getByLabel('Exam type').fill('Final')
+    await page.getByRole('combobox', { name: 'Course' }).click()
+    await page.getByRole('option', { name: /programming fundamentals/i }).click()
+    await page.getByLabel('Exam date').fill('2026-12-18')
+    await page.getByLabel('Start time').fill('09:00')
+    await page.getByLabel('End time').fill('12:00')
+    await page.getByLabel('Room').fill('Hall A')
+    await page.getByLabel('Instructions').fill('Bring your student card')
+    await page.getByRole('button', { name: 'Create exam' }).click()
+    await expect(page.getByRole('heading', { name: 'Exam created' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Programming Fundamentals' })).toBeVisible()
   })
 
   test('teacher can use assigned course, attendance, assessment, and marks modules', async ({
@@ -87,6 +115,18 @@ test.describe('full-stack final state', () => {
     await expect(page.getByText('Ayesha Noor')).toBeVisible()
     await page.getByRole('button', { name: 'Submit result' }).click()
     await expect(page.getByText('Pending HOD Approval')).toBeVisible()
+
+    await page.goto('/timetable')
+    await expect(page.getByRole('heading', { name: 'Timetable' })).toBeVisible()
+    await expect(page.getByText('Programming Fundamentals').first()).toBeVisible()
+    await expect(page.getByText('09:00 - 10:30')).toBeVisible()
+    await expect(page.getByText('Room: Lab 1')).toBeVisible()
+
+    await page.goto('/exams')
+    await expect(page.getByText('Teaching exam schedule')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Programming Fundamentals' })).toBeVisible()
+    await expect(page.getByText('Section A')).toBeVisible()
+    await expect(page.getByText('Hall A')).toBeVisible()
   })
 
   test('student sees enrolled courses, attendance shortage, and published academic data', async ({
@@ -120,6 +160,19 @@ test.describe('full-stack final state', () => {
     await expect(page.getByText('PKR 60,000')).toBeVisible()
     await expect(page.getByText('Partially paid').first()).toBeVisible()
     await expect(page.getByText('First installment received')).toBeVisible()
+
+    await page.goto('/timetable')
+    await expect(page.getByRole('heading', { name: 'Timetable' })).toBeVisible()
+    await expect(page.getByText('Programming Fundamentals').first()).toBeVisible()
+    await expect(page.getByText('Teacher: Tayabba Teacher', { exact: true })).toBeVisible()
+    await expect(page.getByText('Room: Lab 1')).toBeVisible()
+    await expect(page.getByText('Bring your lab manuals')).toBeVisible()
+
+    await page.goto('/exams')
+    await expect(page.getByText('Exam date sheet')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Programming Fundamentals' })).toBeVisible()
+    await expect(page.getByText('18 December 2026')).toBeVisible()
+    await expect(page.getByText('Bring your student card')).toBeVisible()
   })
 
   test('HOD sees final-state attendance shortage data and blocked admin-only routes', async ({

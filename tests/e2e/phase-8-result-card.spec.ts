@@ -6,7 +6,7 @@ import {
   program,
   semester,
   users,
-} from './helpers/portal-fixtures'
+} from './helpers/portal-fixtures.js'
 
 test.describe('phase 8 - student result card', () => {
   test('student views and downloads an approved semester result card', async ({ page }) => {

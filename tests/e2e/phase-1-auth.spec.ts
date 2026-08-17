@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { mockAuthMe, users } from './helpers/portal-fixtures'
+import { mockAuthMe, users } from './helpers/portal-fixtures.js'
 
 test.describe('phase 1 - basic project user flow', () => {
   for (const [role, portalUser] of Object.entries(users)) {

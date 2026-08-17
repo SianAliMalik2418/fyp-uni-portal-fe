@@ -52,6 +52,88 @@ const activeTeacher: MockUser = {
   passwordChangeRequired: false,
 }
 
+const timetableSection = {
+  id: 'section-1',
+  name: 'A',
+  program: {
+    id: 'program-1',
+    name: 'BS Computer Science',
+    code: 'BSCS',
+    isActive: true,
+  },
+  batch: {
+    id: 'batch-1',
+    name: 'Fall 2026',
+    startingYear: 2026,
+    expectedGraduationYear: 2030,
+    isActive: true,
+  },
+  semester: {
+    id: 'semester-1',
+    name: 'Fall Semester',
+    academicYear: '2026-2027',
+    isActive: true,
+    isClosed: false,
+  },
+  isActive: true,
+}
+
+const timetableOffering = {
+  id: 'offering-1',
+  course: {
+    id: 'course-1',
+    code: 'PF',
+    title: 'Programming Fundamentals',
+    creditHours: 3,
+  },
+  teacher: {
+    id: 'teacher-1',
+    fullName: 'Tayabba Teacher',
+    email: 'teacher@example.com',
+  },
+  isActive: true,
+}
+
+const publishedTimetable = {
+  id: 'timetable-1',
+  section: timetableSection,
+  status: 'published' as const,
+  version: 1,
+  notes: 'Bring your lab manuals.',
+  publishedAt: '2026-08-12T09:00:00.000Z',
+  entries: [
+    {
+      id: 'entry-1',
+      dayOfWeek: 'monday' as const,
+      startTime: '09:00',
+      endTime: '10:30',
+      room: 'Lab 1',
+      slotType: 'lecture' as const,
+      notes: 'Bring your lab manuals.',
+      courseOffering: timetableOffering,
+    },
+  ],
+}
+
+const scheduledExam = {
+  id: 'exam-1',
+  examType: 'Final',
+  courseOfferingId: timetableOffering.id,
+  course: {
+    id: timetableOffering.course.id,
+    code: timetableOffering.course.code,
+    title: timetableOffering.course.title,
+  },
+  program: timetableSection.program,
+  semester: timetableSection.semester,
+  section: { id: timetableSection.id, name: timetableSection.name },
+  examDate: '2026-12-18',
+  startTime: '09:00',
+  endTime: '12:00',
+  room: 'Hall A',
+  instructions: 'Bring your student card',
+}
+
 describe('App', () => {
   let getSpy: ReturnType<typeof vi.spyOn>
   let patchSpy: ReturnType<typeof vi.spyOn>
@@ -806,6 +888,172 @@ describe('App', () => {
       'href',
       '/attendance'
     )
+  })
+
+  it('renders the published student timetable', async () => {
+    window.history.pushState(null, '', '/timetable')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeStudent } })
+      }
+
+      if (url === '/timetable/me/student') {
+        return Promise.resolve({ data: { timetable: publishedTimetable } })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(<App />)
+
+    expect(await screen.findByText(/weekly timetable/i)).toBeInTheDocument()
+    expect(screen.getByText(/programming fundamentals/i)).toBeInTheDocument()
+    expect(screen.getByText(/room: lab 1/i)).toBeInTheDocument()
+    expect(screen.getByText(/teacher: tayabba teacher/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/bring your lab manuals/i).length).toBeGreaterThan(0)
+  })
+
+  it('renders the authenticated student exam date sheet', async () => {
+    window.history.pushState(null, '', '/exams')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeStudent } })
+      }
+
+      if (url === '/exams/me/student') {
+        return Promise.resolve({ data: { exams: [scheduledExam] } })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(<App />)
+
+    expect(await screen.findByText(/exam date sheet/i)).toBeInTheDocument()
+    expect(screen.getByText(/programming fundamentals/i)).toBeInTheDocument()
+    expect(screen.getByText(/18 december 2026/i)).toBeInTheDocument()
+    expect(screen.getByText(/hall a/i)).toBeInTheDocument()
+    expect(screen.getByText(/bring your student card/i)).toBeInTheDocument()
+  })
+
+  it('renders exams for the authenticated teacher course assignments', async () => {
+    window.history.pushState(null, '', '/exams')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeTeacher } })
+      }
+
+      if (url === '/exams/me/teacher') {
+        return Promise.resolve({ data: { exams: [scheduledExam] } })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(<App />)
+
+    expect(await screen.findByText(/teaching exam schedule/i)).toBeInTheDocument()
+    expect(screen.getByText(/programming fundamentals/i)).toBeInTheDocument()
+    expect(screen.getByText(/section a/i)).toBeInTheDocument()
+  })
+
+  it('renders the admin timetable workspace', async () => {
+    window.history.pushState(null, '', '/timetables')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeAdmin } })
+      }
+
+      if (url === '/programs') {
+        return Promise.resolve({
+          data: {
+            programs: [
+              {
+                id: 'program-1',
+                name: 'BS Computer Science',
+                code: 'BSCS',
+                department: {
+                  id: 'department-1',
+                  name: 'Computer Science',
+                  code: 'CS',
+                  isActive: true,
+                },
+                totalSemesters: 8,
+                duration: 4,
+                durationUnit: 'years',
+                isActive: true,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/semesters') {
+        return Promise.resolve({
+          data: {
+            semesters: [timetableSection.semester],
+          },
+        })
+      }
+
+      if (url === '/sections') {
+        return Promise.resolve({
+          data: {
+            sections: [timetableSection],
+          },
+        })
+      }
+
+      if (url === `/timetable/sections/${timetableSection.id}`) {
+        return Promise.resolve({
+          data: {
+            section: timetableSection,
+            availableCourseOfferings: [timetableOffering],
+            draftTimetable: null,
+            publishedTimetable,
+          },
+        })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(<App />)
+
+    expect(await screen.findByText(/schedule editor/i)).toBeInTheDocument()
+    expect(screen.getByText(/^current published timetable$/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /save draft/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /publish timetable/i })).toBeDisabled()
+    expect(screen.getByText(/save a draft before publishing/i)).toBeInTheDocument()
+    expect(screen.getByText(/published timetable remains live/i)).toBeInTheDocument()
+  })
+
+  it('keeps timetable reference-data failures visible to admins', async () => {
+    window.history.pushState(null, '', '/timetables')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeAdmin } })
+      }
+
+      if (url === '/programs') {
+        return Promise.reject(new Error('Programs could not be loaded'))
+      }
+
+      if (url === '/semesters') {
+        return Promise.resolve({ data: { semesters: [] } })
+      }
+
+      if (url === '/sections') {
+        return Promise.resolve({ data: { sections: [] } })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(<App />)
+
+    expect(await screen.findByText(/timetable setup unavailable/i)).toBeInTheDocument()
+    expect(screen.getByText(/programs could not be loaded/i)).toBeInTheDocument()
   })
 
   it('opens the profile menu and logs out from the portal shell', async () => {
