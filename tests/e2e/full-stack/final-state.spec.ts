@@ -48,8 +48,14 @@ test.describe('full-stack final state', () => {
     await expect(page.getByLabel('Grade point for A', { exact: true })).toHaveValue('4')
 
     await page.goto('/fees')
-    await expect(page.getByText('Fees workspace', { exact: true })).toBeVisible()
-    await expect(page.getByText('No fee batches available yet.')).toBeVisible()
+    await page.getByRole('button', { name: 'Manage fee for Ayesha Noor' }).click()
+    await page.getByLabel('Total semester fee').fill('100000')
+    await page.getByLabel('Paid amount').fill('40000')
+    await page.getByLabel('Due date').fill('2030-09-15')
+    await page.getByLabel('Payment date').fill('2026-08-10')
+    await page.getByLabel('Notes').fill('First installment received')
+    await page.getByRole('button', { name: 'Save fee information' }).click()
+    await expect(page.getByRole('heading', { name: 'Fee information saved' })).toBeVisible()
   })
 
   test('teacher can use assigned course, attendance, assessment, and marks modules', async ({
@@ -107,6 +113,13 @@ test.describe('full-stack final state', () => {
 
     await page.goto('/results')
     await expect(page.getByText('No published results')).toBeVisible()
+
+    await page.goto('/fees')
+    await expect(page.getByText('PKR 100,000')).toBeVisible()
+    await expect(page.getByText('PKR 40,000')).toBeVisible()
+    await expect(page.getByText('PKR 60,000')).toBeVisible()
+    await expect(page.getByText('Partially paid').first()).toBeVisible()
+    await expect(page.getByText('First installment received')).toBeVisible()
   })
 
   test('HOD sees final-state attendance shortage data and blocked admin-only routes', async ({

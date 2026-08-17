@@ -36,6 +36,12 @@ const temporaryStudent: MockUser = {
   passwordChangeRequired: true,
 }
 
+const activeStudent: MockUser = {
+  ...temporaryStudent,
+  name: 'Hammad Student',
+  passwordChangeRequired: false,
+}
+
 const activeTeacher: MockUser = {
   id: 'teacher-1',
   name: 'Tayabba Teacher',
@@ -1040,5 +1046,139 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.getAllByText(/inactive account/i).length).toBeGreaterThan(0)
     })
+  })
+
+  it('shows the authenticated student their own fee information without payment actions', async () => {
+    window.history.pushState(null, '', '/fees')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeStudent } })
+      }
+
+      if (url === '/fees/me') {
+        return Promise.resolve({
+          data: {
+            fee: {
+              id: 'fee-1',
+              student: {
+                id: activeStudent.id,
+                fullName: activeStudent.name,
+                registrationNumber: 'NCBAE-2026-CS-001',
+              },
+              semester: {
+                id: 'semester-1',
+                name: 'Fall Semester',
+                academicYear: '2026-2027',
+              },
+              totalAmount: 100000,
+              paidAmount: 40000,
+              remainingAmount: 60000,
+              dueDate: '2026-09-15',
+              paymentDate: '2026-08-10',
+              notes: 'First installment received',
+              status: 'partially_paid',
+            },
+          },
+        })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+
+    render(<App />)
+
+    expect(await screen.findByRole('heading', { name: /^fees$/i })).toBeInTheDocument()
+    expect((await screen.findAllByText(/partially paid/i)).length).toBeGreaterThan(0)
+    expect(screen.getByText('PKR 60,000')).toBeInTheDocument()
+    expect(screen.getByText(/first installment received/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /pay/i })).not.toBeInTheDocument()
+  })
+
+  it('lets an admin select a student and save calculated fee information', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', '/fees')
+    getSpy.mockImplementation((url) => {
+      if (url === '/auth/me') {
+        return Promise.resolve({ data: { user: activeAdmin } })
+      }
+
+      if (url === '/users') {
+        return Promise.resolve({
+          data: {
+            users: [
+              {
+                id: 'student-1',
+                fullName: 'Ayesha Noor',
+                email: 'ayesha@example.com',
+                role: 'student',
+                registrationNumber: 'NCBAE-2026-CS-001',
+                semester: {
+                  id: 'semester-1',
+                  name: 'Fall Semester',
+                  academicYear: '2026-2027',
+                  isActive: true,
+                  isClosed: false,
+                },
+                accountStatus: 'active',
+                isActive: true,
+                passwordChangeRequired: false,
+              },
+            ],
+          },
+        })
+      }
+
+      if (url === '/fees/students/student-1') {
+        return Promise.resolve({ data: { fee: null } })
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`))
+    })
+    putSpy.mockResolvedValueOnce({
+      data: {
+        message: 'Fee information saved',
+        fee: {
+          id: 'fee-1',
+          student: {
+            id: 'student-1',
+            fullName: 'Ayesha Noor',
+            registrationNumber: 'NCBAE-2026-CS-001',
+          },
+          semester: {
+            id: 'semester-1',
+            name: 'Fall Semester',
+            academicYear: '2026-2027',
+          },
+          totalAmount: 100000,
+          paidAmount: 40000,
+          remainingAmount: 60000,
+          dueDate: '2026-09-15',
+          paymentDate: '2026-08-10',
+          notes: 'First installment received',
+          status: 'partially_paid',
+        },
+      },
+    })
+
+    render(<App />)
+
+    await user.click(await screen.findByRole('button', { name: /manage fee for ayesha noor/i }))
+    await user.type(await screen.findByLabelText(/total semester fee/i), '100000')
+    await user.type(screen.getByLabelText(/paid amount/i), '40000')
+    await user.type(screen.getByLabelText(/due date/i), '2026-09-15')
+    await user.type(screen.getByLabelText(/payment date/i), '2026-08-10')
+    await user.type(screen.getByLabelText(/notes/i), 'First installment received')
+    await user.click(screen.getByRole('button', { name: /save fee information/i }))
+
+    await waitFor(() => {
+      expect(putSpy).toHaveBeenCalledWith('/fees/students/student-1', {
+        totalAmount: 100000,
+        paidAmount: 40000,
+        dueDate: '2026-09-15',
+        paymentDate: '2026-08-10',
+        notes: 'First installment received',
+      })
+    })
+    expect(await screen.findByRole('heading', { name: /fee information saved/i })).toBeVisible()
   })
 })

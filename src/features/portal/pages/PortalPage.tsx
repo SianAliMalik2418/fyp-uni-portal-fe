@@ -12,6 +12,7 @@ import { CourseManagementPage } from '@/features/courses/pages/CourseManagementP
 import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
 import { TeacherCoursesPage } from '@/features/courses/pages/TeacherCoursesPage'
 import { DepartmentsPage } from '@/features/departments/pages/DepartmentsPage'
+import { FeesPage } from '@/features/fees/pages/FeesPage'
 import { ProgramsPage } from '@/features/programs/pages/ProgramsPage'
 import { StudentDashboardPage } from '@/features/student-dashboard/pages/StudentDashboardPage'
 import { CurrentUserProfilePage } from '@/features/user-accounts/pages/CurrentUserProfilePage'
@@ -119,6 +120,10 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
 
   if (activeItem.id === 'results') {
     return <ResultsPage title={activeItem.label} user={user} />
+  }
+
+  if (activeItem.id === 'fees' && (user.role === 'admin' || user.role === 'student')) {
+    return <FeesPage user={user} />
   }
 
   return <PlaceholderModule user={user} item={activeItem} />
