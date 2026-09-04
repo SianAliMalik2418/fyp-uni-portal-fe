@@ -250,6 +250,17 @@ export type AcademicPerformanceOfferingsResponse = {
   offerings: CourseOffering[]
 }
 
+export type AcademicPerformanceOfferingsQuery = {
+  search?: string
+  departmentId?: string
+  programId?: string
+  batchId?: string
+  semesterId?: string
+  sectionId?: string
+  resultStatus?: ResultStatus
+  limit: number
+}
+
 export type AcademicPerformanceOfferingStudentsResponse = {
   offering: CourseOffering
   students: AcademicPerformanceStudent[]
@@ -311,4 +322,17 @@ export type AttendanceShortage = AttendanceCourseSummary & {
 
 export type AttendanceShortagesResponse = {
   shortages: AttendanceShortage[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+export type AttendanceShortagesQuery = Omit<
+  AcademicPerformanceOfferingsQuery,
+  'resultStatus' | 'limit'
+> & {
+  studentSearch?: string
+  page: number
+  limit: number
 }

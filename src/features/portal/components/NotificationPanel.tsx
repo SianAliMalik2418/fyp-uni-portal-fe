@@ -67,7 +67,7 @@ export function NotificationPanel({
               </span>
               <p className="text-foreground text-sm font-medium">No notifications yet.</p>
               <p className="text-muted-foreground text-sm leading-6">
-                Result, fee, timetable, exam, material, and announcement alerts will appear here.
+                Result, fee, timetable, exam, and announcement alerts will appear here.
               </p>
             </div>
           </div>

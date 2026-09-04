@@ -72,7 +72,7 @@ test.describe('phase 7 - result approval and publishing', () => {
 
     await page.unroute('**/api/auth/me')
     await mockAuthMe(page, users.teacher)
-    await page.route('**/api/academic-performance/offerings', async (route) => {
+    await page.route('**/api/academic-performance/offerings?*', async (route) => {
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({ offerings: [offering] }),
@@ -135,10 +135,22 @@ test.describe('phase 7 - result approval and publishing', () => {
         }),
       })
     })
-    await page.route('**/api/student-dashboard', async (route) => {
+    await page.route('**/api/dashboards/me', async (route) => {
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({
+          role: 'student',
+          student: {
+            id: academicStudent.id,
+            name: academicStudent.name,
+            registrationNumber: academicStudent.registrationNumber,
+            department: academicStudent.department,
+            program: academicStudent.program,
+            semester: academicStudent.semester,
+            section: academicStudent.section,
+          },
+          currentSemester: academicStudent.semester,
+          courses: [offering],
           attendance: { summaries: [] },
           academics: {
             recentMarks: [],
@@ -154,6 +166,10 @@ test.describe('phase 7 - result approval and publishing', () => {
             gpa: 4,
             cgpa: 4,
           },
+          fee: null,
+          todayClasses: [],
+          upcomingExams: [],
+          announcements: [],
           notifications: [
             {
               id: 'notification-1',

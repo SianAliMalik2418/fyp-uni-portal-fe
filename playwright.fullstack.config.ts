@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const apiPort = 5100
-const appPort = 5174
+const apiPort = Number(process.env.PLAYWRIGHT_FULLSTACK_API_PORT ?? 5100)
+const appPort = Number(process.env.PLAYWRIGHT_FULLSTACK_APP_PORT ?? 5174)
 const mongoUri = 'mongodb://127.0.0.1:27017/fyp_uni_portal_e2e'
 
 const backendEnv = {
@@ -39,7 +39,7 @@ export default defineConfig({
       timeout: 30_000,
     },
     {
-      command: `VITE_API_BASE_URL=http://127.0.0.1:${apiPort}/api bun run dev --host 127.0.0.1 --port ${appPort}`,
+      command: `VITE_API_BASE_URL=http://127.0.0.1:${apiPort}/api bun run dev --host 127.0.0.1 --port ${appPort} --strictPort`,
       url: `http://127.0.0.1:${appPort}`,
       reuseExistingServer: false,
       timeout: 30_000,

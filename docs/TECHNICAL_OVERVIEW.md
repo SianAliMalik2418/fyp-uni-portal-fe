@@ -130,7 +130,7 @@ The Query Client is configured in `src/app/query-client.ts` with short session f
 - `date-fns`: Date formatting and manipulation.
 - `react-day-picker`: Calendar/date-picker UI behavior.
 - `embla-carousel-react`: Carousel behavior.
-- `input-otp`: OTP input UI package already present in the frontend stack. It is not part of the planned Better Auth sign-in flow because app authentication is email/password-only.
+- `input-otp`: OTP input UI package already present in the frontend stack. It is not used by the current email/password-only authentication flow.
 - `react-resizable-panels`: Resizable layout panels.
 - `recharts`: Charts for dashboards and academic analytics.
 - `tw-animate-css`: Tailwind-compatible animation utilities.

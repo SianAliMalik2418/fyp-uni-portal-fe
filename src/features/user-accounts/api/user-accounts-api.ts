@@ -3,12 +3,14 @@ import type {
   CreateUserAccountPayload,
   CreateUserAccountResponse,
   UpdateUserAccountPayload,
+  UserAccountListQuery,
   UserAccountResponse,
   UserAccountsResponse,
+  StudentImportResult,
 } from '../types/user-account.types'
 
-export async function listUserAccounts() {
-  const { data } = await apiClient.get<UserAccountsResponse>('/users')
+export async function listUserAccounts(query: UserAccountListQuery) {
+  const { data } = await apiClient.get<UserAccountsResponse>('/users', { params: query })
   return data
 }
 
@@ -42,5 +44,14 @@ export async function resetUserAccountPassword(userId: string) {
   const { data } = await apiClient.patch<CreateUserAccountResponse>(
     `/users/${userId}/reset-password`
   )
+  return data
+}
+
+export async function importStudentAccounts(file: File) {
+  const form = new FormData()
+  form.append('file', file)
+  const { data } = await apiClient.post<StudentImportResult>('/users/import', form, {
+    headers: { 'Content-Type': undefined },
+  })
   return data
 }

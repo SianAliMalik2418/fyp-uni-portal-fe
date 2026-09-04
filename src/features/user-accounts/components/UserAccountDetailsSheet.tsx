@@ -1,5 +1,6 @@
 import { roleLabels } from '@/shared/constants/user-roles'
 import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Sheet,
   SheetContent,
@@ -30,11 +31,22 @@ export function UserAccountDetailsSheet({ account, onOpenChange }: UserAccountDe
         {account ? (
           <ScrollArea className="min-h-0 flex-1 py-4">
             <div className="grid gap-5 px-4 pb-4">
-              <div className="grid gap-1">
-                <span className="text-muted-foreground text-sm">Account status</span>
-                <Badge className="w-fit" variant={account.isActive ? 'secondary' : 'outline'}>
-                  {account.accountStatus}
-                </Badge>
+              <div className="flex items-center gap-3">
+                <Avatar size="lg">
+                  {account.profilePictureUrl ? (
+                    <AvatarImage
+                      src={account.profilePictureUrl}
+                      alt={`${account.fullName} profile picture`}
+                    />
+                  ) : null}
+                  <AvatarFallback>{initials(account.fullName)}</AvatarFallback>
+                </Avatar>
+                <div className="grid gap-1">
+                  <span className="text-muted-foreground text-sm">Account status</span>
+                  <Badge className="w-fit" variant={account.isActive ? 'secondary' : 'outline'}>
+                    {account.accountStatus}
+                  </Badge>
+                </div>
               </div>
               <DetailGrid
                 items={[
@@ -77,6 +89,15 @@ export function UserAccountDetailsSheet({ account, onOpenChange }: UserAccountDe
       </SheetContent>
     </Sheet>
   )
+}
+
+function initials(name: string) {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
 }
 
 function DetailGrid({ items }: { items: Array<[string, string | undefined]> }) {

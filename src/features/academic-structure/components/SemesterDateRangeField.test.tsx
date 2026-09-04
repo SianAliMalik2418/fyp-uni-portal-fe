@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { SemesterFormValues } from '../schemas/academic-structure.schemas'
 import { emptySemesterValues } from '../utils/academic-structure-mappers'
 import { SemesterDateRangeField } from './SemesterDateRangeField'
@@ -15,8 +15,15 @@ function DateRangeFieldTest() {
 }
 
 describe('SemesterDateRangeField', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('updates the displayed range when start and end dates are selected', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.setSystemTime(new Date('2026-08-01T00:00:00.000Z'))
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     render(<DateRangeFieldTest />)
 
     await user.click(screen.getByRole('button', { name: /date range/i }))

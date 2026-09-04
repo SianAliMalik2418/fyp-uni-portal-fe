@@ -141,10 +141,22 @@ test('shows student attendance warnings and opens attendance details', async ({ 
     })
   })
 
-  await page.route('**/api/student-dashboard', async (route) => {
+  await page.route('**/api/dashboards/me', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
       body: JSON.stringify({
+        role: 'student',
+        student: {
+          id: studentUser.id,
+          name: studentUser.name,
+          registrationNumber: 'NCBAE-2026-CS-001',
+          department: null,
+          program: null,
+          semester: null,
+          section: null,
+        },
+        currentSemester: null,
+        courses: [],
         attendance: {
           summaries: [
             {
@@ -186,6 +198,12 @@ test('shows student attendance warnings and opens attendance details', async ({ 
             weightedPercentage: 8,
           },
         },
+        results: { latest: null, gpa: 0, cgpa: 0 },
+        fee: null,
+        todayClasses: [],
+        upcomingExams: [],
+        announcements: [],
+        notifications: [],
       }),
     })
   })
@@ -259,7 +277,7 @@ test('teacher enters assessment marks and saves a draft', async ({ page }) => {
       body: JSON.stringify({ user: teacherUser }),
     })
   })
-  await page.route('**/api/academic-performance/offerings', async (route) => {
+  await page.route('**/api/academic-performance/offerings?*', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
       body: JSON.stringify({ offerings: [offering] }),

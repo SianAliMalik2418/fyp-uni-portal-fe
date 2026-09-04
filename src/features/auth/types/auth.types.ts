@@ -4,6 +4,7 @@ export type PortalUser = {
   id: string
   name: string
   email: string
+  profilePictureUrl?: string
   role: UserRole
   accountStatus: 'active' | 'inactive'
   isActive: boolean

@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/react-query'
+import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 import {
   getStudentAttendanceSummaries,
   getAttendanceConfiguration,
@@ -15,17 +15,26 @@ import {
   getStudentResultCard,
   getGradingScale,
 } from './academic-performance-api'
+import type {
+  AcademicPerformanceOfferingsQuery,
+  AttendanceShortagesQuery,
+} from '../types/academic-performance.types'
+
+const defaultOfferingQuery: AcademicPerformanceOfferingsQuery = { limit: 50 }
+const defaultShortageQuery: AttendanceShortagesQuery = { page: 1, limit: 20 }
 
 export const academicPerformanceKeys = {
   all: ['academic-performance'] as const,
   context: () => [...academicPerformanceKeys.all, 'context'] as const,
-  offerings: () => [...academicPerformanceKeys.all, 'offerings'] as const,
+  offerings: (query: AcademicPerformanceOfferingsQuery = defaultOfferingQuery) =>
+    [...academicPerformanceKeys.all, 'offerings', query] as const,
   offeringStudents: (offeringId: string) =>
     [...academicPerformanceKeys.offerings(), offeringId, 'students'] as const,
   attendanceSessions: (offeringId?: string) =>
     [...academicPerformanceKeys.all, 'attendance-sessions', offeringId ?? 'all'] as const,
   studentAttendance: () => [...academicPerformanceKeys.all, 'student-attendance'] as const,
-  attendanceShortages: () => [...academicPerformanceKeys.all, 'attendance-shortages'] as const,
+  attendanceShortages: (query: AttendanceShortagesQuery = defaultShortageQuery) =>
+    [...academicPerformanceKeys.all, 'attendance-shortages', query] as const,
   configuration: () => [...academicPerformanceKeys.all, 'attendance-configuration'] as const,
   assessmentStructure: () => [...academicPerformanceKeys.all, 'assessment-structure'] as const,
   assessments: (offeringId: string) =>
@@ -48,8 +57,17 @@ export const academicPerformanceContextQueryOptions = queryOptions({
 
 export const academicPerformanceOfferingsQueryOptions = queryOptions({
   queryKey: academicPerformanceKeys.offerings(),
-  queryFn: listAcademicPerformanceOfferings,
+  queryFn: () => listAcademicPerformanceOfferings(defaultOfferingQuery),
 })
+
+export const filteredAcademicPerformanceOfferingsQueryOptions = (
+  query: AcademicPerformanceOfferingsQuery
+) =>
+  queryOptions({
+    queryKey: academicPerformanceKeys.offerings(query),
+    queryFn: () => listAcademicPerformanceOfferings(query),
+    placeholderData: keepPreviousData,
+  })
 
 export const academicPerformanceOfferingStudentsQueryOptions = (offeringId: string) =>
   queryOptions({
@@ -72,8 +90,15 @@ export const studentAttendanceQueryOptions = queryOptions({
 
 export const attendanceShortagesQueryOptions = queryOptions({
   queryKey: academicPerformanceKeys.attendanceShortages(),
-  queryFn: listAttendanceShortages,
+  queryFn: () => listAttendanceShortages(defaultShortageQuery),
 })
+
+export const filteredAttendanceShortagesQueryOptions = (query: AttendanceShortagesQuery) =>
+  queryOptions({
+    queryKey: academicPerformanceKeys.attendanceShortages(query),
+    queryFn: () => listAttendanceShortages(query),
+    placeholderData: keepPreviousData,
+  })
 
 export const attendanceConfigurationQueryOptions = queryOptions({
   queryKey: academicPerformanceKeys.configuration(),

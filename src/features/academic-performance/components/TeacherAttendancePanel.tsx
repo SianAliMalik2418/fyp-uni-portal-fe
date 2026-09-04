@@ -186,7 +186,10 @@ export function TeacherAttendancePanel({ title }: { title: string }) {
               </CardDescription>
             </div>
             {selectedOffering ? (
-              <Badge variant="outline">{selectedOffering.studentCount} students</Badge>
+              <Badge variant="outline">
+                {selectedOffering.studentCount}{' '}
+                {selectedOffering.studentCount === 1 ? 'student' : 'students'}
+              </Badge>
             ) : null}
           </div>
         </CardHeader>

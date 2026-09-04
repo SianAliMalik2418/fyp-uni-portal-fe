@@ -1,5 +1,5 @@
 import {
-  BookOpen01Icon,
+  Audit01Icon,
   Building01Icon,
   Calendar03Icon,
   ChartEvaluationIcon,
@@ -26,7 +26,6 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
     { id: 'fees', label: 'Fees', icon: Invoice01Icon },
     { id: 'timetable', label: 'Timetable', icon: Calendar03Icon },
     { id: 'exams', label: 'Exams', icon: File02Icon },
-    { id: 'materials', label: 'Materials', icon: BookOpen01Icon },
     { id: 'announcements', label: 'Announcements', icon: Megaphone01Icon },
   ],
   teacher: [
@@ -38,7 +37,6 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
     { id: 'results', label: 'Results', icon: SchoolReportCardIcon },
     { id: 'timetable', label: 'Timetable', icon: Calendar03Icon },
     { id: 'exams', label: 'Exams', icon: File02Icon },
-    { id: 'materials', label: 'Materials', icon: BookOpen01Icon },
     { id: 'announcements', label: 'Announcements', icon: Megaphone01Icon },
   ],
   hod: [
@@ -57,6 +55,7 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
     { id: 'departments', label: 'Departments', icon: Building01Icon },
     { id: 'programs', label: 'Programs', icon: Mortarboard01Icon },
     { id: 'academic-structure', label: 'Academic Structure', icon: SchoolReportCardIcon },
+    { id: 'semester-promotion', label: 'Semester Promotion', icon: UserGroupIcon },
     { id: 'courses', label: 'Courses', icon: CourseIcon },
     { id: 'attendance', label: 'Attendance Settings', icon: Calendar03Icon },
     { id: 'assessment-structure', label: 'Assessment Structure', icon: ChartEvaluationIcon },
@@ -66,5 +65,6 @@ export const roleNavigation: Record<UserRole, NavItem[]> = {
     { id: 'timetables', label: 'Timetables', icon: Calendar03Icon },
     { id: 'exams', label: 'Exams', icon: File02Icon },
     { id: 'announcements', label: 'Announcements', icon: Megaphone01Icon },
+    { id: 'audit-log', label: 'Audit log', icon: Audit01Icon },
   ],
 }

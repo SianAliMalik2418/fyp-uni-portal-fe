@@ -82,10 +82,22 @@ test.describe('phase 8 - student result card', () => {
 
   test('student opens the latest semester result card from the dashboard', async ({ page }) => {
     await mockAuthMe(page, users.student)
-    await page.route('**/api/student-dashboard', async (route) => {
+    await page.route('**/api/dashboards/me', async (route) => {
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({
+          role: 'student',
+          student: {
+            id: academicStudent.id,
+            name: academicStudent.name,
+            registrationNumber: academicStudent.registrationNumber,
+            department: academicStudent.department,
+            program: academicStudent.program,
+            semester: academicStudent.semester,
+            section: academicStudent.section,
+          },
+          currentSemester: academicStudent.semester,
+          courses: [offering],
           attendance: { summaries: [] },
           academics: {
             recentMarks: [],
@@ -107,6 +119,10 @@ test.describe('phase 8 - student result card', () => {
             gpa: 4,
             cgpa: 4,
           },
+          fee: null,
+          todayClasses: [],
+          upcomingExams: [],
+          announcements: [],
           notifications: [],
         }),
       })

@@ -253,32 +253,6 @@ export const studentServicePlaceholders: Record<string, ModulePlaceholderDetails
     readinessDescription: 'The exams workspace is ready for date sheets and exam notices.',
     nextIntegrationValue: 'Exams API',
   },
-  materials: {
-    stats: {
-      student: [
-        { label: 'Available files', value: '0' },
-        { label: 'Course folders', value: '0' },
-        { label: 'New uploads', value: '0' },
-      ],
-      teacher: [
-        { label: 'Uploaded files', value: '0' },
-        { label: 'Course folders', value: '0' },
-        { label: 'Draft uploads', value: '0' },
-      ],
-    },
-    emptyStates: {
-      student: {
-        emptyTitle: 'No course materials available yet.',
-        emptyDescription: 'Lecture files, handouts, and shared resources will appear here.',
-      },
-      teacher: {
-        emptyTitle: 'No materials uploaded yet.',
-        emptyDescription: 'Teacher upload controls will appear after course assignments exist.',
-      },
-    },
-    readinessDescription: 'The materials workspace is ready for course files and upload flows.',
-    nextIntegrationValue: 'Materials API',
-  },
   announcements: {
     stats: {
       student: [

@@ -1,18 +1,21 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const appPort = Number(process.env.PLAYWRIGHT_PORT ?? 4173)
+const appUrl = `http://127.0.0.1:${appPort}`
+
 export default defineConfig({
   testDir: './tests/e2e',
   testIgnore: '**/full-stack/**',
   fullyParallel: true,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:5173',
+    baseURL: appUrl,
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'bun run dev --host 127.0.0.1',
-    url: 'http://127.0.0.1:5173',
-    reuseExistingServer: !process.env.CI,
+    command: `bun run dev --host 127.0.0.1 --port ${appPort} --strictPort`,
+    url: appUrl,
+    reuseExistingServer: false,
   },
   projects: [
     {

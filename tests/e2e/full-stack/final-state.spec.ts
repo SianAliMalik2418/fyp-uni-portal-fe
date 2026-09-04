@@ -12,10 +12,12 @@ const accounts = {
 test.describe.configure({ mode: 'serial' })
 
 test.describe('full-stack final state', () => {
-  test('admin sees implemented setup modules and unfinished placeholder modules', async ({
-    page,
-  }) => {
+  test('admin sees the implemented setup and operations modules', async ({ page }) => {
     await login(page, accounts.admin)
+
+    await expect(page.getByRole('heading', { name: 'Admin dashboard' })).toBeVisible()
+    await expect(page.getByText('Fall Semester 2026-2027')).toBeVisible()
+    await expect(page.getByText('Recent administrative activity')).toBeVisible()
 
     await page.goto('/departments')
     await expect(page.getByRole('heading', { name: 'Departments' })).toBeVisible()
@@ -83,7 +85,12 @@ test.describe('full-stack final state', () => {
     await page.getByLabel('Instructions').fill('Bring your student card')
     await page.getByRole('button', { name: 'Create exam' }).click()
     await expect(page.getByRole('heading', { name: 'Exam created' })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Programming Fundamentals' })).toBeVisible()
+    await expect(
+      page
+        .getByRole('article')
+        .filter({ hasText: 'Hall A' })
+        .getByRole('heading', { name: 'Programming Fundamentals' })
+    ).toBeVisible()
 
     await page.goto('/announcements')
     await page.getByRole('button', { name: 'Create announcement' }).click()
@@ -91,9 +98,20 @@ test.describe('full-stack final state', () => {
     await page.getByLabel('Description').fill('Complete semester registration before Friday.')
     await page.getByLabel('Publish date').fill('2026-08-17T08:00')
     await page.getByLabel('Expiry date').fill('2027-08-25T08:00')
+    await page.getByLabel('Attachment').setInputFiles({
+      name: 'registration-notice.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('Phase 12 attachment'),
+    })
     await page.getByRole('checkbox', { name: 'Pin announcement' }).click()
     await page.getByRole('button', { name: 'Create announcement' }).last().click()
     await expect(page.getByRole('heading', { name: 'Announcement created' })).toBeVisible()
+    await expect(page.getByText('Semester registration deadline')).toBeVisible()
+    await expect(page.getByRole('link', { name: 'registration-notice.pdf' })).toBeVisible()
+
+    await page.goto('/audit-log')
+    await expect(page.getByRole('heading', { name: 'Audit log' })).toBeVisible()
+    await page.getByLabel('Module').selectOption('announcements')
     await expect(page.getByText('Semester registration deadline')).toBeVisible()
   })
 
@@ -101,6 +119,9 @@ test.describe('full-stack final state', () => {
     page,
   }) => {
     await login(page, accounts.teacher)
+
+    await expect(page.getByRole('heading', { name: 'Teacher dashboard' })).toBeVisible()
+    await expect(page.getByText('Marks progress')).toBeVisible()
 
     await page.goto('/courses')
     await expect(page.getByRole('heading', { name: 'Courses' })).toBeVisible()
@@ -113,15 +134,18 @@ test.describe('full-stack final state', () => {
     await expect(page.getByRole('button', { name: 'Save attendance' })).toBeEnabled()
 
     await page.goto('/assessments')
+    await selectCourseSection(page, 'PF - BSCS Fall Semester A')
     await expect(page.getByLabel('Course section')).toContainText('PF - BSCS Fall Semester A')
     await expect(page.getByText('Quiz 1').first()).toBeVisible()
     await expect(page.getByRole('button', { name: 'Create assessment' })).toBeEnabled()
 
     await page.goto('/marks')
+    await selectCourseSection(page, 'PF - BSCS Fall Semester A')
     await expect(page.getByText('Quiz 1').first()).toBeVisible()
     await expect(page.getByRole('spinbutton', { name: 'Marks for Ayesha Noor' })).toHaveValue('8')
 
     await page.goto('/results')
+    await selectCourseSection(page, 'PF - BSCS Fall Semester A')
     await expect(page.getByText('Draft', { exact: true })).toBeVisible()
     await expect(page.getByText('Ayesha Noor')).toBeVisible()
     await page.getByRole('button', { name: 'Submit result' }).click()
@@ -135,9 +159,11 @@ test.describe('full-stack final state', () => {
 
     await page.goto('/exams')
     await expect(page.getByText('Teaching exam schedule')).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Programming Fundamentals' })).toBeVisible()
-    await expect(page.getByText('Section A')).toBeVisible()
-    await expect(page.getByText('Hall A')).toBeVisible()
+    const createdExam = page.getByRole('article').filter({ hasText: 'Hall A' })
+    await expect(
+      createdExam.getByRole('heading', { name: 'Programming Fundamentals' })
+    ).toBeVisible()
+    await expect(createdExam.getByText('Section A')).toBeVisible()
   })
 
   test('student sees enrolled courses, attendance shortage, and published academic data', async ({
@@ -149,7 +175,7 @@ test.describe('full-stack final state', () => {
     await expect(page.getByText('Low-attendance warning')).toBeVisible()
     await expect(page.getByText('Recent marks')).toBeVisible()
     await expect(page.getByText('Quiz 1').first()).toBeVisible()
-    await expect(page.getByText('8 / 10')).toBeVisible()
+    await expect(page.getByText('8 / 10', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('Academic summary')).toBeVisible()
 
     await page.goto('/courses')
@@ -160,10 +186,12 @@ test.describe('full-stack final state', () => {
     await page.goto('/attendance')
     await expect(page.getByText('Programming Fundamentals').first()).toBeVisible()
     await expect(page.getByText('50%')).toBeVisible()
-    await expect(page.getByText('Required 75%')).toBeVisible()
+    await expect(page.getByText('Required 75%').first()).toBeVisible()
 
     await page.goto('/results')
-    await expect(page.getByText('No published results')).toBeVisible()
+    await expect(page.getByText('4.00 CGPA')).toBeVisible()
+    await expect(page.getByText('GPA 4.00')).toBeVisible()
+    await expect(page.getByText('Computer Networks')).toBeVisible()
 
     await page.goto('/fees')
     await expect(page.getByText('PKR 100,000')).toBeVisible()
@@ -181,9 +209,12 @@ test.describe('full-stack final state', () => {
 
     await page.goto('/exams')
     await expect(page.getByText('Exam date sheet')).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Programming Fundamentals' })).toBeVisible()
-    await expect(page.getByText('18 December 2026')).toBeVisible()
-    await expect(page.getByText('Bring your student card')).toBeVisible()
+    const createdExam = page.getByRole('article').filter({ hasText: 'Hall A' })
+    await expect(
+      createdExam.getByRole('heading', { name: 'Programming Fundamentals' })
+    ).toBeVisible()
+    await expect(createdExam.getByText('18 December 2026')).toBeVisible()
+    await expect(createdExam.getByText('Bring your student card')).toBeVisible()
 
     await page.goto('/announcements')
     await expect(page.getByText('Semester registration deadline')).toBeVisible()
@@ -195,6 +226,9 @@ test.describe('full-stack final state', () => {
   }) => {
     await login(page, accounts.hod)
 
+    await expect(page.getByRole('heading', { name: 'HOD dashboard' })).toBeVisible()
+    await expect(page.getByText('Attendance shortages')).toBeVisible()
+
     await page.goto('/attendance')
     await expect(page.getByText('Ayesha Noor').first()).toBeVisible()
     await expect(page.getByText('NCBAE-2026-CS-001').first()).toBeVisible()
@@ -202,6 +236,7 @@ test.describe('full-stack final state', () => {
     await expect(page.getByText('50%')).toBeVisible()
 
     await page.goto('/results')
+    await selectCourseSection(page, 'PF - BSCS Fall Semester A')
     await expect(page.getByText('Pending HOD Approval')).toBeVisible()
     await page.getByRole('button', { name: 'Approve result' }).click()
     await expect(page.getByText('Approved', { exact: true })).toBeVisible()
@@ -215,14 +250,14 @@ test.describe('full-stack final state', () => {
     await login(page, accounts.student)
     await page.goto('/results')
 
-    await expect(page.getByText('0.00 CGPA')).toBeVisible()
-    await expect(page.getByText('GPA 0.00')).toBeVisible()
+    await expect(page.getByText('2.00 CGPA')).toBeVisible()
+    await expect(page.getByText('GPA 2.00')).toBeVisible()
     await expect(page.getByText('Programming Fundamentals')).toBeVisible()
 
     await page.goto('/dashboard')
     await expect(page.getByText('Latest published result')).toBeVisible()
-    await expect(page.getByText('Result published')).toBeVisible()
-    await expect(page.getByText('0.00 GPA')).toBeVisible()
+    await expect(page.getByText('Result published').first()).toBeVisible()
+    await expect(page.getByText('2.00 GPA')).toBeVisible()
     await page.getByLabel(/Notifications, \d+ unread/).click()
     await expect(page.getByText('Result published').last()).toBeVisible()
     await page.getByRole('button', { name: 'Mark all as read' }).click()
@@ -239,4 +274,9 @@ async function login(page: Page, email: string) {
   await page.getByLabel(/^Password$/).fill(password)
   await page.getByRole('button', { name: 'Login' }).click()
   await expect(page.getByRole('button', { name: 'Open profile menu' })).toBeVisible()
+}
+
+async function selectCourseSection(page: Page, label: string) {
+  await page.getByLabel('Course section').click()
+  await page.getByRole('option', { name: label }).click()
 }

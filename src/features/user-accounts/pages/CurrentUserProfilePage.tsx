@@ -4,6 +4,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { roleLabels } from '@/shared/constants/user-roles'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -61,6 +62,15 @@ export function CurrentUserProfilePage() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <CardTitle className="flex items-center gap-2">
+                <Avatar size="lg">
+                  {account.profilePictureUrl ? (
+                    <AvatarImage
+                      src={account.profilePictureUrl}
+                      alt={`${account.fullName} profile picture`}
+                    />
+                  ) : null}
+                  <AvatarFallback>{initials(account.fullName)}</AvatarFallback>
+                </Avatar>
                 <HugeiconsIcon icon={UserIcon} strokeWidth={2} className="size-5" />
                 {account.fullName}
               </CardTitle>
@@ -90,6 +100,15 @@ export function CurrentUserProfilePage() {
       </Card>
     </div>
   )
+}
+
+function initials(name: string) {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
 }
 
 function ProfileField({ label, value }: { label: string; value?: string }) {

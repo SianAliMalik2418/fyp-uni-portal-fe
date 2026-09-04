@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Add01Icon, Megaphone01Icon } from '@hugeicons/core-free-icons'
+import { Add01Icon, Megaphone01Icon, Search01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/toast-manager'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { getApiErrorMessage } from '@/shared/api/http-client'
@@ -32,12 +33,18 @@ export function AnnouncementsPage({ title, user }: { title: string; user: Portal
   const canManage = user.role === 'admin'
   const queryClient = useQueryClient()
   const [status, setStatus] = useState<AnnouncementStatus>('active')
+  const [search, setSearch] = useState('')
+  const [isPinned, setIsPinned] = useState<boolean>()
   const [page, setPage] = useState(1)
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null)
   const [announcementToDelete, setAnnouncementToDelete] = useState<Announcement | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const deferredSearch = useDeferredValue(search.trim())
   const announcementsQuery = useQuery(
-    announcementsQueryOptions(canManage ? status : 'active', page)
+    announcementsQueryOptions(canManage ? status : 'active', page, {
+      ...(deferredSearch ? { search: deferredSearch } : {}),
+      ...(isPinned === undefined ? {} : { isPinned }),
+    })
   )
   const invalidateAnnouncements = () =>
     queryClient.invalidateQueries({ queryKey: announcementKeys.all })
@@ -126,6 +133,51 @@ export function AnnouncementsPage({ title, user }: { title: string; user: Portal
         </div>
       ) : null}
 
+      <div className="bg-background grid gap-3 rounded-md border p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <div className="grid gap-1.5">
+          <label className="text-foreground text-sm font-medium" htmlFor="announcement-search">
+            Search announcements
+          </label>
+          <div className="relative">
+            <HugeiconsIcon
+              icon={Search01Icon}
+              strokeWidth={2}
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2"
+            />
+            <Input
+              id="announcement-search"
+              className="pl-8"
+              placeholder="Search announcements"
+              value={search}
+              onValueChange={(value) => {
+                setSearch(value)
+                setPage(1)
+              }}
+            />
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2" aria-label="Pinned announcement filter">
+          {[
+            { label: 'All notices', value: undefined },
+            { label: 'Pinned only', value: true },
+            { label: 'Unpinned only', value: false },
+          ].map((option) => (
+            <Button
+              key={option.label}
+              type="button"
+              size="sm"
+              variant={isPinned === option.value ? 'default' : 'outline'}
+              onClick={() => {
+                setIsPinned(option.value)
+                setPage(1)
+              }}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
       {announcementsQuery.isPending ? (
         <div className="grid gap-3" aria-busy="true">
           <Skeleton className="h-40 w-full" />
@@ -167,15 +219,15 @@ export function AnnouncementsPage({ title, user }: { title: string; user: Portal
       )}
 
       {announcementsQuery.data && announcementsQuery.data.totalPages > 1 ? (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
           <p className="text-muted-foreground text-sm">
             Page {announcementsQuery.data.page} of {announcementsQuery.data.totalPages}
           </p>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex">
             <Button
               variant="outline"
               size="sm"
-              disabled={page === 1}
+              disabled={page === 1 || announcementsQuery.isFetching}
               onClick={() => setPage(page - 1)}
             >
               Previous
@@ -183,7 +235,7 @@ export function AnnouncementsPage({ title, user }: { title: string; user: Portal
             <Button
               variant="outline"
               size="sm"
-              disabled={page >= announcementsQuery.data.totalPages}
+              disabled={page >= announcementsQuery.data.totalPages || announcementsQuery.isFetching}
               onClick={() => setPage(page + 1)}
             >
               Next

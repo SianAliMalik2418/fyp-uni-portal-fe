@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useDeferredValue, useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { SearchIcon, UserAdd01Icon } from '@hugeicons/core-free-icons'
+import { UserAdd01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   batchesQueryOptions,
@@ -13,7 +13,6 @@ import { departmentsQueryOptions } from '@/features/departments/api/departments-
 import { programsQueryOptions } from '@/features/programs/api/programs-queries'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
 import {
@@ -32,19 +31,22 @@ import {
   resetUserAccountPassword,
   updateUserAccount,
 } from '../api/user-accounts-api'
-import { userAccountKeys, userAccountsQueryOptions } from '../api/user-accounts-queries'
+import { userAccountKeys, userAccountSearchQueryOptions } from '../api/user-accounts-queries'
+import { AccountDirectoryFilters } from '../components/AccountDirectoryFilters'
 import { AccountFormCard } from '../components/AccountFormCard'
 import { AccountsCard } from '../components/AccountsCard'
 import { DeleteUserAccountDialog } from '../components/DeleteUserAccountDialog'
 import { ResetPasswordDialog } from '../components/ResetPasswordDialog'
 import { UserAccountDetailsSheet } from '../components/UserAccountDetailsSheet'
+import { StudentImportSheet } from '../components/StudentImportSheet'
 import {
   createUserAccountSchema,
   type CreateUserAccountFormValues,
 } from '../schemas/user-account.schemas'
-import type { ProvisionedUserAccount } from '../types/user-account.types'
+import type { ProvisionedUserAccount, UserAccountListQuery } from '../types/user-account.types'
 import {
   accountMatchesSection,
+  accountSectionKind,
   accountToFormValues,
   cleanOptional,
   defaultAccountValues,
@@ -54,6 +56,13 @@ import {
 } from '../utils/account-sections'
 
 const accountFormId = 'account-sheet-form'
+const accountPageSize = 20
+
+function initialAccountFilters(sectionId: string): Partial<UserAccountListQuery> {
+  if (sectionId === 'students') return { role: 'student' }
+  if (sectionId === 'teachers') return { role: 'teacher' }
+  return {}
+}
 
 type UserAccountsPageProps = {
   sectionId: string
@@ -62,19 +71,30 @@ type UserAccountsPageProps = {
 
 export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
   const queryClient = useQueryClient()
-  const accountsQuery = useQuery(userAccountsQueryOptions)
+  const [filters, setFilters] = useState<Partial<UserAccountListQuery>>(() =>
+    initialAccountFilters(sectionId)
+  )
+  const [page, setPage] = useState(1)
+  const deferredSearch = useDeferredValue(filters.search)
+  const accountQuery: UserAccountListQuery = {
+    ...filters,
+    ...(deferredSearch?.trim() ? { search: deferredSearch.trim() } : { search: undefined }),
+    page,
+    limit: accountPageSize,
+  }
+  const accountsQuery = useQuery(userAccountSearchQueryOptions(accountQuery))
   const departmentsQuery = useQuery(departmentsQueryOptions)
   const programsQuery = useQuery(programsQueryOptions)
   const batchesQuery = useQuery(batchesQueryOptions)
   const semestersQuery = useQuery(semestersQueryOptions)
   const sectionsQuery = useQuery(sectionsQueryOptions)
   const sectionRoleOptions = roleOptionsForSection(sectionId)
-  const [searchTerm, setSearchTerm] = useState('')
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [editingAccount, setEditingAccount] = useState<ProvisionedUserAccount | null>(null)
   const [viewingAccount, setViewingAccount] = useState<ProvisionedUserAccount | null>(null)
   const [accountToDelete, setAccountToDelete] = useState<ProvisionedUserAccount | null>(null)
   const [accountToReset, setAccountToReset] = useState<ProvisionedUserAccount | null>(null)
+  const [isImportOpen, setIsImportOpen] = useState(false)
   const form = useForm<CreateUserAccountFormValues>({
     resolver: zodResolver(createUserAccountSchema),
     mode: 'onSubmit',
@@ -164,33 +184,8 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
     },
   })
 
-  const visibleAccounts = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase()
-    const sectionAccounts =
-      accountsQuery.data?.users.filter((account) => accountMatchesSection(account, sectionId)) ?? []
-
-    if (!normalizedSearch) {
-      return sectionAccounts
-    }
-
-    return sectionAccounts.filter((account) =>
-      [
-        account.fullName,
-        account.email,
-        account.registrationNumber,
-        account.employeeId,
-        account.department?.name,
-        account.department?.code,
-        account.program?.name,
-        account.program?.code,
-        account.batch?.name,
-        account.semester?.name,
-        account.section?.name,
-      ]
-        .filter(Boolean)
-        .some((value) => value?.toLowerCase().includes(normalizedSearch))
-    )
-  }, [accountsQuery.data?.users, searchTerm, sectionId])
+  const visibleAccounts =
+    accountsQuery.data?.users.filter((account) => accountMatchesSection(account, sectionId)) ?? []
 
   function submitAccount(values: CreateUserAccountFormValues) {
     const role = sectionRoleOptions.includes(values.role) ? values.role : fixedRole
@@ -199,6 +194,7 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
       role,
       email: values.email.trim().toLowerCase(),
       fullName: values.fullName.trim(),
+      profilePictureUrl: cleanOptional(values.profilePictureUrl),
       phoneNumber: cleanOptional(values.phoneNumber),
       registrationNumber: role === 'student' ? cleanOptional(values.registrationNumber) : undefined,
       employeeId:
@@ -268,25 +264,36 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
             Manage role profiles, academic assignment, account status, and temporary passwords.
           </p>
         </div>
-        <Button type="button" onClick={openCreateSheet}>
-          <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
-          Create account
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {sectionId === 'students' ? (
+            <Button type="button" variant="outline" onClick={() => setIsImportOpen(true)}>
+              Import CSV
+            </Button>
+          ) : null}
+          <Button type="button" onClick={openCreateSheet}>
+            <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} data-icon="inline-start" />
+            Create account
+          </Button>
+        </div>
       </div>
 
-      <div className="relative max-w-md">
-        <HugeiconsIcon
-          icon={SearchIcon}
-          strokeWidth={2}
-          className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2"
-        />
-        <Input
-          className="pl-8"
-          placeholder={`Search ${title.toLowerCase()}`}
-          value={searchTerm}
-          onValueChange={setSearchTerm}
-        />
-      </div>
+      <AccountDirectoryFilters
+        batches={batchesQuery.data?.batches ?? []}
+        departments={departmentsQuery.data?.departments ?? []}
+        kind={accountSectionKind(sectionId)}
+        onChange={(field, value) => {
+          setFilters((current) => ({ ...current, [field]: value }))
+          setPage(1)
+        }}
+        onClear={() => {
+          setFilters(initialAccountFilters(sectionId))
+          setPage(1)
+        }}
+        programs={programsQuery.data?.programs ?? []}
+        sections={sectionsQuery.data?.sections ?? []}
+        semesters={semestersQuery.data?.semesters ?? []}
+        values={filters}
+      />
 
       <AccountsCard
         accounts={visibleAccounts}
@@ -299,6 +306,35 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
         onResetPassword={setAccountToReset}
         onView={setViewingAccount}
       />
+
+      {accountsQuery.data && accountsQuery.data.totalPages > 1 ? (
+        <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+          <p className="text-muted-foreground text-sm">
+            Page {accountsQuery.data.page} of {accountsQuery.data.totalPages} ·{' '}
+            {accountsQuery.data.total} accounts
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:flex">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={page === 1 || accountsQuery.isFetching}
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+            >
+              Previous
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={page >= accountsQuery.data.totalPages || accountsQuery.isFetching}
+              onClick={() => setPage((current) => current + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       <Sheet
         open={isSheetOpen}
@@ -374,6 +410,7 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
           }
         }}
       />
+      <StudentImportSheet open={isImportOpen} onOpenChange={setIsImportOpen} />
     </div>
   )
 }

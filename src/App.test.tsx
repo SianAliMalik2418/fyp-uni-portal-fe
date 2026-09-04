@@ -717,7 +717,7 @@ describe('App', () => {
     expect(screen.getByText(/1 missing/i)).toBeInTheDocument()
   })
 
-  it('renders Hammad phase 4 student courses for materials and AI placeholders', async () => {
+  it('blocks the removed materials workspace', async () => {
     window.history.pushState(null, '', '/materials')
     getSpy.mockImplementation((url) => {
       if (url === '/auth/me') {
@@ -837,10 +837,8 @@ describe('App', () => {
 
     render(<App />)
 
-    expect(await screen.findByText(/enrolled course context/i)).toBeInTheDocument()
-    expect(screen.getByText(/artificial intelligence/i)).toBeInTheDocument()
-    expect(screen.getAllByText(/hammad teacher/i).length).toBeGreaterThan(0)
-    expect(screen.getByText(/1 enrolled course ready for future ai context/i)).toBeInTheDocument()
+    expect(await screen.findByText('Unauthorized page')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /materials/i })).not.toBeInTheDocument()
   })
 
   it('renders Hammad phase 5 attendance on the student dashboard', async () => {
@@ -852,9 +850,21 @@ describe('App', () => {
         })
       }
 
-      if (url === '/student-dashboard') {
+      if (url === '/dashboards/me') {
         return Promise.resolve({
           data: {
+            role: 'student',
+            student: {
+              id: temporaryStudent.id,
+              name: temporaryStudent.name,
+              registrationNumber: 'BSCS-001',
+              department: null,
+              program: null,
+              semester: null,
+              section: null,
+            },
+            currentSemester: null,
+            courses: [],
             attendance: {
               summaries: [
                 {
@@ -872,6 +882,21 @@ describe('App', () => {
                 },
               ],
             },
+            academics: {
+              recentMarks: [],
+              summary: {
+                publishedAssessments: 0,
+                coursesWithMarks: 0,
+                averagePercentage: 0,
+                weightedPercentage: 0,
+              },
+            },
+            results: { latest: null, gpa: 0, cgpa: 0 },
+            fee: null,
+            todayClasses: [],
+            upcomingExams: [],
+            announcements: [],
+            notifications: [],
           },
         })
       }

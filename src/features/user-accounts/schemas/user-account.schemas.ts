@@ -4,6 +4,12 @@ export const createUserAccountSchema = z
   .object({
     fullName: z.string().trim().min(2, 'Full name is required.'),
     email: z.string().trim().min(1, 'Email is required.').email('Enter a valid email address.'),
+    profilePictureUrl: z
+      .string()
+      .trim()
+      .url('Enter a valid profile picture URL.')
+      .optional()
+      .or(z.literal('')),
     role: z.enum(['student', 'teacher', 'hod', 'admin']),
     phoneNumber: z.string().trim().optional(),
     registrationNumber: z.string().trim().optional(),

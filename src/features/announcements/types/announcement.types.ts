@@ -20,6 +20,13 @@ export type Announcement = {
 
 export type AnnouncementStatus = 'active' | 'expired' | 'scheduled' | 'all'
 
+export type AnnouncementListQuery = {
+  status: AnnouncementStatus
+  search?: string
+  isPinned?: boolean
+  page?: number
+}
+
 export type AnnouncementsResponse = {
   announcements: Announcement[]
   page: number

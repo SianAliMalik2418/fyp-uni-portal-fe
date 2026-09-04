@@ -55,7 +55,7 @@ test.describe('phase 6 - assessments and marks', () => {
 
     await page.unroute('**/api/auth/me')
     await mockAuthMe(page, users.teacher)
-    await page.route('**/api/academic-performance/offerings', async (route) => {
+    await page.route('**/api/academic-performance/offerings?*', async (route) => {
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({ offerings: [offering] }),

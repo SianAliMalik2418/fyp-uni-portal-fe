@@ -3,7 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate } from 'react-router-dom'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { roleLabels } from '@/shared/constants/user-roles'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +33,9 @@ export function ProfileMenu({ user, onLogout }: { user: PortalUser; onLogout: ()
         aria-label="Open profile menu"
       >
         <Avatar size="sm">
+          {user.profilePictureUrl ? (
+            <AvatarImage src={user.profilePictureUrl} alt={`${user.name} profile picture`} />
+          ) : null}
           <AvatarFallback>{initials(user.name)}</AvatarFallback>
         </Avatar>
         <span className="hidden min-w-0 sm:block">

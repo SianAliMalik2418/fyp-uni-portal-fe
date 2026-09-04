@@ -8,7 +8,7 @@ test.describe('phase 5 - attendance management', () => {
     let attendancePayload: unknown
 
     await mockAuthMe(page, users.teacher)
-    await page.route('**/api/academic-performance/offerings', async (route) => {
+    await page.route('**/api/academic-performance/offerings?*', async (route) => {
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({ offerings: [offering] }),
@@ -82,7 +82,7 @@ test.describe('phase 5 - attendance management', () => {
 
     await page.unroute('**/api/auth/me')
     await mockAuthMe(page, users.hod)
-    await page.route('**/api/attendance/shortages', async (route) => {
+    await page.route('**/api/attendance/shortages?*', async (route) => {
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({
@@ -99,6 +99,10 @@ test.describe('phase 5 - attendance management', () => {
               isBelowThreshold: true,
             },
           ],
+          page: 1,
+          limit: 20,
+          total: 1,
+          totalPages: 1,
         }),
       })
     })

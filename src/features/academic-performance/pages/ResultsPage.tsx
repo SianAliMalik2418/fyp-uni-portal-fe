@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AlertCircleIcon, SchoolReportCardIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -11,6 +11,12 @@ import { TableSkeleton } from '@/components/ui/table-skeleton'
 import { toast } from '@/components/ui/toast-manager'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import {
+  batchesQueryOptions,
+  sectionsQueryOptions,
+  semestersQueryOptions,
+} from '@/features/academic-structure/api/academic-structure-queries'
+import { programsQueryOptions } from '@/features/programs/api/programs-queries'
+import {
   approveCourseResult,
   reopenCourseResult,
   returnCourseResult,
@@ -18,11 +24,15 @@ import {
 } from '../api/academic-performance-api'
 import {
   academicPerformanceKeys,
-  academicPerformanceOfferingsQueryOptions,
   courseResultQueryOptions,
+  filteredAcademicPerformanceOfferingsQueryOptions,
   studentResultsQueryOptions,
 } from '../api/academic-performance-queries'
 import { CourseOfferingPicker } from '../components/CourseOfferingPicker'
+import {
+  AcademicRecordFilters,
+  type AcademicRecordFilterField,
+} from '../components/AcademicRecordFilters'
 import { ResultCommentDialog } from '../components/ResultCommentDialog'
 import { ResultRecordsTable } from '../components/ResultRecordsTable'
 import { ResultStatisticsCards } from '../components/ResultStatisticsCards'
@@ -31,7 +41,9 @@ import { StudentPublishedResults } from '../components/StudentPublishedResults'
 import { StudentResultCardDialog } from '../components/StudentResultCardDialog'
 import type {
   CourseResultResponse,
+  AcademicPerformanceOfferingsQuery,
   ResultCommentPayload,
+  ResultStatus,
 } from '../types/academic-performance.types'
 
 type CommentAction = 'return' | 'reopen' | null
@@ -88,11 +100,41 @@ function ManagedResultsPage({ title, user }: { title: string; user: PortalUser }
   const queryClient = useQueryClient()
   const [selectedOfferingId, setSelectedOfferingId] = useState<string>()
   const [commentAction, setCommentAction] = useState<CommentAction>(null)
-  const offeringsQuery = useQuery(academicPerformanceOfferingsQueryOptions)
+  const [offeringFilters, setOfferingFilters] = useState<AcademicPerformanceOfferingsQuery>({
+    limit: 50,
+  })
+  const deferredSearch = useDeferredValue(offeringFilters.search)
+  const offeringQuery = {
+    ...offeringFilters,
+    ...(deferredSearch?.trim() ? { search: deferredSearch.trim() } : { search: undefined }),
+  }
+  const offeringsQuery = useQuery(filteredAcademicPerformanceOfferingsQueryOptions(offeringQuery))
+  const programsQuery = useQuery(programsQueryOptions)
+  const batchesQuery = useQuery(batchesQueryOptions)
+  const semestersQuery = useQuery(semestersQueryOptions)
+  const sectionsQuery = useQuery(sectionsQueryOptions)
   const offerings = offeringsQuery.data?.offerings ?? []
-  const activeOfferingId = selectedOfferingId ?? offerings[0]?.id ?? ''
+  const activeOfferingId =
+    offerings.find((offering) => offering.id === selectedOfferingId)?.id ?? offerings[0]?.id ?? ''
   const resultQuery = useQuery(courseResultQueryOptions(activeOfferingId))
   const result = resultQuery.data?.result
+
+  function updateOfferingFilter(field: AcademicRecordFilterField, value?: string) {
+    if (field === 'studentSearch') return
+
+    setOfferingFilters((current) => {
+      const next = { ...current }
+      if (!value) {
+        delete next[field]
+      } else if (field === 'resultStatus') {
+        next.resultStatus = value as ResultStatus
+      } else {
+        next[field] = value
+      }
+      return next
+    })
+    setSelectedOfferingId(undefined)
+  }
 
   function handleSuccess(response: CourseResultResponse) {
     queryClient.setQueryData(academicPerformanceKeys.courseResult(activeOfferingId), response)
@@ -160,6 +202,19 @@ function ManagedResultsPage({ title, user }: { title: string; user: PortalUser }
         </div>
       </CardHeader>
       <CardContent className="grid gap-5">
+        <AcademicRecordFilters
+          batches={batchesQuery.data?.batches ?? []}
+          mode="results"
+          onChange={updateOfferingFilter}
+          onClear={() => {
+            setOfferingFilters({ limit: 50 })
+            setSelectedOfferingId(undefined)
+          }}
+          programs={programsQuery.data?.programs ?? []}
+          sections={sectionsQuery.data?.sections ?? []}
+          semesters={semestersQuery.data?.semesters ?? []}
+          values={offeringFilters}
+        />
         {offeringsQuery.isPending ? (
           <TableSkeleton columns={5} rows={5} />
         ) : offerings.length ? (

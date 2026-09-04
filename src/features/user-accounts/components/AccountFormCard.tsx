@@ -145,6 +145,19 @@ export function AccountFormCard({
           <FieldError id="accountEmail-error" errors={[errors.email]} />
         </Field>
 
+        <Field data-invalid={Boolean(errors.profilePictureUrl)}>
+          <FieldLabel htmlFor="profilePictureUrl">Profile picture URL</FieldLabel>
+          <Input
+            id="profilePictureUrl"
+            type="url"
+            placeholder="https://example.com/profile.jpg"
+            aria-invalid={Boolean(errors.profilePictureUrl)}
+            aria-describedby={errors.profilePictureUrl ? 'profilePictureUrl-error' : undefined}
+            {...register('profilePictureUrl')}
+          />
+          <FieldError id="profilePictureUrl-error" errors={[errors.profilePictureUrl]} />
+        </Field>
+
         <Field data-invalid={Boolean(errors.phoneNumber)}>
           <FieldLabel htmlFor="phoneNumber">Phone number</FieldLabel>
           <Input

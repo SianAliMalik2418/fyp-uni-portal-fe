@@ -4,6 +4,7 @@ export type ProvisionedUserAccount = {
   id: string
   fullName: string
   email: string
+  profilePictureUrl?: string
   phoneNumber?: string
   role: UserRole
   registrationNumber?: string
@@ -57,11 +58,30 @@ export type AccountSection = {
 
 export type UserAccountsResponse = {
   users: ProvisionedUserAccount[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+export type UserAccountListQuery = {
+  search?: string
+  role?: UserRole
+  departmentId?: string
+  programId?: string
+  batchId?: string
+  semesterId?: string
+  sectionId?: string
+  designation?: string
+  isActive?: boolean
+  page: number
+  limit: number
 }
 
 export type CreateUserAccountPayload = {
   fullName: string
   email: string
+  profilePictureUrl?: string
   role: UserRole
   phoneNumber?: string
   registrationNumber?: string
@@ -87,4 +107,16 @@ export type CreateUserAccountResponse = {
 export type UserAccountResponse = {
   message: string
   user: ProvisionedUserAccount
+}
+
+export type StudentImportResult = {
+  message: string
+  summary: { total: number; imported: number; failed: number }
+  rows: Array<{
+    row: number
+    email: string
+    registrationNumber: string
+    status: 'imported' | 'failed'
+    error?: string
+  }>
 }

@@ -4,6 +4,7 @@ import type { PortalUser } from '@/features/auth/types/auth.types'
 import { AcademicStructurePage } from '@/features/academic-structure/pages/AcademicStructurePage'
 import { AttendancePage } from '@/features/academic-performance/pages/AttendancePage'
 import { AnnouncementsPage } from '@/features/announcements/pages/AnnouncementsPage'
+import { AuditLogsPage } from '@/features/audit-logs/pages/AuditLogsPage'
 import { AssessmentsPage } from '@/features/academic-performance/pages/AssessmentsPage'
 import { AssessmentStructureSettingsPage } from '@/features/academic-performance/pages/AssessmentStructureSettingsPage'
 import { MarksPage } from '@/features/academic-performance/pages/MarksPage'
@@ -13,13 +14,19 @@ import { CourseManagementPage } from '@/features/courses/pages/CourseManagementP
 import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
 import { TeacherCoursesPage } from '@/features/courses/pages/TeacherCoursesPage'
 import { DepartmentsPage } from '@/features/departments/pages/DepartmentsPage'
+import { HodDepartmentPage } from '@/features/departments/pages/HodDepartmentPage'
 import { FeesPage } from '@/features/fees/pages/FeesPage'
 import { ExamsPage } from '@/features/exams/pages/ExamsPage'
 import { ProgramsPage } from '@/features/programs/pages/ProgramsPage'
+import { SemesterPromotionPage } from '@/features/semester-promotion/pages/SemesterPromotionPage'
 import { StudentDashboardPage } from '@/features/student-dashboard/pages/StudentDashboardPage'
+import { AdminDashboardPage } from '@/features/dashboards/pages/AdminDashboardPage'
+import { HodDashboardPage } from '@/features/dashboards/pages/HodDashboardPage'
+import { TeacherDashboardPage } from '@/features/dashboards/pages/TeacherDashboardPage'
 import { TimetablePage } from '@/features/timetable/pages/TimetablePage'
 import { CurrentUserProfilePage } from '@/features/user-accounts/pages/CurrentUserProfilePage'
 import { UserAccountsPage } from '@/features/user-accounts/pages/UserAccountsPage'
+import { HodTeachersPage } from '@/features/user-accounts/pages/HodTeachersPage'
 import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
 import { FloatingChatbot } from '@/features/portal/components/FloatingChatbot'
 import { PortalHeader } from '@/features/portal/components/PortalHeader'
@@ -73,8 +80,34 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
     return <StudentDashboardPage user={user} />
   }
 
+  if (user.role === 'teacher' && activeItem.id === 'dashboard') {
+    return <TeacherDashboardPage user={user} />
+  }
+
+  if (user.role === 'hod' && activeItem.id === 'dashboard') {
+    return <HodDashboardPage user={user} />
+  }
+
+  if (user.role === 'admin' && activeItem.id === 'dashboard') {
+    return <AdminDashboardPage user={user} />
+  }
+
+  if (user.role === 'admin' && activeItem.id === 'audit-log') {
+    return <AuditLogsPage />
+  }
+
+  if (user.role === 'hod' && activeItem.id === 'department') {
+    return <HodDepartmentPage />
+  }
+
+  if (user.role === 'hod' && activeItem.id === 'teachers') {
+    return <HodTeachersPage />
+  }
+
   if (isAdminAccountSection(user, activeItem.id)) {
-    return <UserAccountsPage sectionId={activeItem.id} title={activeItem.label} />
+    return (
+      <UserAccountsPage key={activeItem.id} sectionId={activeItem.id} title={activeItem.label} />
+    )
   }
 
   if (isDepartmentsSection(user, activeItem.id)) {
@@ -87,6 +120,10 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
 
   if (isAcademicStructureSection(user, activeItem.id)) {
     return <AcademicStructurePage title={activeItem.label} />
+  }
+
+  if (user.role === 'admin' && activeItem.id === 'semester-promotion') {
+    return <SemesterPromotionPage />
   }
 
   if (isCoursesSection(user, activeItem.id)) {
@@ -165,7 +202,7 @@ export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () 
   }
 
   return (
-    <main className="bg-muted/20 grid min-h-svh text-left md:grid-cols-[248px_minmax(0,1fr)]">
+    <main className="bg-muted/20 grid min-h-dvh text-left md:grid-cols-[248px_minmax(0,1fr)]">
       <PortalSidebar user={user} />
 
       <section className="min-w-0">

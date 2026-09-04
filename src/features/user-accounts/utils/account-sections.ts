@@ -71,6 +71,7 @@ export function defaultAccountValues(sectionId: string): CreateUserAccountFormVa
   return {
     fullName: '',
     email: '',
+    profilePictureUrl: '',
     phoneNumber: '',
     role: defaultRoleForSection(sectionId),
     registrationNumber: '',
@@ -90,6 +91,7 @@ export function accountToFormValues(account: ProvisionedUserAccount): CreateUser
   return {
     fullName: account.fullName,
     email: account.email,
+    profilePictureUrl: account.profilePictureUrl ?? '',
     phoneNumber: account.phoneNumber ?? '',
     role: account.role,
     registrationNumber: account.registrationNumber ?? '',

@@ -2,19 +2,18 @@ import { apiClient } from '@/shared/api/http-client'
 import type { AnnouncementFormValues } from '../schemas/announcement.schemas'
 import type {
   Announcement,
+  AnnouncementListQuery,
   AnnouncementsResponse,
-  AnnouncementStatus,
 } from '../types/announcement.types'
 
 export async function listAnnouncements({
   status,
+  search,
+  isPinned,
   page = 1,
-}: {
-  status: AnnouncementStatus
-  page?: number
-}) {
+}: AnnouncementListQuery) {
   const { data } = await apiClient.get<AnnouncementsResponse>('/announcements', {
-    params: { status, page, limit: 20 },
+    params: { status, search, isPinned, page, limit: 20 },
   })
   return data
 }
@@ -36,7 +35,8 @@ function announcementFormData(values: AnnouncementFormValues, canClearExpiry = f
 export async function createAnnouncement(values: AnnouncementFormValues) {
   const { data } = await apiClient.post<{ message: string; announcement: Announcement }>(
     '/announcements',
-    announcementFormData(values)
+    announcementFormData(values),
+    { headers: { 'Content-Type': undefined } }
   )
   return data
 }
@@ -50,7 +50,8 @@ export async function updateAnnouncement({
 }) {
   const { data } = await apiClient.patch<{ message: string; announcement: Announcement }>(
     `/announcements/${announcementId}`,
-    announcementFormData(values, true)
+    announcementFormData(values, true),
+    { headers: { 'Content-Type': undefined } }
   )
   return data
 }

@@ -25,7 +25,7 @@ const fee = {
 test.describe('phase 9 - fee information', () => {
   test('admin selects a student and saves a calculated fee record', async ({ page }) => {
     await mockAuthMe(page, users.admin)
-    await page.route('**/api/users', async (route) => {
+    await page.route('**/api/users?*', async (route) => {
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({
@@ -46,6 +46,10 @@ test.describe('phase 9 - fee information', () => {
               passwordChangeRequired: false,
             },
           ],
+          page: 1,
+          limit: 50,
+          total: 1,
+          totalPages: 1,
         }),
       })
     })

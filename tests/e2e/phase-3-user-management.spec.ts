@@ -31,7 +31,7 @@ test.describe('phase 3 - student, teacher, and HOD management', () => {
     await page.getByLabel('Email').fill(users.teacher.email)
     await page.getByLabel('Employee ID').fill('EMP-001')
     await selectByLabel(page, 'Department', /Computer Science \(CS\)/)
-    await page.getByLabel('Designation').fill('Lecturer')
+    await page.getByRole('dialog').getByLabel('Designation').fill('Lecturer')
     await page.getByLabel('Create account').getByRole('button', { name: 'Create account' }).click()
 
     await expect(
@@ -73,6 +73,19 @@ test.describe('phase 3 - student, teacher, and HOD management', () => {
 })
 
 async function mockUserRoutes(page: Page, state: { users: unknown[]; payloads: unknown[] }) {
+  await page.route('**/api/users?*', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        users: state.users,
+        page: 1,
+        limit: 20,
+        total: state.users.length,
+        totalPages: state.users.length ? 1 : 0,
+      }),
+    })
+  })
+
   await page.route('**/api/users', async (route) => {
     if (route.request().method() === 'POST') {
       const payload = route.request().postDataJSON()
@@ -95,10 +108,7 @@ async function mockUserRoutes(page: Page, state: { users: unknown[]; payloads: u
       return
     }
 
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({ users: state.users }),
-    })
+    await route.fallback()
   })
 }
 

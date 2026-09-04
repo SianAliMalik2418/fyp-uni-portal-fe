@@ -3,12 +3,14 @@ import type {
   AcademicPerformanceContext,
   AcademicPerformanceOfferingStudentsResponse,
   AcademicPerformanceOfferingsResponse,
+  AcademicPerformanceOfferingsQuery,
   AttendanceConfigurationPayload,
   AttendanceConfigurationResponse,
   AttendanceSessionPayload,
   AttendanceSessionResponse,
   AttendanceSessionsResponse,
   AttendanceShortagesResponse,
+  AttendanceShortagesQuery,
   StudentAttendanceResponse,
   AssessmentStructurePayload,
   AssessmentStructureResponse,
@@ -43,9 +45,10 @@ export async function getAcademicPerformanceContext() {
   return data
 }
 
-export async function listAcademicPerformanceOfferings() {
+export async function listAcademicPerformanceOfferings(query: AcademicPerformanceOfferingsQuery) {
   const { data } = await apiClient.get<AcademicPerformanceOfferingsResponse>(
-    '/academic-performance/offerings'
+    '/academic-performance/offerings',
+    { params: query }
   )
   return data
 }
@@ -85,8 +88,10 @@ export async function getStudentAttendanceSummaries() {
   return data
 }
 
-export async function listAttendanceShortages() {
-  const { data } = await apiClient.get<AttendanceShortagesResponse>('/attendance/shortages')
+export async function listAttendanceShortages(query: AttendanceShortagesQuery) {
+  const { data } = await apiClient.get<AttendanceShortagesResponse>('/attendance/shortages', {
+    params: query,
+  })
   return data
 }
 

@@ -49,7 +49,7 @@ test('admin creates and manages announcements', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: 'Announcement created' })).toBeVisible()
   await expect(page.getByText(announcement.title)).toBeVisible()
-  await expect(page.getByText('Pinned')).toBeVisible()
+  await expect(page.getByText('Pinned', { exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: `Edit ${announcement.title}` })).toBeVisible()
 })
 
