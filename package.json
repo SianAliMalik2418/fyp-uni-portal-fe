@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "test:e2e:full": "playwright test -c playwright.fullstack.config.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "verify": "bun run build && bun run lint && bun run format:check && bun run test && bun run test:e2e && bun run test:e2e:full"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

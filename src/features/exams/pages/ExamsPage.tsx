@@ -13,7 +13,7 @@ import {
   semestersQueryOptions,
 } from '@/features/academic-structure/api/academic-structure-queries'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { courseOfferingsQueryOptions } from '@/features/courses/api/courses-queries'
+import { sectionCourseOfferingsQueryOptions } from '@/features/courses/api/courses-queries'
 import { programsQueryOptions } from '@/features/programs/api/programs-queries'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { createExam, deleteExam, updateExam } from '../api/exams-api'
@@ -70,7 +70,6 @@ function AdminExamsPage({ title }: { title: string }) {
   const programsQuery = useQuery(programsQueryOptions)
   const semestersQuery = useQuery(semestersQueryOptions)
   const sectionsQuery = useQuery(sectionsQueryOptions)
-  const offeringsQuery = useQuery(courseOfferingsQueryOptions)
   const [programSelection, setProgramSelection] = useState('')
   const [semesterSelection, setSemesterSelection] = useState('')
   const [sectionSelection, setSectionSelection] = useState('')
@@ -81,7 +80,6 @@ function AdminExamsPage({ title }: { title: string }) {
   const programs = programsQuery.data?.programs ?? []
   const semesters = semestersQuery.data?.semesters ?? []
   const sections = sectionsQuery.data?.sections ?? []
-  const offerings = offeringsQuery.data?.offerings ?? []
   const selectedProgramId = programs.some((program) => program.id === programSelection)
     ? programSelection
     : (programs[0]?.id ?? '')
@@ -107,7 +105,8 @@ function AdminExamsPage({ title }: { title: string }) {
   const selectedSectionId = availableSections.some((section) => section.id === sectionSelection)
     ? sectionSelection
     : (availableSections[0]?.id ?? '')
-  const sectionOfferings = offerings.filter(
+  const offeringsQuery = useQuery(sectionCourseOfferingsQueryOptions(selectedSectionId))
+  const sectionOfferings = (offeringsQuery.data?.offerings ?? []).filter(
     (offering) => offering.isActive && offering.section.id === selectedSectionId
   )
   const examsQuery = useQuery(adminSectionExamsQueryOptions(selectedSectionId))
@@ -117,7 +116,7 @@ function AdminExamsPage({ title }: { title: string }) {
     programsQuery.isPending ||
     semestersQuery.isPending ||
     sectionsQuery.isPending ||
-    offeringsQuery.isPending
+    offeringsQuery.isLoading
 
   const saveMutation = useMutation({
     mutationFn: (values: ExamFormValues) => {

@@ -1,4 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
+import { DEFAULT_TABLE_PAGE_SIZE, REFERENCE_LIST_LIMIT } from '@/shared/constants/pagination'
 import {
   listCourses,
   listAssignableTeachers,
@@ -11,6 +12,7 @@ import {
 export const courseKeys = {
   all: ['courses'] as const,
   lists: () => [...courseKeys.all, 'list'] as const,
+  listPage: (page: number) => [...courseKeys.lists(), page] as const,
   offerings: () => [...courseKeys.all, 'offerings'] as const,
   teachers: () => [...courseKeys.all, 'teachers'] as const,
   sectionOfferings: (sectionId: string) => [...courseKeys.all, 'sections', sectionId] as const,
@@ -20,8 +22,14 @@ export const courseKeys = {
 
 export const coursesQueryOptions = queryOptions({
   queryKey: courseKeys.lists(),
-  queryFn: listCourses,
+  queryFn: () => listCourses({ page: 1, limit: REFERENCE_LIST_LIMIT }),
 })
+
+export const coursesTableQueryOptions = (page: number) =>
+  queryOptions({
+    queryKey: courseKeys.listPage(page),
+    queryFn: () => listCourses({ page, limit: DEFAULT_TABLE_PAGE_SIZE }),
+  })
 
 export const courseOfferingsQueryOptions = queryOptions({
   queryKey: courseKeys.offerings(),

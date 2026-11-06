@@ -17,5 +17,5 @@ export function AttendancePage({ title, user }: { title: string; user: PortalUse
     return <HodAttendanceShortages title={title} />
   }
 
-  return <AttendanceSettingsPage title={title} />
+  return <AttendanceSettingsPage />
 }

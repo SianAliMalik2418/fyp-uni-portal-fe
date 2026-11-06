@@ -5,6 +5,7 @@ import type {
 } from '@/features/academic-structure/types/academic-structure.types'
 import type { Department } from '@/features/departments/types/department.types'
 import type { Program } from '@/features/programs/types/program.types'
+import { teacherDesignations } from '../constants/designations'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -82,7 +83,7 @@ export function AccountDirectoryFilters({
               { label: 'Teacher', value: 'teacher' },
               { label: 'HOD', value: 'hod' },
             ]}
-            value={values.role ?? ''}
+            value={typeof values.role === 'string' ? values.role : ''}
             onChange={(value) => onChange('role', value || undefined)}
           />
         ) : null}
@@ -141,15 +142,16 @@ export function AccountDirectoryFilters({
         ) : null}
 
         {isTeacherList || kind === 'all' ? (
-          <div className="grid gap-1.5">
-            <Label htmlFor="account-designation-filter">Designation filter</Label>
-            <Input
-              id="account-designation-filter"
-              placeholder="Lecturer"
-              value={values.designation ?? ''}
-              onValueChange={(value) => onChange('designation', value || undefined)}
-            />
-          </div>
+          <FilterSelect
+            id="account-designation-filter"
+            label="Designation filter"
+            options={teacherDesignations.map((designation) => ({
+              label: designation,
+              value: designation,
+            }))}
+            value={values.designation ?? ''}
+            onChange={(value) => onChange('designation', value || undefined)}
+          />
         ) : null}
       </div>
 

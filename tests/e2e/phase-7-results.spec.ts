@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import {
   academicStudent,
   assessmentStructure,
+  goToAcademicSettingsTab,
   mockAuthMe,
   offering,
   users,
@@ -64,7 +65,7 @@ test.describe('phase 7 - result approval and publishing', () => {
         body: JSON.stringify({ message: 'Grading scale updated.', gradingScale }),
       })
     })
-    await page.goto('/grading-scale')
+    await goToAcademicSettingsTab(page, 'Grading Scale')
     await expect(page.getByLabel('Minimum percentage for A', { exact: true })).toHaveValue('85')
     await page.getByRole('button', { name: 'Save grading scale' }).click()
     await expect(page.getByRole('heading', { name: 'Grading scale saved' })).toBeVisible()

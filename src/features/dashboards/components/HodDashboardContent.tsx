@@ -1,3 +1,16 @@
+import {
+  AlertCircleIcon,
+  Clock01Icon,
+  CheckmarkCircle02Icon,
+  ChartLineData01Icon,
+  ChartUpIcon,
+  CourseIcon,
+  SchoolReportCardIcon,
+  TaskDone01Icon,
+  TeacherIcon,
+  UserGroupIcon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { HodDashboardResponse } from '../types/dashboard.types'
@@ -12,31 +25,55 @@ export function HodDashboardContent({ data }: { data: HodDashboardResponse }) {
     <>
       <DashboardStatGrid
         stats={[
-          { label: 'Students', value: data.summary.students },
-          { label: 'Teachers', value: data.summary.teachers },
-          { label: 'Courses', value: data.summary.courses },
-          { label: 'Low attendance', value: data.summary.lowAttendance },
-          { label: 'Pending approvals', value: data.summary.pendingApprovals },
-          { label: 'Approved results', value: data.summary.recentlyApproved },
+          { label: 'Students', value: data.summary.students, icon: UserGroupIcon },
+          { label: 'Teachers', value: data.summary.teachers, icon: TeacherIcon },
+          { label: 'Courses', value: data.summary.courses, icon: CourseIcon },
+          { label: 'Low attendance', value: data.summary.lowAttendance, icon: AlertCircleIcon },
+          {
+            label: 'Pending approvals',
+            value: data.summary.pendingApprovals,
+            icon: Clock01Icon,
+          },
+          {
+            label: 'Approved results',
+            value: data.summary.recentlyApproved,
+            icon: CheckmarkCircle02Icon,
+          },
         ]}
       />
 
       <DashboardStatGrid
         stats={[
-          { label: 'Approved result sets', value: data.academicSummary.approvedResults },
-          { label: 'Students assessed', value: data.academicSummary.studentsAssessed },
+          {
+            label: 'Approved result sets',
+            value: data.academicSummary.approvedResults,
+            icon: SchoolReportCardIcon,
+          },
+          {
+            label: 'Students assessed',
+            value: data.academicSummary.studentsAssessed,
+            icon: TaskDone01Icon,
+          },
           {
             label: 'Average percentage',
             value: percentage(data.academicSummary.averagePercentage),
+            icon: ChartUpIcon,
           },
-          { label: 'Pass rate', value: percentage(data.academicSummary.passRate) },
+          {
+            label: 'Pass rate',
+            value: percentage(data.academicSummary.passRate),
+            icon: ChartLineData01Icon,
+          },
         ]}
       />
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Card className="bg-background">
           <CardHeader className="border-border border-b">
-            <CardTitle>Attendance shortages</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
+              Attendance shortages
+            </CardTitle>
             <CardDescription>Lowest department attendance records first.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2">
@@ -63,7 +100,10 @@ export function HodDashboardContent({ data }: { data: HodDashboardResponse }) {
 
         <Card className="bg-background">
           <CardHeader className="border-border border-b">
-            <CardTitle>Recently approved results</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <HugeiconsIcon icon={CheckmarkCircle02Icon} strokeWidth={2} className="size-4" />
+              Recently approved results
+            </CardTitle>
             <CardDescription>Latest department result approvals.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2">

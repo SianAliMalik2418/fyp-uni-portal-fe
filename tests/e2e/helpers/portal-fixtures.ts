@@ -123,44 +123,48 @@ export async function mockAuthMe(page: Page, portalUser = users.admin) {
   })
 }
 
+export function paginated<Key extends string>(key: Key, items: unknown[]) {
+  return { [key]: items, page: 1, limit: 100, total: items.length, totalPages: 1 }
+}
+
 export async function mockReferenceData(page: Page) {
-  await page.route('**/api/departments', async (route) => {
+  await page.route('**/api/departments?*', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ departments: [department] }),
+      body: JSON.stringify(paginated('departments', [department])),
     })
   })
-  await page.route('**/api/programs', async (route) => {
+  await page.route('**/api/programs?*', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ programs: [program] }),
+      body: JSON.stringify(paginated('programs', [program])),
     })
   })
-  await page.route('**/api/batches', async (route) => {
+  await page.route('**/api/batches?*', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ batches: [batch] }),
+      body: JSON.stringify(paginated('batches', [batch])),
     })
   })
-  await page.route('**/api/semesters', async (route) => {
+  await page.route('**/api/semesters?*', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ semesters: [semester] }),
+      body: JSON.stringify(paginated('semesters', [semester])),
     })
   })
-  await page.route('**/api/sections', async (route) => {
+  await page.route('**/api/sections?*', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ sections: [section] }),
+      body: JSON.stringify(paginated('sections', [section])),
     })
   })
 }
 
 export async function mockCourses(page: Page) {
-  await page.route('**/api/courses', async (route) => {
+  await page.route('**/api/courses?*', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ courses: [course] }),
+      body: JSON.stringify(paginated('courses', [course])),
     })
   })
   await page.route('**/api/courses/offerings', async (route) => {
@@ -203,6 +207,14 @@ export async function mockCourses(page: Page) {
       body: JSON.stringify({ offerings: [offering] }),
     })
   })
+}
+
+export async function goToAcademicSettingsTab(
+  page: Page,
+  tab: 'Semester Promotion' | 'Attendance' | 'Assessment Structure' | 'Grading Scale'
+) {
+  await page.goto('/academic-settings')
+  await page.getByRole('tab', { name: tab }).click()
 }
 
 export async function selectByLabel(page: Page, label: string | RegExp, option: string | RegExp) {

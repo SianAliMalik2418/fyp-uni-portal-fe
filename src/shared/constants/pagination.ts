@@ -1,0 +1,2 @@
+export const REFERENCE_LIST_LIMIT = 100
+export const DEFAULT_TABLE_PAGE_SIZE = 20

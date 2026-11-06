@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
+  stickyActionsColumnClassName,
   Table,
   TableBody,
   TableCell,
@@ -47,7 +48,9 @@ export function SectionsCard({ onDelete, onEdit, query, sections }: SectionsCard
                 <TableHead>Batch</TableHead>
                 <TableHead>Semester</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-16 text-right">Actions</TableHead>
+                <TableHead className={`w-16 text-right ${stickyActionsColumnClassName}`}>
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -68,7 +71,7 @@ export function SectionsCard({ onDelete, onEdit, query, sections }: SectionsCard
                   <TableCell>
                     <AcademicStatusText active={section.isActive} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={stickyActionsColumnClassName}>
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         render={<Button type="button" variant="ghost" size="icon-sm" />}

@@ -44,7 +44,7 @@ test.describe('phase 1 - basic project user flow', () => {
 
     await page.goto('/')
 
-    await expect(page.getByText('Change temporary password')).toBeVisible()
+    await expect(page.getByText('Set a new password', { exact: true })).toBeVisible()
     await page.getByLabel('Current temporary password').fill('@Abc1234')
     await page.getByLabel('New password').fill('Permanent123!')
     await page.getByLabel('Confirm password').fill('Permanent123!')

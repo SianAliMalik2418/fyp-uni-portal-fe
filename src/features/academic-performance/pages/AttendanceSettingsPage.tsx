@@ -21,7 +21,7 @@ const defaultAttendanceSettings: AttendanceSettingsFormValues = {
   minimumAttendancePercentage: 75,
 }
 
-export function AttendanceSettingsPage({ title }: { title: string }) {
+export function AttendanceSettingsPage() {
   const queryClient = useQueryClient()
   const configurationQuery = useQuery(attendanceConfigurationQueryOptions)
   const form = useForm<AttendanceSettingsFormValues>({
@@ -67,13 +67,6 @@ export function AttendanceSettingsPage({ title }: { title: string }) {
 
   return (
     <div className="mx-auto grid max-w-6xl gap-5">
-      <div>
-        <h1 className="text-foreground text-2xl leading-tight font-semibold">{title}</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Set the university-wide attendance threshold used throughout the active semester.
-        </p>
-      </div>
-
       {configurationQuery.isPending ? (
         <div className="grid max-w-2xl gap-4 rounded-xl border p-6" aria-busy="true">
           <Skeleton className="h-5 w-48" />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useDeferredValue, useEffect, useState, type ReactNode } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
@@ -6,11 +6,13 @@ import { SearchIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast-manager'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { userAccountsQueryOptions } from '@/features/user-accounts/api/user-accounts-queries'
+import { userAccountSearchQueryOptions } from '@/features/user-accounts/api/user-accounts-queries'
+import type { ProvisionedUserAccount } from '@/features/user-accounts/types/user-account.types'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { saveStudentFee } from '../api/fees-api'
 import { feeKeys, ownFeeQueryOptions, studentFeeQueryOptions } from '../api/fees-queries'
@@ -43,12 +45,19 @@ function StudentFeesPage() {
 
 function AdminFeesPage() {
   const queryClient = useQueryClient()
-  const accountsQuery = useQuery(userAccountsQueryOptions)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedStudentId, setSelectedStudentId] = useState('')
-  const selectedStudent = accountsQuery.data?.users.find(
-    (account) => account.id === selectedStudentId
+  const [page, setPage] = useState(1)
+  const search = useDeferredValue(searchTerm.trim())
+  const accountsQuery = useQuery(
+    userAccountSearchQueryOptions({
+      role: 'student',
+      search: search || undefined,
+      page,
+      limit: 50,
+    })
   )
+  const [selectedStudent, setSelectedStudent] = useState<ProvisionedUserAccount | null>(null)
+  const selectedStudentId = selectedStudent?.id ?? ''
   const feeQuery = useQuery(studentFeeQueryOptions(selectedStudentId))
   const form = useForm<FeeFormValues>({
     resolver: zodResolver(feeFormSchema),
@@ -61,21 +70,6 @@ function AdminFeesPage() {
       reset(feeToFormValues(feeQuery.data.fee))
     }
   }, [feeQuery.data, feeQuery.isSuccess, reset])
-
-  const visibleStudents = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase()
-    const students = accountsQuery.data?.users.filter((account) => account.role === 'student') ?? []
-
-    if (!normalizedSearch) {
-      return students
-    }
-
-    return students.filter((student) =>
-      [student.fullName, student.registrationNumber, student.email].some((value) =>
-        value?.toLowerCase().includes(normalizedSearch)
-      )
-    )
-  }, [accountsQuery.data?.users, searchTerm])
 
   const saveMutation = useMutation({
     mutationFn: saveStudentFee,
@@ -125,17 +119,53 @@ function AdminFeesPage() {
                 aria-label="Find student"
                 placeholder="Find student"
                 value={searchTerm}
-                onValueChange={setSearchTerm}
+                onValueChange={(value) => {
+                  setSearchTerm(value)
+                  setPage(1)
+                }}
               />
             </div>
             <StudentFeePicker
               error={accountsQuery.error}
               isError={accountsQuery.isError}
               isPending={accountsQuery.isPending}
-              onSelect={setSelectedStudentId}
+              onSelect={(studentId) => {
+                const student = accountsQuery.data?.users.find(
+                  (account) => account.id === studentId
+                )
+                if (student) setSelectedStudent(student)
+              }}
               selectedStudentId={selectedStudentId}
-              students={visibleStudents}
+              students={accountsQuery.data?.users ?? []}
             />
+            {accountsQuery.data && accountsQuery.data.totalPages > 1 ? (
+              <div className="mt-3 grid gap-2">
+                <p className="text-muted-foreground text-sm">
+                  Page {accountsQuery.data.page} of {accountsQuery.data.totalPages} ·{' '}
+                  {accountsQuery.data.total} accounts
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={page === 1 || accountsQuery.isFetching}
+                    onClick={() => setPage((current) => Math.max(1, current - 1))}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={page >= accountsQuery.data.totalPages || accountsQuery.isFetching}
+                    onClick={() => setPage((current) => current + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
 

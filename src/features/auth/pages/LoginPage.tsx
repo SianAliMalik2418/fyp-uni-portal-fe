@@ -53,10 +53,10 @@ export function LoginPage({ onLogin }: { onLogin: (user: PortalUser) => void }) 
   }
 
   return (
-    <AuthShell supportingCopy="Use the email and temporary password provided by the administrator. Account access is checked against the backend session.">
+    <AuthShell supportingCopy="Sign in with the email and temporary password your administrator gave you.">
       <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>Email and password are required.</CardDescription>
+        <CardTitle>Welcome back</CardTitle>
+        <CardDescription>Enter your email and password to continue.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="grid gap-4" noValidate onSubmit={handleSubmit(submitLogin)}>

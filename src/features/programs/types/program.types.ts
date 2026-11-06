@@ -17,6 +17,10 @@ export type ProgramDurationUnit = 'years' | 'months'
 
 export type ProgramsResponse = {
   programs: Program[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
 }
 
 export type ProgramResponse = {

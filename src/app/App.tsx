@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { QueryClientProvider, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { logout } from '@/features/auth/api/auth-api'
@@ -5,10 +6,19 @@ import { authKeys, currentUserQueryOptions } from '@/features/auth/api/auth-quer
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { PasswordChangePage } from '@/features/auth/pages/PasswordChangePage'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { PortalPage } from '@/features/portal/pages/PortalPage'
+import { PortalSkeleton } from '@/features/portal/components/PortalSkeleton'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Toaster } from '@/components/ui/toast'
 import { queryClient } from './query-client'
+
+const DemoGuidePage = lazy(() =>
+  import('@/features/demo/pages/DemoGuidePage').then((module) => ({
+    default: module.DemoGuidePage,
+  }))
+)
+const PortalPage = lazy(() =>
+  import('@/features/portal/pages/PortalPage').then((module) => ({ default: module.PortalPage }))
+)
 
 function AppRoutes() {
   const navigate = useNavigate()
@@ -63,7 +73,14 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/:sectionId" element={<PortalPage user={user} onLogout={handleLogout} />} />
+      <Route
+        path="/:sectionId"
+        element={
+          <Suspense fallback={<PortalSkeleton />}>
+            <PortalPage user={user} onLogout={handleLogout} />
+          </Suspense>
+        }
+      />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
@@ -74,7 +91,17 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Toaster>
         <BrowserRouter>
-          <AppRoutes />
+          <Routes>
+            <Route
+              path="/demo"
+              element={
+                <Suspense fallback={<PortalSkeleton />}>
+                  <DemoGuidePage />
+                </Suspense>
+              }
+            />
+            <Route path="*" element={<AppRoutes />} />
+          </Routes>
         </BrowserRouter>
       </Toaster>
     </QueryClientProvider>

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { goToAcademicSettingsTab } from '../helpers/portal-fixtures.js'
 
 const password = 'Password123!'
 
@@ -16,7 +17,6 @@ test.describe('full-stack final state', () => {
     await login(page, accounts.admin)
 
     await expect(page.getByRole('heading', { name: 'Admin dashboard' })).toBeVisible()
-    await expect(page.getByText('Fall Semester 2026-2027')).toBeVisible()
     await expect(page.getByText('Recent administrative activity')).toBeVisible()
 
     await page.goto('/departments')
@@ -36,16 +36,16 @@ test.describe('full-stack final state', () => {
     await expect(page.getByText('Programming Fundamentals').first()).toBeVisible()
     await expect(page.getByText('Tayabba Teacher').first()).toBeVisible()
 
-    await page.goto('/attendance')
-    await expect(page.getByRole('heading', { name: 'Attendance Settings' })).toBeVisible()
+    await goToAcademicSettingsTab(page, 'Attendance')
+    await expect(page.getByText('Attendance requirement')).toBeVisible()
     await expect(page.getByLabel('Minimum attendance percentage')).toHaveValue('75')
 
-    await page.goto('/assessment-structure')
+    await page.getByRole('tab', { name: 'Assessment Structure' }).click()
     await expect(page.getByLabel('Quizzes')).toHaveValue('10')
     await expect(page.getByLabel('Final')).toHaveValue('35')
     await expect(page.getByText('100%', { exact: true })).toBeVisible()
 
-    await page.goto('/grading-scale')
+    await page.getByRole('tab', { name: 'Grading Scale' }).click()
     await expect(page.getByLabel('Minimum percentage for A', { exact: true })).toHaveValue('85')
     await expect(page.getByLabel('Grade point for A', { exact: true })).toHaveValue('4')
 

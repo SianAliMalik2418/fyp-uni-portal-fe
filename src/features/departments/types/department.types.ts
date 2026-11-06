@@ -10,6 +10,10 @@ export type Department = {
 
 export type DepartmentsResponse = {
   departments: Department[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
 }
 
 export type DepartmentResponse = {

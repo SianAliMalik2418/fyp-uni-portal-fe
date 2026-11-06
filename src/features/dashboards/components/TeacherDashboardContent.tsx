@@ -1,3 +1,12 @@
+import {
+  Calendar03Icon,
+  ChartNoAxesColumnDecreasingIcon,
+  CourseIcon,
+  Layers01Icon,
+  SchoolReportCardIcon,
+  UserGroupIcon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -13,17 +22,28 @@ export function TeacherDashboardContent({ data }: { data: TeacherDashboardRespon
     <>
       <DashboardStatGrid
         stats={[
-          { label: 'Assigned courses', value: data.summary.assignedCourses },
-          { label: 'Sections', value: data.summary.sections },
-          { label: 'Students', value: data.summary.students },
-          { label: 'Attendance sessions', value: data.summary.attendanceSessions },
+          { label: 'Assigned courses', value: data.summary.assignedCourses, icon: CourseIcon },
+          { label: 'Sections', value: data.summary.sections, icon: Layers01Icon },
+          { label: 'Students', value: data.summary.students, icon: UserGroupIcon },
+          {
+            label: 'Attendance sessions',
+            value: data.summary.attendanceSessions,
+            icon: Calendar03Icon,
+          },
         ]}
       />
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Card className="bg-background">
           <CardHeader className="border-border border-b">
-            <CardTitle>Marks progress</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <HugeiconsIcon
+                icon={ChartNoAxesColumnDecreasingIcon}
+                strokeWidth={2}
+                className="size-4"
+              />
+              Marks progress
+            </CardTitle>
             <CardDescription>Completed mark sheets across assigned assessments.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -36,7 +56,10 @@ export function TeacherDashboardContent({ data }: { data: TeacherDashboardRespon
 
         <Card className="bg-background">
           <CardHeader className="border-border border-b">
-            <CardTitle>Result workflow</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <HugeiconsIcon icon={SchoolReportCardIcon} strokeWidth={2} className="size-4" />
+              Result workflow
+            </CardTitle>
             <CardDescription>Your current result submission states.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
@@ -52,7 +75,10 @@ export function TeacherDashboardContent({ data }: { data: TeacherDashboardRespon
       <div className="grid gap-5 lg:grid-cols-2">
         <Card className="bg-background">
           <CardHeader className="border-border border-b">
-            <CardTitle>Assigned courses</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <HugeiconsIcon icon={CourseIcon} strokeWidth={2} className="size-4" />
+              Assigned courses
+            </CardTitle>
             <CardDescription>Active course and section assignments.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2">
@@ -76,7 +102,10 @@ export function TeacherDashboardContent({ data }: { data: TeacherDashboardRespon
 
         <Card className="bg-background">
           <CardHeader className="border-border border-b">
-            <CardTitle>Attendance activity</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <HugeiconsIcon icon={Calendar03Icon} strokeWidth={2} className="size-4" />
+              Attendance activity
+            </CardTitle>
             <CardDescription>Recent attendance sessions you recorded.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2">

@@ -10,8 +10,8 @@ import type {
   SectionCourseAssignmentResponse,
 } from '../types/course.types'
 
-export async function listCourses() {
-  const { data } = await apiClient.get<CoursesResponse>('/courses')
+export async function listCourses(query: { page: number; limit: number }) {
+  const { data } = await apiClient.get<CoursesResponse>('/courses', { params: query })
   return data
 }
 

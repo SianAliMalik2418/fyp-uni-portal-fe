@@ -1,8 +1,8 @@
 import { apiClient } from '@/shared/api/http-client'
 import type { ProgramPayload, ProgramResponse, ProgramsResponse } from '../types/program.types'
 
-export async function listPrograms() {
-  const { data } = await apiClient.get<ProgramsResponse>('/programs')
+export async function listPrograms(query: { page: number; limit: number }) {
+  const { data } = await apiClient.get<ProgramsResponse>('/programs', { params: query })
   return data
 }
 

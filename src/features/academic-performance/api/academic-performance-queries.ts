@@ -88,11 +88,6 @@ export const studentAttendanceQueryOptions = queryOptions({
   queryFn: getStudentAttendanceSummaries,
 })
 
-export const attendanceShortagesQueryOptions = queryOptions({
-  queryKey: academicPerformanceKeys.attendanceShortages(),
-  queryFn: () => listAttendanceShortages(defaultShortageQuery),
-})
-
 export const filteredAttendanceShortagesQueryOptions = (query: AttendanceShortagesQuery) =>
   queryOptions({
     queryKey: academicPerformanceKeys.attendanceShortages(query),

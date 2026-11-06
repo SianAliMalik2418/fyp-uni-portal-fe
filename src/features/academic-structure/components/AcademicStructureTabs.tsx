@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TablePagination } from '@/components/ui/table-pagination'
 import type {
   AcademicStructureTab,
   Batch,
@@ -16,9 +17,18 @@ type QueryState = {
   isPending: boolean
 }
 
+type PaginationState = {
+  page: number
+  totalPages: number
+  total: number
+  isFetching: boolean
+  onPageChange: (page: number) => void
+}
+
 type AcademicStructureTabsProps = {
   activeTab: AcademicStructureTab
   batches: Batch[]
+  batchesPagination: PaginationState
   batchesQuery: QueryState
   onActivateSemester: (semesterId: string) => void
   onCloseSemester: (semesterId: string) => void
@@ -29,8 +39,10 @@ type AcademicStructureTabsProps = {
   onTabChange: (tab: AcademicStructureTab) => void
   sectionCountsByBatch: Map<string, number>
   sections: Section[]
+  sectionsPagination: PaginationState
   sectionsQuery: QueryState
   semesters: Semester[]
+  semestersPagination: PaginationState
   semestersQuery: QueryState
 }
 
@@ -39,6 +51,7 @@ const tabButtonClass = 'min-w-28'
 export function AcademicStructureTabs({
   activeTab,
   batches,
+  batchesPagination,
   batchesQuery,
   onActivateSemester,
   onCloseSemester,
@@ -49,8 +62,10 @@ export function AcademicStructureTabs({
   onTabChange,
   sectionCountsByBatch,
   sections,
+  sectionsPagination,
   sectionsQuery,
   semesters,
+  semestersPagination,
   semestersQuery,
 }: AcademicStructureTabsProps) {
   return (
@@ -67,7 +82,7 @@ export function AcademicStructureTabs({
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="batches">
+      <TabsContent value="batches" className="grid gap-3">
         <BatchesCard
           batches={batches}
           query={batchesQuery}
@@ -75,9 +90,17 @@ export function AcademicStructureTabs({
           onEdit={onEditBatch}
           sectionCountsByBatch={sectionCountsByBatch}
         />
+        <TablePagination
+          page={batchesPagination.page}
+          totalPages={batchesPagination.totalPages}
+          total={batchesPagination.total}
+          itemLabel="batches"
+          isFetching={batchesPagination.isFetching}
+          onPageChange={batchesPagination.onPageChange}
+        />
       </TabsContent>
 
-      <TabsContent value="semesters">
+      <TabsContent value="semesters" className="grid gap-3">
         <SemestersCard
           query={semestersQuery}
           semesters={semesters}
@@ -86,14 +109,30 @@ export function AcademicStructureTabs({
           onDelete={onDelete}
           onEdit={onEditSemester}
         />
+        <TablePagination
+          page={semestersPagination.page}
+          totalPages={semestersPagination.totalPages}
+          total={semestersPagination.total}
+          itemLabel="semesters"
+          isFetching={semestersPagination.isFetching}
+          onPageChange={semestersPagination.onPageChange}
+        />
       </TabsContent>
 
-      <TabsContent value="sections">
+      <TabsContent value="sections" className="grid gap-3">
         <SectionsCard
           query={sectionsQuery}
           sections={sections}
           onDelete={onDelete}
           onEdit={onEditSection}
+        />
+        <TablePagination
+          page={sectionsPagination.page}
+          totalPages={sectionsPagination.totalPages}
+          total={sectionsPagination.total}
+          itemLabel="sections"
+          isFetching={sectionsPagination.isFetching}
+          onPageChange={sectionsPagination.onPageChange}
         />
       </TabsContent>
     </Tabs>

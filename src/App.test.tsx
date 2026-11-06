@@ -1,10 +1,19 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { queryClient } from './app/query-client'
 import { toast } from './components/ui/toast-manager'
 import { apiClient } from './shared/api/http-client'
+
+beforeAll(async () => {
+  await Promise.all([
+    import('./features/portal/pages/PortalPage'),
+    import('./features/academic-performance/pages/AttendancePage'),
+    import('./features/academic-structure/pages/AcademicStructurePage'),
+    import('./features/user-accounts/pages/UserAccountsPage'),
+  ])
+})
 
 type MockUser = {
   id: string
@@ -358,7 +367,7 @@ describe('App', () => {
     await user.type(screen.getByLabelText(/^password$/i), 'temporary-password')
     await user.click(screen.getByRole('button', { name: /login/i }))
 
-    await screen.findByText('Change temporary password')
+    await screen.findByText('Set a new password')
     await user.type(screen.getByLabelText(/current temporary password/i), 'temporary-password')
     await user.type(screen.getByLabelText(/^new password$/i), 'new-password')
     await user.type(screen.getByLabelText(/confirm password/i), 'new-password')
@@ -387,7 +396,7 @@ describe('App', () => {
     await user.type(screen.getByLabelText(/^password$/i), 'temporary-password')
     await user.click(screen.getByRole('button', { name: /login/i }))
 
-    await screen.findByText('Change temporary password')
+    await screen.findByText('Set a new password')
     await user.type(screen.getByLabelText(/current temporary password/i), 'temporary-password')
     await user.type(screen.getByLabelText(/^new password$/i), 'short')
     await user.type(screen.getByLabelText(/confirm password/i), 'different-password')
@@ -410,12 +419,12 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /students/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /academic structure/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /announcements/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /attendance settings/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /academic settings/i })).toBeInTheDocument()
   })
 
   it('lets Sian configure the phase 5 attendance threshold', async () => {
     const user = userEvent.setup()
-    window.history.pushState(null, '', '/attendance')
+    window.history.pushState(null, '', '/academic-settings')
     getSpy.mockImplementation((url) => {
       if (url === '/auth/me') {
         return Promise.resolve({ data: { user: activeAdmin } })
@@ -438,7 +447,8 @@ describe('App', () => {
 
     render(<App />)
 
-    expect(await screen.findByRole('heading', { name: /attendance settings/i })).toBeInTheDocument()
+    await user.click(await screen.findByRole('tab', { name: /^attendance$/i }))
+    expect(await screen.findByText(/attendance requirement/i)).toBeInTheDocument()
     const thresholdInput = await screen.findByLabelText(/minimum attendance percentage/i)
     await user.clear(thresholdInput)
     await user.type(thresholdInput, '80')

@@ -11,6 +11,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    maxWorkers: 2,
     exclude: ['node_modules/**', 'dist/**', 'tests/e2e/**'],
     setupFiles: ['./src/test/setup.ts'],
     coverage: {

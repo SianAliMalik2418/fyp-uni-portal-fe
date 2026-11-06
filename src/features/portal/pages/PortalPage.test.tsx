@@ -110,10 +110,10 @@ describe('PortalPage', () => {
       },
       'Admin dashboard',
     ],
-  ])('renders the live %s dashboard instead of a placeholder', (role, data, heading) => {
+  ])('renders the live %s dashboard instead of a placeholder', async (role, data, heading) => {
     renderPortal(portalUser(role), data)
 
-    expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: heading })).toBeInTheDocument()
     expect(screen.queryByText(/module access is ready for backend data/i)).not.toBeInTheDocument()
   })
 

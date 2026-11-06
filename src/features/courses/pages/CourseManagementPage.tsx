@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { Add01Icon, FloppyDiskIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
+import { usePaginatedQuery } from '@/hooks/use-paginated-query'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { TablePagination } from '@/components/ui/table-pagination'
 import { toast } from '@/components/ui/toast-manager'
 import {
   academicStructureKeys,
@@ -39,6 +41,7 @@ import {
   courseKeys,
   courseOfferingsQueryOptions,
   coursesQueryOptions,
+  coursesTableQueryOptions,
   sectionCourseOfferingsQueryOptions,
 } from '../api/courses-queries'
 import { CourseAssignmentCard } from '../components/CourseAssignmentCard'
@@ -59,7 +62,9 @@ export function CourseManagementPage({ title, user }: { title: string; user: Por
   const programsQuery = useQuery({ ...programsQueryOptions, enabled: isAdmin })
   const semestersQuery = useQuery({ ...semestersQueryOptions, enabled: isAdmin })
   const sectionsQuery = useQuery({ ...sectionsQueryOptions, enabled: isAdmin })
-  const coursesQuery = useQuery(coursesQueryOptions)
+  const { setPage: setCoursesPage, query: coursesQuery } =
+    usePaginatedQuery(coursesTableQueryOptions)
+  const allCoursesQuery = useQuery(coursesQueryOptions)
   const offeringsQuery = useQuery(courseOfferingsQueryOptions)
   const teachersQuery = useQuery(assignableTeachersQueryOptions)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
@@ -196,6 +201,7 @@ export function CourseManagementPage({ title, user }: { title: string; user: Por
   }
 
   const courses = coursesQuery.data?.courses ?? []
+  const allCourses = allCoursesQuery.data?.courses ?? []
   const offerings = offeringsQuery.data?.offerings ?? []
   const teachers = teachersQuery.data?.teachers ?? []
   const departments = departmentsQuery.data?.departments ?? []
@@ -234,9 +240,20 @@ export function CourseManagementPage({ title, user }: { title: string; user: Por
         onEdit={openEditSheet}
       />
 
+      {coursesQuery.data ? (
+        <TablePagination
+          page={coursesQuery.data.page}
+          totalPages={coursesQuery.data.totalPages}
+          total={coursesQuery.data.total}
+          itemLabel="courses"
+          isFetching={coursesQuery.isFetching}
+          onPageChange={setCoursesPage}
+        />
+      ) : null}
+
       {isAdmin ? (
         <CourseAssignmentCard
-          courses={courses}
+          courses={allCourses}
           isSaving={assignCoursesMutation.isPending}
           onSave={() => assignCoursesMutation.mutate()}
           onSelectedCourseIdsChange={setSelectedCourseIdOverride}

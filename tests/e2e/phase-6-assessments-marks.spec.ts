@@ -3,6 +3,7 @@ import {
   academicStudent,
   assessment,
   assessmentStructure,
+  goToAcademicSettingsTab,
   mockAuthMe,
   offering,
   users,
@@ -36,7 +37,7 @@ test.describe('phase 6 - assessments and marks', () => {
       })
     })
 
-    await page.goto('/assessment-structure')
+    await goToAcademicSettingsTab(page, 'Assessment Structure')
     await expect(page.getByLabel('Assignments')).toHaveValue('15')
     await page.getByLabel('Quizzes').fill('10')
     await page.getByRole('button', { name: 'Save structure' }).click()

@@ -66,7 +66,7 @@ export type UserAccountsResponse = {
 
 export type UserAccountListQuery = {
   search?: string
-  role?: UserRole
+  role?: UserRole | UserRole[]
   departmentId?: string
   programId?: string
   batchId?: string

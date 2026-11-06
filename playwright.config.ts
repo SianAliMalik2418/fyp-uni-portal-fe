@@ -7,10 +7,11 @@ export default defineConfig({
   testDir: './tests/e2e',
   testIgnore: '**/full-stack/**',
   fullyParallel: true,
+  workers: 2,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: appUrl,
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
   },
   webServer: {
     command: `bun run dev --host 127.0.0.1 --port ${appPort} --strictPort`,

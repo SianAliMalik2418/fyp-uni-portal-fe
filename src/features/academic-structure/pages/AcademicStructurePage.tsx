@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Add01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { usePaginatedQuery } from '@/hooks/use-paginated-query'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast-manager'
@@ -25,8 +26,11 @@ import {
 import {
   academicStructureKeys,
   batchesQueryOptions,
+  batchesTableQueryOptions,
   sectionsQueryOptions,
+  sectionsTableQueryOptions,
   semestersQueryOptions,
+  semestersTableQueryOptions,
 } from '../api/academic-structure-queries'
 import { AcademicStructureFormSheet } from '../components/AcademicStructureFormSheet'
 import { AcademicStructureTabs } from '../components/AcademicStructureTabs'
@@ -69,6 +73,21 @@ export function AcademicStructurePage({ title }: { title: string }) {
   const batchesQuery = useQuery(batchesQueryOptions)
   const semestersQuery = useQuery(semestersQueryOptions)
   const sectionsQuery = useQuery(sectionsQueryOptions)
+  const {
+    page: batchesPage,
+    setPage: setBatchesPage,
+    query: batchesTableQuery,
+  } = usePaginatedQuery(batchesTableQueryOptions)
+  const {
+    page: semestersPage,
+    setPage: setSemestersPage,
+    query: semestersTableQuery,
+  } = usePaginatedQuery(semestersTableQueryOptions)
+  const {
+    page: sectionsPage,
+    setPage: setSectionsPage,
+    query: sectionsTableQuery,
+  } = usePaginatedQuery(sectionsTableQueryOptions)
   const [activeTab, setActiveTab] = useState<AcademicStructureTab>('batches')
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null)
   const [editingSemester, setEditingSemester] = useState<Semester | null>(null)
@@ -80,6 +99,9 @@ export function AcademicStructurePage({ title }: { title: string }) {
   const batches = batchesQuery.data?.batches ?? EMPTY_BATCHES
   const semesters = semestersQuery.data?.semesters ?? EMPTY_SEMESTERS
   const sections = sectionsQuery.data?.sections ?? EMPTY_SECTIONS
+  const tableBatches = batchesTableQuery.data?.batches ?? EMPTY_BATCHES
+  const tableSemesters = semestersTableQuery.data?.semesters ?? EMPTY_SEMESTERS
+  const tableSections = sectionsTableQuery.data?.sections ?? EMPTY_SECTIONS
   const activeSemester = semesters.find((semester) => semester.isActive)
 
   const batchForm = useForm<BatchFormValues>({
@@ -370,8 +392,15 @@ export function AcademicStructurePage({ title }: { title: string }) {
 
       <AcademicStructureTabs
         activeTab={activeTab}
-        batches={batches}
-        batchesQuery={batchesQuery}
+        batches={tableBatches}
+        batchesQuery={batchesTableQuery}
+        batchesPagination={{
+          page: batchesPage,
+          totalPages: batchesTableQuery.data?.totalPages ?? 1,
+          total: batchesTableQuery.data?.total ?? 0,
+          isFetching: batchesTableQuery.isFetching,
+          onPageChange: setBatchesPage,
+        }}
         onActivateSemester={(semesterId) => activateSemesterMutation.mutate(semesterId)}
         onCloseSemester={(semesterId) => closeSemesterMutation.mutate(semesterId)}
         onDelete={setDeleteTarget}
@@ -380,10 +409,24 @@ export function AcademicStructurePage({ title }: { title: string }) {
         onEditSemester={openSemesterEditSheet}
         onTabChange={setActiveTab}
         sectionCountsByBatch={sectionCountsByBatch}
-        sections={sections}
-        sectionsQuery={sectionsQuery}
-        semesters={semesters}
-        semestersQuery={semestersQuery}
+        sections={tableSections}
+        sectionsQuery={sectionsTableQuery}
+        sectionsPagination={{
+          page: sectionsPage,
+          totalPages: sectionsTableQuery.data?.totalPages ?? 1,
+          total: sectionsTableQuery.data?.total ?? 0,
+          isFetching: sectionsTableQuery.isFetching,
+          onPageChange: setSectionsPage,
+        }}
+        semesters={tableSemesters}
+        semestersQuery={semestersTableQuery}
+        semestersPagination={{
+          page: semestersPage,
+          totalPages: semestersTableQuery.data?.totalPages ?? 1,
+          total: semestersTableQuery.data?.total ?? 0,
+          isFetching: semestersTableQuery.isFetching,
+          onPageChange: setSemestersPage,
+        }}
       />
 
       <AcademicStructureFormSheet

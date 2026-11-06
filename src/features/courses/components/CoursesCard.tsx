@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
+  stickyActionsColumnClassName,
   Table,
   TableBody,
   TableCell,
@@ -65,7 +66,11 @@ export function CoursesCard({
             <TableHead>Semester</TableHead>
             <TableHead>Credits</TableHead>
             <TableHead>Status</TableHead>
-            {canManage ? <TableHead className="w-16 text-right">Actions</TableHead> : null}
+            {canManage ? (
+              <TableHead className={`w-16 text-right ${stickyActionsColumnClassName}`}>
+                Actions
+              </TableHead>
+            ) : null}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -88,7 +93,7 @@ export function CoursesCard({
                 </span>
               </TableCell>
               {canManage ? (
-                <TableCell>
+                <TableCell className={stickyActionsColumnClassName}>
                   <DropdownMenu>
                     <DropdownMenuTrigger
                       render={<Button type="button" variant="ghost" size="icon-sm" />}

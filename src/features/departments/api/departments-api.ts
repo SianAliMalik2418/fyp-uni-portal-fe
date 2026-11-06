@@ -5,8 +5,8 @@ import type {
   DepartmentsResponse,
 } from '../types/department.types'
 
-export async function listDepartments() {
-  const { data } = await apiClient.get<DepartmentsResponse>('/departments')
+export async function listDepartments(query: { page: number; limit: number }) {
+  const { data } = await apiClient.get<DepartmentsResponse>('/departments', { params: query })
   return data
 }
 

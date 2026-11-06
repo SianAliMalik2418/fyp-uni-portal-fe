@@ -36,7 +36,7 @@ export function PlaceholderModule({ user, item }: { user: PortalUser; item: NavI
         <div>
           <h1 className="text-foreground text-2xl leading-tight font-semibold">{item.label}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            {roleLabels[user.role]} module access is ready for backend data.
+            You have {roleLabels[user.role]} access to this section.
           </p>
         </div>
       </div>

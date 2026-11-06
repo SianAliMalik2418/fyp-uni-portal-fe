@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
 import {
+  stickyActionsColumnClassName,
   Table,
   TableBody,
   TableCell,
@@ -77,7 +78,9 @@ export function AccountsCard({
             <TableHead>{identifierColumnLabel}</TableHead>
             <TableHead>Department</TableHead>
             <TableHead>Academic profile</TableHead>
-            <TableHead className="w-16 text-right">Actions</TableHead>
+            <TableHead className={`w-16 text-right ${stickyActionsColumnClassName}`}>
+              Actions
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -96,7 +99,7 @@ export function AccountsCard({
               <TableCell>{identifierForAccount(account)}</TableCell>
               <TableCell>{account.department?.code ?? '-'}</TableCell>
               <TableCell>{profileSummary(account)}</TableCell>
-              <TableCell>
+              <TableCell className={stickyActionsColumnClassName}>
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     render={<Button type="button" variant="ghost" size="icon-sm" />}

@@ -1,32 +1,10 @@
+import { Component, lazy, Suspense, type ReactNode } from 'react'
+import { PortalSkeleton } from '../components/PortalSkeleton'
 import { useParams } from 'react-router-dom'
 import { ShieldUserIcon, UserIcon } from '@hugeicons/core-free-icons'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import type { PortalUser } from '@/features/auth/types/auth.types'
-import { AcademicStructurePage } from '@/features/academic-structure/pages/AcademicStructurePage'
-import { AttendancePage } from '@/features/academic-performance/pages/AttendancePage'
-import { AnnouncementsPage } from '@/features/announcements/pages/AnnouncementsPage'
-import { AuditLogsPage } from '@/features/audit-logs/pages/AuditLogsPage'
-import { AssessmentsPage } from '@/features/academic-performance/pages/AssessmentsPage'
-import { AssessmentStructureSettingsPage } from '@/features/academic-performance/pages/AssessmentStructureSettingsPage'
-import { MarksPage } from '@/features/academic-performance/pages/MarksPage'
-import { ResultsPage } from '@/features/academic-performance/pages/ResultsPage'
-import { GradingScaleSettingsPage } from '@/features/academic-performance/pages/GradingScaleSettingsPage'
-import { CourseManagementPage } from '@/features/courses/pages/CourseManagementPage'
-import { StudentCoursesPage } from '@/features/courses/pages/StudentCoursesPage'
-import { TeacherCoursesPage } from '@/features/courses/pages/TeacherCoursesPage'
-import { DepartmentsPage } from '@/features/departments/pages/DepartmentsPage'
-import { HodDepartmentPage } from '@/features/departments/pages/HodDepartmentPage'
-import { FeesPage } from '@/features/fees/pages/FeesPage'
-import { ExamsPage } from '@/features/exams/pages/ExamsPage'
-import { ProgramsPage } from '@/features/programs/pages/ProgramsPage'
-import { SemesterPromotionPage } from '@/features/semester-promotion/pages/SemesterPromotionPage'
-import { StudentDashboardPage } from '@/features/student-dashboard/pages/StudentDashboardPage'
-import { AdminDashboardPage } from '@/features/dashboards/pages/AdminDashboardPage'
-import { HodDashboardPage } from '@/features/dashboards/pages/HodDashboardPage'
-import { TeacherDashboardPage } from '@/features/dashboards/pages/TeacherDashboardPage'
-import { TimetablePage } from '@/features/timetable/pages/TimetablePage'
-import { CurrentUserProfilePage } from '@/features/user-accounts/pages/CurrentUserProfilePage'
-import { UserAccountsPage } from '@/features/user-accounts/pages/UserAccountsPage'
-import { HodTeachersPage } from '@/features/user-accounts/pages/HodTeachersPage'
 import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
 import { FloatingChatbot } from '@/features/portal/components/FloatingChatbot'
 import { PortalHeader } from '@/features/portal/components/PortalHeader'
@@ -34,6 +12,123 @@ import { PortalSidebar } from '@/features/portal/components/PortalSidebar'
 import { UnauthorizedSection } from '@/features/portal/components/UnauthorizedSection'
 import { roleNavigation } from '@/features/portal/constants/portal-navigation'
 import type { NavItem } from '@/features/portal/types/portal.types'
+
+const AcademicStructurePage = lazy(() =>
+  import('@/features/academic-structure/pages/AcademicStructurePage').then((module) => ({
+    default: module.AcademicStructurePage,
+  }))
+)
+const AttendancePage = lazy(() =>
+  import('@/features/academic-performance/pages/AttendancePage').then((module) => ({
+    default: module.AttendancePage,
+  }))
+)
+const AnnouncementsPage = lazy(() =>
+  import('@/features/announcements/pages/AnnouncementsPage').then((module) => ({
+    default: module.AnnouncementsPage,
+  }))
+)
+const AuditLogsPage = lazy(() =>
+  import('@/features/audit-logs/pages/AuditLogsPage').then((module) => ({
+    default: module.AuditLogsPage,
+  }))
+)
+const AssessmentsPage = lazy(() =>
+  import('@/features/academic-performance/pages/AssessmentsPage').then((module) => ({
+    default: module.AssessmentsPage,
+  }))
+)
+const MarksPage = lazy(() =>
+  import('@/features/academic-performance/pages/MarksPage').then((module) => ({
+    default: module.MarksPage,
+  }))
+)
+const ResultsPage = lazy(() =>
+  import('@/features/academic-performance/pages/ResultsPage').then((module) => ({
+    default: module.ResultsPage,
+  }))
+)
+const AcademicSettingsPage = lazy(() =>
+  import('@/features/academic-performance/pages/AcademicSettingsPage').then((module) => ({
+    default: module.AcademicSettingsPage,
+  }))
+)
+const CourseManagementPage = lazy(() =>
+  import('@/features/courses/pages/CourseManagementPage').then((module) => ({
+    default: module.CourseManagementPage,
+  }))
+)
+const StudentCoursesPage = lazy(() =>
+  import('@/features/courses/pages/StudentCoursesPage').then((module) => ({
+    default: module.StudentCoursesPage,
+  }))
+)
+const TeacherCoursesPage = lazy(() =>
+  import('@/features/courses/pages/TeacherCoursesPage').then((module) => ({
+    default: module.TeacherCoursesPage,
+  }))
+)
+const DepartmentsPage = lazy(() =>
+  import('@/features/departments/pages/DepartmentsPage').then((module) => ({
+    default: module.DepartmentsPage,
+  }))
+)
+const HodDepartmentPage = lazy(() =>
+  import('@/features/departments/pages/HodDepartmentPage').then((module) => ({
+    default: module.HodDepartmentPage,
+  }))
+)
+const FeesPage = lazy(() =>
+  import('@/features/fees/pages/FeesPage').then((module) => ({ default: module.FeesPage }))
+)
+const ExamsPage = lazy(() =>
+  import('@/features/exams/pages/ExamsPage').then((module) => ({ default: module.ExamsPage }))
+)
+const ProgramsPage = lazy(() =>
+  import('@/features/programs/pages/ProgramsPage').then((module) => ({
+    default: module.ProgramsPage,
+  }))
+)
+const StudentDashboardPage = lazy(() =>
+  import('@/features/student-dashboard/pages/StudentDashboardPage').then((module) => ({
+    default: module.StudentDashboardPage,
+  }))
+)
+const AdminDashboardPage = lazy(() =>
+  import('@/features/dashboards/pages/AdminDashboardPage').then((module) => ({
+    default: module.AdminDashboardPage,
+  }))
+)
+const HodDashboardPage = lazy(() =>
+  import('@/features/dashboards/pages/HodDashboardPage').then((module) => ({
+    default: module.HodDashboardPage,
+  }))
+)
+const TeacherDashboardPage = lazy(() =>
+  import('@/features/dashboards/pages/TeacherDashboardPage').then((module) => ({
+    default: module.TeacherDashboardPage,
+  }))
+)
+const TimetablePage = lazy(() =>
+  import('@/features/timetable/pages/TimetablePage').then((module) => ({
+    default: module.TimetablePage,
+  }))
+)
+const CurrentUserProfilePage = lazy(() =>
+  import('@/features/user-accounts/pages/CurrentUserProfilePage').then((module) => ({
+    default: module.CurrentUserProfilePage,
+  }))
+)
+const UserAccountsPage = lazy(() =>
+  import('@/features/user-accounts/pages/UserAccountsPage').then((module) => ({
+    default: module.UserAccountsPage,
+  }))
+)
+const HodTeachersPage = lazy(() =>
+  import('@/features/user-accounts/pages/HodTeachersPage').then((module) => ({
+    default: module.HodTeachersPage,
+  }))
+)
 
 function isAdminAccountSection(user: PortalUser, sectionId: string) {
   return user.role === 'admin' && (sectionId === 'students' || sectionId === 'teachers')
@@ -64,10 +159,7 @@ function isCoursesSection(user: PortalUser, sectionId: string) {
 function isAttendanceSection(user: PortalUser, sectionId: string) {
   return (
     sectionId === 'attendance' &&
-    (user.role === 'student' ||
-      user.role === 'teacher' ||
-      user.role === 'hod' ||
-      user.role === 'admin')
+    (user.role === 'student' || user.role === 'teacher' || user.role === 'hod')
   )
 }
 
@@ -122,10 +214,6 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
     return <AcademicStructurePage title={activeItem.label} />
   }
 
-  if (user.role === 'admin' && activeItem.id === 'semester-promotion') {
-    return <SemesterPromotionPage />
-  }
-
   if (isCoursesSection(user, activeItem.id)) {
     if (user.role === 'student') {
       return <StudentCoursesPage title={activeItem.label} />
@@ -142,12 +230,8 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
     return <AttendancePage title={activeItem.label} user={user} />
   }
 
-  if (user.role === 'admin' && activeItem.id === 'assessment-structure') {
-    return <AssessmentStructureSettingsPage title={activeItem.label} />
-  }
-
-  if (user.role === 'admin' && activeItem.id === 'grading-scale') {
-    return <GradingScaleSettingsPage title={activeItem.label} />
+  if (user.role === 'admin' && activeItem.id === 'academic-settings') {
+    return <AcademicSettingsPage title={activeItem.label} />
   }
 
   if (user.role === 'teacher' && activeItem.id === 'assessments') {
@@ -187,6 +271,32 @@ function portalModuleFor(user: PortalUser, activeItem: NavItem) {
   return <PlaceholderModule user={user} item={activeItem} />
 }
 
+class PortalModuleBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (!this.state.hasError) {
+      return this.props.children
+    }
+
+    return (
+      <Alert variant="destructive" role="alert">
+        <AlertTitle>Page unavailable</AlertTitle>
+        <AlertDescription className="grid gap-3">
+          <span>Reload the page and try opening this section again.</span>
+          <Button type="button" variant="outline" onClick={() => window.location.reload()}>
+            Reload page
+          </Button>
+        </AlertDescription>
+      </Alert>
+    )
+  }
+}
+
 export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () => void }) {
   const params = useParams()
   const activeSection = params.sectionId ?? 'dashboard'
@@ -215,7 +325,9 @@ export function PortalPage({ user, onLogout }: { user: PortalUser; onLogout: () 
 
         <div className="p-4 md:p-6">
           {activeItem ? (
-            portalModuleFor(user, activeItem)
+            <PortalModuleBoundary key={activeItem.id}>
+              <Suspense fallback={<PortalSkeleton />}>{portalModuleFor(user, activeItem)}</Suspense>
+            </PortalModuleBoundary>
           ) : (
             <UnauthorizedSection user={user} section={activeSection} />
           )}

@@ -101,3 +101,53 @@ test.describe('phase 9 - fee information', () => {
     await expect(page.getByRole('button', { name: /pay/i })).toHaveCount(0)
   })
 })
+
+test('fee directory searches beyond the first page and keeps the selected student', async ({
+  page,
+}) => {
+  await mockAuthMe(page, users.admin)
+  const students = Array.from({ length: 51 }, (_, index) => ({
+    id: `student-${index + 1}`,
+    fullName: `Student ${index + 1}`,
+    email: `student${index + 1}@example.com`,
+    role: 'student',
+    registrationNumber: `REG-${index + 1}`,
+    semester: { ...fee.semester, isActive: true, isClosed: false },
+    accountStatus: 'active',
+    isActive: true,
+    passwordChangeRequired: false,
+  }))
+  await page.route('**/api/users?*', async (route) => {
+    const params = new URL(route.request().url()).searchParams
+    const search = params.get('search') ?? ''
+    const currentPage = Number(params.get('page') ?? 1)
+    const limit = Number(params.get('limit') ?? 50)
+    const matches = students.filter((student) => student.fullName.includes(search))
+    await route.fulfill({
+      json: {
+        users: matches.slice((currentPage - 1) * limit, currentPage * limit),
+        page: currentPage,
+        limit,
+        total: matches.length,
+        totalPages: Math.ceil(matches.length / limit),
+      },
+    })
+  })
+  await page.route('**/api/fees/students/student-51', async (route) => {
+    await route.fulfill({ json: { fee: null } })
+  })
+  await page.goto('/fees')
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+  await page.getByRole('button', { name: 'Manage fee for Student 51', exact: true }).click()
+  await page.getByLabel('Total semester fee').fill('75000')
+  await page.getByRole('button', { name: 'Previous', exact: true }).click()
+  await expect(page.getByLabel('Total semester fee')).toHaveValue('75000')
+  await page.getByRole('textbox', { name: 'Find student' }).fill('Student 51')
+  await expect(
+    page.getByRole('button', { name: 'Manage fee for Student 51', exact: true })
+  ).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Manage fee for Student 1', exact: true })
+  ).toHaveCount(0)
+  await expect(page.getByLabel('Total semester fee')).toHaveValue('75000')
+})

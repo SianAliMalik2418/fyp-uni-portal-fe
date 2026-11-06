@@ -93,3 +93,5 @@ bun run test:e2e:full  # live frontend + backend + MongoDB final state
 - Do not show mutation outcomes as inline page banners; use the established toast system while retaining field validation and persistent query errors inline.
 - Do not persist session tokens in local or session storage; the backend owns the HTTP-only session cookie.
 - Do not use plain loading text for structured content; use skeletons, and reserve spinners for short inline actions.
+
+- Use distinct browser ports for concurrent worktrees; let the full-stack runner allocate and clean up its unique test database and uploads. See [README.md](README.md).

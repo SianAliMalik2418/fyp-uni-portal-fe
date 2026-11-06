@@ -71,6 +71,10 @@ export type SectionPayload = {
 
 export type BatchesResponse = {
   batches: Batch[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
 }
 
 export type BatchResponse = {
@@ -80,6 +84,10 @@ export type BatchResponse = {
 
 export type SemestersResponse = {
   semesters: Semester[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
 }
 
 export type SemesterResponse = {
@@ -89,6 +97,10 @@ export type SemesterResponse = {
 
 export type SectionsResponse = {
   sections: Section[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
 }
 
 export type SectionResponse = {

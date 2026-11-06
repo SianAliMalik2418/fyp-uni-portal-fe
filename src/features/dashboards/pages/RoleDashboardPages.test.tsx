@@ -127,7 +127,7 @@ describe('role dashboards', () => {
     expect(screen.getByText('91.2%')).toBeInTheDocument()
   })
 
-  it('shows live admin counts, current semester, and truthful empty imports', () => {
+  it('shows live admin counts and recent administrative activity', () => {
     renderDashboard(
       {
         role: 'admin',
@@ -155,8 +155,6 @@ describe('role dashboards', () => {
 
     expect(screen.getByRole('heading', { name: 'Admin dashboard' })).toBeInTheDocument()
     expect(screen.getByText('850')).toBeInTheDocument()
-    expect(screen.getByText('Fall 2026')).toBeInTheDocument()
-    expect(screen.getByText('No bulk imports recorded.')).toBeInTheDocument()
     expect(screen.getByText('New Teacher · teacher')).toBeInTheDocument()
   })
 })

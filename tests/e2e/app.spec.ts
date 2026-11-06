@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { goToAcademicSettingsTab } from './helpers/portal-fixtures.js'
 
 const adminUser = {
   id: 'admin-1',
@@ -121,7 +122,7 @@ test('updates the admin attendance threshold', async ({ page }) => {
     })
   })
 
-  await page.goto('/attendance')
+  await goToAcademicSettingsTab(page, 'Attendance')
 
   const input = page.getByLabel('Minimum attendance percentage')
   await expect(input).toHaveValue('75')
@@ -381,7 +382,7 @@ test('admin updates the university assessment structure with a 100 percent total
     })
   })
 
-  await page.goto('/assessment-structure')
+  await goToAcademicSettingsTab(page, 'Assessment Structure')
 
   await expect(page.getByText('Total weightage')).toBeVisible()
   await expect(page.getByText('100%', { exact: true })).toBeVisible()

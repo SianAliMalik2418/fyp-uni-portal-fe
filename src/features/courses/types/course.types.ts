@@ -60,6 +60,10 @@ export type AssignableTeacher = {
 
 export type CoursesResponse = {
   courses: Course[]
+  page: number
+  limit: number
+  total: number
+  totalPages: number
 }
 
 export type CourseResponse = {

@@ -15,6 +15,7 @@ import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
+import { TablePagination } from '@/components/ui/table-pagination'
 import {
   Sheet,
   SheetClose,
@@ -60,7 +61,7 @@ const accountPageSize = 20
 
 function initialAccountFilters(sectionId: string): Partial<UserAccountListQuery> {
   if (sectionId === 'students') return { role: 'student' }
-  if (sectionId === 'teachers') return { role: 'teacher' }
+  if (sectionId === 'teachers') return { role: ['teacher', 'hod'] }
   return {}
 }
 
@@ -307,33 +308,15 @@ export function UserAccountsPage({ sectionId, title }: UserAccountsPageProps) {
         onView={setViewingAccount}
       />
 
-      {accountsQuery.data && accountsQuery.data.totalPages > 1 ? (
-        <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-          <p className="text-muted-foreground text-sm">
-            Page {accountsQuery.data.page} of {accountsQuery.data.totalPages} ·{' '}
-            {accountsQuery.data.total} accounts
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:flex">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={page === 1 || accountsQuery.isFetching}
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-            >
-              Previous
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={page >= accountsQuery.data.totalPages || accountsQuery.isFetching}
-              onClick={() => setPage((current) => current + 1)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+      {accountsQuery.data ? (
+        <TablePagination
+          page={accountsQuery.data.page}
+          totalPages={accountsQuery.data.totalPages}
+          total={accountsQuery.data.total}
+          itemLabel="accounts"
+          isFetching={accountsQuery.isFetching}
+          onPageChange={setPage}
+        />
       ) : null}
 
       <Sheet

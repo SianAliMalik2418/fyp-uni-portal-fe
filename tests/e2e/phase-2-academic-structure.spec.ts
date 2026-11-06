@@ -3,6 +3,7 @@ import {
   batch,
   department,
   mockAuthMe,
+  paginated,
   program,
   section,
   selectByLabel,
@@ -126,7 +127,7 @@ async function mockAcademicStructureRoutes(
   page: Page,
   state: ReturnType<typeof createAcademicState>
 ) {
-  await page.route('**/api/departments', async (route) => {
+  const handleDepartments: Parameters<Page['route']>[1] = async (route) => {
     if (route.request().method() === 'POST') {
       state.lastDepartmentPayload = route.request().postDataJSON()
       state.departments = [department]
@@ -139,11 +140,13 @@ async function mockAcademicStructureRoutes(
 
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ departments: state.departments }),
+      body: JSON.stringify(paginated('departments', state.departments)),
     })
-  })
+  }
+  await page.route('**/api/departments', handleDepartments)
+  await page.route('**/api/departments?*', handleDepartments)
 
-  await page.route('**/api/programs', async (route) => {
+  const handlePrograms: Parameters<Page['route']>[1] = async (route) => {
     if (route.request().method() === 'POST') {
       state.lastProgramPayload = route.request().postDataJSON()
       state.programs = [program]
@@ -156,11 +159,13 @@ async function mockAcademicStructureRoutes(
 
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ programs: state.programs }),
+      body: JSON.stringify(paginated('programs', state.programs)),
     })
-  })
+  }
+  await page.route('**/api/programs', handlePrograms)
+  await page.route('**/api/programs?*', handlePrograms)
 
-  await page.route('**/api/batches', async (route) => {
+  const handleBatches: Parameters<Page['route']>[1] = async (route) => {
     if (route.request().method() === 'POST') {
       state.lastBatchPayload = route.request().postDataJSON()
       state.batches = [batch]
@@ -173,11 +178,13 @@ async function mockAcademicStructureRoutes(
 
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ batches: state.batches }),
+      body: JSON.stringify(paginated('batches', state.batches)),
     })
-  })
+  }
+  await page.route('**/api/batches', handleBatches)
+  await page.route('**/api/batches?*', handleBatches)
 
-  await page.route('**/api/semesters', async (route) => {
+  const handleSemesters: Parameters<Page['route']>[1] = async (route) => {
     if (route.request().method() === 'POST') {
       state.lastSemesterPayload = route.request().postDataJSON()
       state.semesters = [semester]
@@ -190,11 +197,13 @@ async function mockAcademicStructureRoutes(
 
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ semesters: state.semesters }),
+      body: JSON.stringify(paginated('semesters', state.semesters)),
     })
-  })
+  }
+  await page.route('**/api/semesters', handleSemesters)
+  await page.route('**/api/semesters?*', handleSemesters)
 
-  await page.route('**/api/sections', async (route) => {
+  const handleSections: Parameters<Page['route']>[1] = async (route) => {
     if (route.request().method() === 'POST') {
       state.lastSectionPayload = route.request().postDataJSON()
       state.sections = [section]
@@ -207,7 +216,9 @@ async function mockAcademicStructureRoutes(
 
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ sections: state.sections }),
+      body: JSON.stringify(paginated('sections', state.sections)),
     })
-  })
+  }
+  await page.route('**/api/sections', handleSections)
+  await page.route('**/api/sections?*', handleSections)
 }

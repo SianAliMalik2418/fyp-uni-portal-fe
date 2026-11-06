@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
+  stickyActionsColumnClassName,
   Table,
   TableBody,
   TableCell,
@@ -60,7 +61,9 @@ export function SemestersCard({
                 <TableHead>Semester</TableHead>
                 <TableHead>Dates</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-16 text-right">Actions</TableHead>
+                <TableHead className={`w-16 text-right ${stickyActionsColumnClassName}`}>
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -76,7 +79,7 @@ export function SemestersCard({
                   <TableCell>
                     <AcademicStatusText active={semester.isActive} closed={semester.isClosed} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={stickyActionsColumnClassName}>
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         render={<Button type="button" variant="ghost" size="icon-sm" />}

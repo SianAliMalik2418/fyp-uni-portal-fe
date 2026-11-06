@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { usePaginatedQuery } from '@/hooks/use-paginated-query'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Add01Icon, FloppyDiskIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -18,10 +19,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { TablePagination } from '@/components/ui/table-pagination'
 import { toast } from '@/components/ui/toast-manager'
 import { departmentsQueryOptions } from '@/features/departments/api/departments-queries'
 import { createProgram, deleteProgram, updateProgram } from '../api/programs-api'
-import { programKeys, programsQueryOptions } from '../api/programs-queries'
+import { programKeys, programsTableQueryOptions } from '../api/programs-queries'
 import { DeleteProgramDialog } from '../components/DeleteProgramDialog'
 import { ProgramFormCard } from '../components/ProgramFormCard'
 import { ProgramsCard } from '../components/ProgramsCard'
@@ -34,7 +36,7 @@ const programFormId = 'program-sheet-form'
 export function ProgramsPage({ title }: { title: string }) {
   const queryClient = useQueryClient()
   const departmentsQuery = useQuery(departmentsQueryOptions)
-  const programsQuery = useQuery(programsQueryOptions)
+  const { setPage, query: programsQuery } = usePaginatedQuery(programsTableQueryOptions)
   const [editingProgram, setEditingProgram] = useState<Program | null>(null)
   const [programToDelete, setProgramToDelete] = useState<Program | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
@@ -181,6 +183,17 @@ export function ProgramsPage({ title }: { title: string }) {
         onEdit={openEditSheet}
         programs={programs}
       />
+
+      {programsQuery.data ? (
+        <TablePagination
+          page={programsQuery.data.page}
+          totalPages={programsQuery.data.totalPages}
+          total={programsQuery.data.total}
+          itemLabel="programs"
+          isFetching={programsQuery.isFetching}
+          onPageChange={setPage}
+        />
+      ) : null}
 
       <Sheet
         open={isSheetOpen}

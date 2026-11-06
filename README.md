@@ -1,34 +1,54 @@
-# React + TypeScript + Vite
+# University Portal frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React, TypeScript and Vite frontend for the Express API in the sibling `BE/` checkout.
+Read [AGENTS.md](AGENTS.md) and [the technical overview](docs/TECHNICAL_OVERVIEW.md) before making changes.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Install Bun and Node.js, then run `bun install --frozen-lockfile` from this directory.
+Copy `.env.example` to `.env` when connecting to a separately running backend.
+Run `bun run dev` for interactive development.
 
-## React Compiler
+## Verification
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+`bun run verify` runs the build, lint, formatting check, unit tests, mocked browser tests,
+and full-stack browser tests. Each step stops on failure.
 
-Note: This will impact Vite dev & build performances.
+For smaller checks during development:
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```sh
+bun run test src/features/announcements/pages/AnnouncementsPage.test.tsx
+bun run test:e2e tests/e2e/phase-9-fees.spec.ts
+bun run test:e2e:full
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Install the browser once with `bunx playwright install chromium`. The mocked suite starts
+its own Vite server and needs no backend. The full-stack suite requires dependencies in
+`../BE/` and MongoDB at `127.0.0.1:27017`. It seeds its own database, builds the frontend
+against its test API, and serves the production build. It does not call Gemini.
+
+Full-stack runs create a database named `fyp_uni_portal_e2e_<32 hexadecimal characters>`
+and a matching backend upload directory. The run ID is based on the frontend checkout
+path and selected ports, so concurrent worktrees do not share fixtures. The backend
+test runner removes both after Playwright gracefully stops the API server. If the test
+process is forcibly killed, cleanup may not run. The backend seed command supports
+`--cleanup` for removing the exact test database under the same test-only target guard.
+
+Failures retain Playwright traces. Open `playwright-report/index.html` or
+`playwright-report-full/index.html`, or run `bunx playwright show-trace <trace.zip>`.
+Reports and test results are ignored by Git.
+
+## Worktrees
+
+Keep `FE/` and `BE/` as siblings in each working directory. Install dependencies in each
+checkout. The full-stack runner resolves the backend relative to the frontend checkout.
+For concurrent browser runs in one checkout, assign different ports:
+
+```sh
+PLAYWRIGHT_PORT=4273 bun run test:e2e
+PLAYWRIGHT_FULLSTACK_API_PORT=5200 PLAYWRIGHT_FULLSTACK_APP_PORT=5274 bun run test:e2e:full
+```
+
+Do not reuse a server from another checkout. Both browser configurations enforce this.
+Compare production chunk sizes with `bun run build`; use browser network traces when
+evaluating actual requests. Unit-test timing is not a browser performance measurement.

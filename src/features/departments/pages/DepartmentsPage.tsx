@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { usePaginatedQuery } from '@/hooks/use-paginated-query'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Add01Icon, FloppyDiskIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Spinner } from '@/components/ui/spinner'
 import {
   Sheet,
   SheetClose,
@@ -17,9 +17,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { Spinner } from '@/components/ui/spinner'
+import { TablePagination } from '@/components/ui/table-pagination'
 import { toast } from '@/components/ui/toast-manager'
 import { createDepartment, deleteDepartment, updateDepartment } from '../api/departments-api'
-import { departmentKeys, departmentsQueryOptions } from '../api/departments-queries'
+import { departmentKeys, departmentsTableQueryOptions } from '../api/departments-queries'
 import { DeleteDepartmentDialog } from '../components/DeleteDepartmentDialog'
 import { DepartmentFormCard } from '../components/DepartmentFormCard'
 import { DepartmentsCard } from '../components/DepartmentsCard'
@@ -35,7 +37,7 @@ const departmentFormId = 'department-sheet-form'
 
 export function DepartmentsPage({ title }: { title: string }) {
   const queryClient = useQueryClient()
-  const departmentsQuery = useQuery(departmentsQueryOptions)
+  const { setPage, query: departmentsQuery } = usePaginatedQuery(departmentsTableQueryOptions)
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null)
   const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
@@ -180,6 +182,17 @@ export function DepartmentsPage({ title }: { title: string }) {
         onDelete={setDepartmentToDelete}
         onEdit={openEditSheet}
       />
+
+      {departmentsQuery.data ? (
+        <TablePagination
+          page={departmentsQuery.data.page}
+          totalPages={departmentsQuery.data.totalPages}
+          total={departmentsQuery.data.total}
+          itemLabel="departments"
+          isFetching={departmentsQuery.isFetching}
+          onPageChange={setPage}
+        />
+      ) : null}
 
       <Sheet
         open={isSheetOpen}

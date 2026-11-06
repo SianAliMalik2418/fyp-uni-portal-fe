@@ -5,6 +5,7 @@ import {
   mockCourses,
   mockReferenceData,
   offering,
+  paginated,
   program,
   section,
   semester,
@@ -30,6 +31,12 @@ test('admin configures, edits, and deletes an exam entry', async ({ page }) => {
   await mockAuthMe(page, users.admin)
   await mockReferenceData(page)
   await mockCourses(page)
+  const offeringRequests: string[] = []
+  page.on('request', (request) => {
+    if (request.url().includes('/courses/') && request.url().endsWith('/offerings')) {
+      offeringRequests.push(new URL(request.url()).pathname)
+    }
+  })
   let exams: (typeof exam)[] = []
 
   await page.route('**/api/exams/admin?sectionId=*', async (route) => {
@@ -72,6 +79,7 @@ test('admin configures, edits, and deletes an exam entry', async ({ page }) => {
   await page.goto('/exams')
 
   await page.getByRole('button', { name: 'Add exam' }).click()
+  expect(offeringRequests).toEqual([`/api/courses/sections/${section.id}/offerings`])
   await page.getByLabel('Exam type').fill('Final')
   await page.getByRole('combobox', { name: 'Course' }).click()
   await page.getByRole('option', { name: /programming fundamentals/i }).click()
@@ -127,4 +135,16 @@ test('teacher sees only exams returned for assigned course offerings', async ({ 
   await expect(page.getByText('Teaching exam schedule')).toBeVisible()
   await expect(page.getByText('Programming Fundamentals')).toBeVisible()
   await expect(page.getByText('Section A')).toBeVisible()
+})
+
+test('admin can view exam scope when no sections are configured', async ({ page }) => {
+  await mockAuthMe(page, users.admin)
+  await mockReferenceData(page)
+  await page.route('**/api/sections?*', (route) =>
+    route.fulfill({ json: paginated('sections', []) })
+  )
+  await page.goto('/exams')
+  await expect(page.getByRole('combobox', { name: 'Program', exact: true })).toBeVisible()
+  await expect(page.getByRole('combobox', { name: 'Section', exact: true })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Add exam' })).toBeDisabled()
 })

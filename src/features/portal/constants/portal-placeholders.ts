@@ -30,13 +30,11 @@ export const modulePlaceholderStats: Record<UserRole, ModulePlaceholderStat[]> =
 
 export const modulePlaceholderContent: ModulePlaceholderContent = {
   emptyTitle: 'No records yet',
-  emptyDescription:
-    'Backend data for this module will appear here once the workflow APIs are connected.',
-  readinessTitle: 'Module readiness',
-  readinessDescription:
-    'The page shell, permissions check, and empty state are in place for this area.',
-  nextIntegrationLabel: 'Next integration',
-  nextIntegrationValue: 'API data',
+  emptyDescription: 'Your information will show up here once it is available.',
+  readinessTitle: "What's coming",
+  readinessDescription: 'This area is being prepared and will be available soon.',
+  nextIntegrationLabel: 'Coming next',
+  nextIntegrationValue: 'Your data',
 }
 
 export const academicPerformancePlaceholders: Record<string, ModulePlaceholderDetails> = {
@@ -73,8 +71,8 @@ export const academicPerformancePlaceholders: Record<string, ModulePlaceholderDe
       },
     },
     readinessDescription:
-      'The attendance workspace is ready for future tables, percentages, and shortage alerts.',
-    nextIntegrationValue: 'Attendance API',
+      'Attendance tables, percentages, and shortage alerts will appear here soon.',
+    nextIntegrationValue: 'Attendance records',
   },
   assessments: {
     stats: {
@@ -90,8 +88,8 @@ export const academicPerformancePlaceholders: Record<string, ModulePlaceholderDe
         emptyDescription: 'Quiz and assignment setup will appear once course data is connected.',
       },
     },
-    readinessDescription: 'The assessment workspace can later hold quiz and assignment forms.',
-    nextIntegrationValue: 'Assessment API',
+    readinessDescription: 'Quiz and assignment setup will appear here soon.',
+    nextIntegrationValue: 'Assessment setup',
   },
   marks: {
     stats: {
@@ -107,8 +105,8 @@ export const academicPerformancePlaceholders: Record<string, ModulePlaceholderDe
         emptyDescription: 'Marks tables will appear after assessments and enrolled students exist.',
       },
     },
-    readinessDescription: 'The marks workspace can later hold entry tables and submission status.',
-    nextIntegrationValue: 'Marks API',
+    readinessDescription: 'Marks entry tables and submission status will appear here soon.',
+    nextIntegrationValue: 'Marks entry',
   },
   results: {
     stats: {
@@ -142,9 +140,8 @@ export const academicPerformancePlaceholders: Record<string, ModulePlaceholderDe
         emptyDescription: 'Submitted result approvals will appear here.',
       },
     },
-    readinessDescription:
-      'The results workspace is ready for result submission, HOD approval, and result cards.',
-    nextIntegrationValue: 'Results API',
+    readinessDescription: 'Result submission, approval, and result cards will appear here soon.',
+    nextIntegrationValue: 'Results',
   },
 }
 
@@ -172,8 +169,8 @@ export const studentServicePlaceholders: Record<string, ModulePlaceholderDetails
         emptyDescription: 'Admin fee setup and student challan records will appear here.',
       },
     },
-    readinessDescription: 'The fees workspace is ready for challans, dues, and payment status.',
-    nextIntegrationValue: 'Fees API',
+    readinessDescription: 'Challans, dues, and payment status will appear here soon.',
+    nextIntegrationValue: 'Fee details',
   },
   timetable: {
     stats: {
@@ -198,8 +195,8 @@ export const studentServicePlaceholders: Record<string, ModulePlaceholderDetails
         emptyDescription: 'Assigned class slots will appear after timetable setup.',
       },
     },
-    readinessDescription: 'The timetable workspace is ready for class slots and room details.',
-    nextIntegrationValue: 'Timetable API',
+    readinessDescription: 'Class slots and room details will appear here soon.',
+    nextIntegrationValue: 'Class schedule',
   },
   timetables: {
     stats: {
@@ -215,8 +212,8 @@ export const studentServicePlaceholders: Record<string, ModulePlaceholderDetails
         emptyDescription: 'Admin timetable setup and publishing controls will appear here.',
       },
     },
-    readinessDescription: 'The timetable administration workspace is ready for schedule setup.',
-    nextIntegrationValue: 'Timetable API',
+    readinessDescription: 'Schedule setup for the whole department will appear here soon.',
+    nextIntegrationValue: 'Class schedule',
   },
   exams: {
     stats: {
@@ -250,8 +247,8 @@ export const studentServicePlaceholders: Record<string, ModulePlaceholderDetails
         emptyDescription: 'Admin exam date sheet publishing controls will appear here.',
       },
     },
-    readinessDescription: 'The exams workspace is ready for date sheets and exam notices.',
-    nextIntegrationValue: 'Exams API',
+    readinessDescription: 'Date sheets and exam notices will appear here soon.',
+    nextIntegrationValue: 'Exam schedule',
   },
   announcements: {
     stats: {
@@ -294,7 +291,7 @@ export const studentServicePlaceholders: Record<string, ModulePlaceholderDetails
         emptyDescription: 'Admin announcement publishing controls will appear here.',
       },
     },
-    readinessDescription: 'The announcements workspace is ready for notices and targeting.',
-    nextIntegrationValue: 'Announcements API',
+    readinessDescription: 'Notices for the right audience will appear here soon.',
+    nextIntegrationValue: 'Announcements',
   },
 }

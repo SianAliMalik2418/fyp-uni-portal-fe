@@ -64,12 +64,10 @@ export function PasswordChangePage({
   }
 
   return (
-    <AuthShell supportingCopy="Temporary passwords must be replaced before portal modules are available. This keeps first login onboarding explicit and auditable.">
+    <AuthShell supportingCopy="For your security, you need to set a new password before you can continue.">
       <CardHeader>
-        <CardTitle>Change temporary password</CardTitle>
-        <CardDescription>
-          {user.name}, update your password before entering the portal.
-        </CardDescription>
+        <CardTitle>Set a new password</CardTitle>
+        <CardDescription>{user.name}, please choose a new password to continue.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="grid gap-4" noValidate onSubmit={handleSubmit(submitPasswordChange)}>

@@ -5,6 +5,7 @@ import {
   mockAuthMe,
   mockReferenceData,
   offering,
+  paginated,
   program,
   selectByLabel,
   semester,
@@ -85,7 +86,7 @@ test.describe('phase 4 - courses, teacher assignment, and enrollment', () => {
 })
 
 async function mockCourseRoutes(page: Page, state: Record<string, unknown>) {
-  await page.route('**/api/courses', async (route) => {
+  const handleCourses: Parameters<Page['route']>[1] = async (route) => {
     if (route.request().method() === 'POST') {
       state.lastCoursePayload = route.request().postDataJSON()
       state.courses = [course]
@@ -98,9 +99,11 @@ async function mockCourseRoutes(page: Page, state: Record<string, unknown>) {
 
     await route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ courses: state.courses }),
+      body: JSON.stringify(paginated('courses', state.courses as unknown[])),
     })
-  })
+  }
+  await page.route('**/api/courses', handleCourses)
+  await page.route('**/api/courses?*', handleCourses)
 
   await page.route('**/api/courses/sections/*/offerings', async (route) => {
     if (route.request().method() === 'PUT') {

@@ -11,8 +11,8 @@ import type {
   SemestersResponse,
 } from '../types/academic-structure.types'
 
-export async function listBatches() {
-  const { data } = await apiClient.get<BatchesResponse>('/batches')
+export async function listBatches(query: { page: number; limit: number }) {
+  const { data } = await apiClient.get<BatchesResponse>('/batches', { params: query })
   return data
 }
 
@@ -37,8 +37,8 @@ export async function deleteBatch(batchId: string) {
   return data
 }
 
-export async function listSemesters() {
-  const { data } = await apiClient.get<SemestersResponse>('/semesters')
+export async function listSemesters(query: { page: number; limit: number }) {
+  const { data } = await apiClient.get<SemestersResponse>('/semesters', { params: query })
   return data
 }
 
@@ -73,8 +73,8 @@ export async function deleteSemester(semesterId: string) {
   return data
 }
 
-export async function listSections() {
-  const { data } = await apiClient.get<SectionsResponse>('/sections')
+export async function listSections(query: { page: number; limit: number }) {
+  const { data } = await apiClient.get<SectionsResponse>('/sections', { params: query })
   return data
 }
 

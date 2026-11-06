@@ -2,6 +2,16 @@
 
 Use this document when presenting the University Portal FYP and when manually testing every implemented workflow. It is written in demo order, because later screens depend on earlier data.
 
+## Keeping this guide current
+
+This guide goes stale the moment a route, nav label, merged page, or removed widget changes and nobody updates it. Treat it like a living doc, not a one-time writeup.
+
+1. Whenever you change portal navigation (`FE/src/features/portal/constants/portal-navigation.ts`), merge or split a page, rename a route, or add/remove a dashboard widget, update the matching section here in the same change — do not leave it for later.
+2. Update, in this order: the **Presentation route map** table, the numbered demo step for that module, and the **Known limits** section if the behavior or scope changed.
+3. If a whole step is merged into another (like Academic Settings below), merge the content into one step and renumber everything after it so the step numbers stay sequential — do not leave gaps or duplicate numbers.
+4. If demo/seed credentials change, update both the **Demo accounts** tables below and `TEST_CREDENTIALS.md` at the repo root together.
+5. Before any real presentation, walk the whole guide once against the running app and fix anything that no longer matches — a guide that lies is worse than no guide.
+
 ## One-minute project explanation
 
 This app is a role-based university portal for admins, HODs, teachers, and students. The backend owns authentication, authorization, academic records, fees, schedules, announcements, notifications, audit logs, and the student AI assistant context. The frontend gives each role only the screens they should use, but security is still checked again on the API.
@@ -22,13 +32,28 @@ Use the current local development setup:
 | App | URL |
 | --- | --- |
 | Backend API | `http://localhost:5000/api` |
-| Frontend | `http://localhost:5175/` |
+| Frontend | `http://localhost:5173/` |
 
-The frontend port may change if another Vite app is already running. Use the URL printed by `bun run dev`.
+Vite falls back to the next free port (5174, 5175, ...) if 5173 is already in use by another running dev server. Use the URL printed by `bun run dev`.
 
 ## Demo accounts
 
-Use the accounts in your seeded database. If you run the deterministic E2E seed, these are the expected accounts:
+### Option A: live demo database (recommended for presenting yourself)
+
+If you already have a seeded demo database running, use the accounts in `TEST_CREDENTIALS.md` at the repo root:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `testadmin@gmail.com` | `myteka500` |
+| Teacher | `testteacher@gmail.com` | `myteka500` |
+| HOD | `testhod@gmail.com` | `myteka500` |
+| Student | `sianalimalik2418@gmail.com` | `myteka500` |
+
+Keep `TEST_CREDENTIALS.md` and this table in sync if the demo database accounts change.
+
+### Option B: deterministic E2E seed
+
+If you run the deterministic E2E seed instead, these are the expected accounts:
 
 | Role | Email | Password |
 | --- | --- | --- |
@@ -60,8 +85,11 @@ Present bulk CSV import and semester promotion only after verifying them in the 
 | Departments and programs | `/departments`, `/programs` | Department view | No | No |
 | Academic structure | `/academic-structure` | No | No | No |
 | Courses | Manage all at `/courses` | Department course view | Assigned courses | Enrolled courses |
-| Attendance | Settings | Shortages | Take attendance | Own summary |
-| Assessments | Settings | No editing | Create assessments | Read via results/dashboard |
+| Semester promotion | `/academic-settings` → Semester Promotion tab | No | No | No |
+| Attendance | `/academic-settings` → Attendance tab | Shortages | Take attendance | Own summary |
+| Assessment structure | `/academic-settings` → Assessment Structure tab | No | No | No |
+| Grading scale | `/academic-settings` → Grading Scale tab | No | No | No |
+| Assessments | No direct entry | No editing | Create assessments | Read via results/dashboard |
 | Marks | No direct entry | No editing | Enter marks | Read via dashboard/results |
 | Results | Oversight | Approve or return | Submit | Published results only |
 | Fees | Manage | No | No | Own fee only |
@@ -71,6 +99,8 @@ Present bulk CSV import and semester promotion only after verifying them in the 
 | Notifications | Header menu | Header menu | Header menu | Header menu |
 | AI assistant | No | No | No | Student-only chat |
 | Audit log | `/audit-log` | No | No | No |
+
+All admin list screens (Departments, Programs, Courses, Academic Structure tabs, Students, Academic Staff) are paginated with a Previous/Next control, and every table keeps its Actions column visible while scrolling horizontally.
 
 ## Part 1: Admin setup and system control
 
@@ -83,8 +113,7 @@ Open `/dashboard`.
 What to show:
 
 - The admin dashboard heading.
-- Active semester information.
-- Totals for academic records and users.
+- Icon-labeled totals for students, academic staff, departments, programs, sections, and courses.
 - Recent administrative activity.
 
 What to say:
@@ -117,6 +146,7 @@ Manual checks:
 - Try creating another department with the same code. The API should reject duplicates.
 - Edit the department name or description.
 - Delete only the test department if no other records depend on it.
+- If there are more than 20 departments, confirm the Previous/Next pager works and the Actions column stays visible on the right while scrolling.
 
 ### 3. Programs
 
@@ -160,6 +190,7 @@ Manual checks:
 - Add or inspect a semester.
 - Add a section by selecting program, batch, and semester.
 - Confirm dropdowns only show valid related records.
+- Switch tabs and confirm each tab paginates its own table independently.
 
 ### 5. Student and staff accounts
 
@@ -167,8 +198,8 @@ Open `/students`, then `/teachers`.
 
 What to show:
 
-- Search and filters.
-- Account list.
+- Search and filters, including the Designation filter dropdown on the Academic Staff screen.
+- Account list, defaulting to all roles (not just Teacher) on Academic Staff.
 - Add account form.
 - Account details sheet.
 - Profile picture URL on teacher profiles.
@@ -181,7 +212,8 @@ Users are admin-provisioned. Students need academic placement. Teachers and HODs
 Manual checks:
 
 - Search by name, email, registration number, or employee ID.
-- Open a details sheet.
+- Confirm the Role filter on Academic Staff defaults to "All" and shows both teachers and HODs.
+- Open a details sheet and confirm it opens as a right-side panel at a consistent width, not centered.
 - Create a temporary test user if needed.
 - Reset a test user password and confirm a temporary password is shown.
 - Try direct access to `/students` later as HOD or student and confirm it is blocked.
@@ -208,45 +240,30 @@ Manual checks:
 - Assign a teacher to the course offering.
 - Confirm the same offering appears later for the teacher and student.
 
-### 7. Attendance settings
+### 7. Academic settings: semester promotion, attendance, assessment structure, grading scale
 
-Open `/attendance` as admin.
-
-What to show:
-
-- Minimum attendance percentage setting.
-
-What to say:
-
-The admin configures the shortage threshold once. Teacher attendance sessions feed student percentages and HOD shortage lists.
-
-Manual checks:
-
-- Change the threshold to a safe test value.
-- Save it.
-- Restore the original threshold before the final demo.
-
-### 8. Assessment structure and grading scale
-
-Open `/assessment-structure`, then `/grading-scale`.
+Open `/academic-settings`. This page replaces four previously separate admin pages with one page and four tabs.
 
 What to show:
 
-- Assessment category weights.
-- Total percentage validation.
-- Grade boundaries and grade points.
+- **Semester Promotion** tab: source section, target section, exclusion list, and the promote action.
+- **Attendance** tab: minimum attendance percentage setting.
+- **Assessment Structure** tab: assessment category weights and total percentage validation.
+- **Grading Scale** tab: grade boundaries and grade points.
 
 What to say:
 
-Assessment settings decide how marks become final results. The grading scale decides how percentages become grades and GPA.
+This single page controls the academic rules that drive everything downstream. Semester promotion moves eligible students to the next semester. The attendance threshold feeds teacher sessions and HOD shortage lists. Assessment weights and the grading scale decide how marks become final results, grades, and GPA.
 
 Manual checks:
 
-- Confirm assessment weights total 100 percent.
-- Try an invalid total and confirm validation blocks it.
-- Inspect grade ranges and grade points.
+- Semester Promotion: select a source and target section, exclude a student, and confirm the promotion preview updates.
+- Attendance: change the threshold to a safe test value, save it, then restore the original threshold before the final demo.
+- Assessment Structure: confirm weights total 100 percent; try an invalid total and confirm validation blocks it.
+- Grading Scale: inspect grade ranges and grade points.
+- Confirm switching tabs does not lose unsaved edits unexpectedly, and each tab loads its own data independently.
 
-### 9. Fees
+### 8. Fees
 
 Open `/fees`.
 
@@ -267,7 +284,7 @@ Manual checks:
 - Confirm the remaining amount calculates correctly.
 - Later, log in as that student and confirm the same values are read-only.
 
-### 10. Timetables
+### 9. Timetables
 
 Open `/timetables`.
 
@@ -290,7 +307,7 @@ Manual checks:
 - Publish.
 - Confirm the slot appears later for teacher and student.
 
-### 11. Exams
+### 10. Exams
 
 Open `/exams`.
 
@@ -310,7 +327,7 @@ Manual checks:
 - Confirm it appears in the admin exam list.
 - Later, confirm the same exam appears for teacher and student.
 
-### 12. Announcements
+### 11. Announcements
 
 Open `/announcements`.
 
@@ -333,7 +350,7 @@ Manual checks:
 - Confirm the attachment link is visible.
 - Later, confirm HOD, teacher, and student can read it.
 
-### 13. Audit log
+### 12. Audit log
 
 Open `/audit-log`.
 
@@ -357,13 +374,13 @@ Manual checks:
 
 Sign in as teacher.
 
-### 14. Teacher dashboard and courses
+### 13. Teacher dashboard and courses
 
 Open `/dashboard`, then `/courses`.
 
 What to show:
 
-- Teacher dashboard.
+- Teacher dashboard with icon-labeled stat tiles.
 - Assigned course offerings.
 - Course section label.
 
@@ -376,7 +393,7 @@ Manual checks:
 - Confirm admin-only routes are hidden.
 - Open `/courses` and verify only assigned offerings appear.
 
-### 15. Attendance entry
+### 14. Attendance entry
 
 Open `/attendance`.
 
@@ -400,7 +417,7 @@ Manual checks:
 - Reopen the saved session and confirm the status is preserved.
 - Later, confirm the student percentage and HOD shortage list update.
 
-### 16. Assessments
+### 15. Assessments
 
 Open `/assessments`.
 
@@ -422,7 +439,7 @@ Manual checks:
 - Confirm max marks validation.
 - Confirm it appears in the list and in marks entry.
 
-### 17. Marks
+### 16. Marks
 
 Open `/marks`.
 
@@ -443,7 +460,7 @@ Manual checks:
 - Try a mark above maximum and confirm validation blocks it.
 - Refresh and confirm saved draft marks still appear.
 
-### 18. Result submission
+### 17. Result submission
 
 Open `/results`.
 
@@ -465,7 +482,7 @@ Manual checks:
 - Confirm status changes to pending HOD approval.
 - Log in as student before HOD approval if you want to prove unpublished results remain hidden.
 
-### 19. Teacher timetable, exams, and announcements
+### 18. Teacher timetable, exams, and announcements
 
 Open `/timetable`, `/exams`, and `/announcements`.
 
@@ -489,13 +506,13 @@ Manual checks:
 
 Sign in as HOD.
 
-### 20. HOD dashboard
+### 19. HOD dashboard
 
 Open `/dashboard`.
 
 What to show:
 
-- HOD dashboard.
+- HOD dashboard with icon-labeled stat tiles.
 - Department-level summary.
 - Attendance shortages.
 - Pending academic review items if present.
@@ -509,7 +526,7 @@ Manual checks:
 - Confirm admin-only navigation is absent.
 - Confirm department-scoped data appears.
 
-### 21. Attendance shortage review
+### 20. Attendance shortage review
 
 Open `/attendance`.
 
@@ -527,7 +544,7 @@ Manual checks:
 - Confirm the student changed in the teacher attendance flow appears here if below threshold.
 - Change filters if available.
 
-### 22. Result approval
+### 21. Result approval
 
 Open `/results`.
 
@@ -551,7 +568,7 @@ Manual checks:
 
 Sign in as student.
 
-### 23. Student dashboard
+### 22. Student dashboard
 
 Open `/dashboard`.
 
@@ -572,7 +589,7 @@ Manual checks:
 - Confirm the student's own name and academic details.
 - Confirm no admin or teacher actions are visible.
 
-### 24. Student courses
+### 23. Student courses
 
 Open `/courses`.
 
@@ -591,7 +608,7 @@ Manual checks:
 - Confirm the assigned course appears.
 - Confirm unrelated courses do not appear.
 
-### 25. Student attendance
+### 24. Student attendance
 
 Open `/attendance`.
 
@@ -610,7 +627,7 @@ Manual checks:
 - Confirm the percentage matches the teacher attendance data.
 - Confirm there is no save or edit action.
 
-### 26. Student results and result card
+### 25. Student results and result card
 
 Open `/results`.
 
@@ -632,7 +649,7 @@ Manual checks:
 - Confirm the dialog contains student name, registration number, program, course, marks, grade, and GPA.
 - Try the download action.
 
-### 27. Student fees
+### 26. Student fees
 
 Open `/fees`.
 
@@ -653,7 +670,7 @@ Manual checks:
 - Confirm the values match the admin fee record.
 - Confirm there is no edit action.
 
-### 28. Student timetable and exams
+### 27. Student timetable and exams
 
 Open `/timetable`, then `/exams`.
 
@@ -672,7 +689,7 @@ Manual checks:
 - Confirm draft timetable changes are not visible until admin publishes.
 - Confirm the exam belongs to the student's course.
 
-### 29. Announcements and notifications
+### 28. Announcements and notifications
 
 Open `/announcements`, then the header notification menu.
 
@@ -694,7 +711,7 @@ Manual checks:
 - Open notifications.
 - Mark all as read and confirm the unread count changes.
 
-### 30. Student AI assistant
+### 29. Student AI assistant
 
 Open the floating AI academic assistant.
 
@@ -765,7 +782,7 @@ Adjust names if your final presentation ownership differs.
 ## Known limits to mention honestly
 
 - Bulk CSV import is the supported import workflow; Excel import is outside the current scope.
-- Semester promotion is admin-controlled from a source section to a target section with selectable exclusions.
+- Semester promotion is admin-controlled from a source section to a target section with selectable exclusions, under `/academic-settings` → Semester Promotion tab.
 - Gemini answers require a valid live API key and model access.
 - Uploaded announcement files depend on the configured upload directory.
 - The frontend hides unauthorized routes, but the important security point is that the backend also checks role and ownership.
@@ -776,6 +793,7 @@ Adjust names if your final presentation ownership differs.
 - Frontend opens and points to the correct API base URL.
 - Admin can create or inspect academic setup.
 - Admin can manage users, courses, fees, timetable, exams, announcements, and audit logs.
+- Admin Academic Settings page opens with all four tabs (Semester Promotion, Attendance, Assessment Structure, Grading Scale) working.
 - Teacher can see assigned courses only.
 - Teacher can save attendance, create assessments, enter marks, and submit results.
 - HOD can approve or return submitted results.
