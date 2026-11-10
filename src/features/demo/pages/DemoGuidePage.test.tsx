@@ -1,7 +1,11 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { DIRECTORY_PASSWORD } from '@/features/demo/constants/demo-directory'
+import {
+  DIRECTORY_PASSWORD,
+  DIRECTORY_STAFF,
+  DIRECTORY_STUDENTS,
+} from '@/features/demo/constants/demo-directory'
 import { DEMO_ACCOUNTS } from '@/features/demo/constants/demo-guide'
 import { DemoGuidePage } from './DemoGuidePage'
 
@@ -36,7 +40,8 @@ describe('DemoGuidePage', () => {
     render(<DemoGuidePage />)
 
     expect(screen.getByText('registrar@uni-portal.example')).toBeInTheDocument()
-    expect(screen.getByText('tariq.mehmood@uni-portal.example')).toBeInTheDocument()
+    const hod = DIRECTORY_STAFF.find((member) => member.role === 'hod')!
+    expect(screen.getByText(hod.email)).toBeInTheDocument()
     expect(
       screen.getByText(`Every account below uses the password ${DIRECTORY_PASSWORD}`, {
         exact: false,
@@ -44,7 +49,7 @@ describe('DemoGuidePage', () => {
     ).toBeInTheDocument()
 
     await user.click(screen.getByRole('tab', { name: /students by program/i }))
-    expect(screen.getByText('ayesha.khan@student.uni-portal.example')).toBeInTheDocument()
+    expect(screen.getByText(DIRECTORY_STUDENTS[0]!.email)).toBeInTheDocument()
   })
 
   it('asks the presenter to try a read-only refusal on the AI assistant', () => {

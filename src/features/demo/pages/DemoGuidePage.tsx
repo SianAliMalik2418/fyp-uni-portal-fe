@@ -233,7 +233,7 @@ export function DemoGuidePage() {
         <Section
           id="directory"
           title="University directory"
-          description={`A full university is loaded in the database. Every account below uses the password ${DIRECTORY_PASSWORD}.`}
+          description={`A full university is loaded in the database. Every account below uses the password ${DIRECTORY_PASSWORD}. The Software Engineering HOD and first teacher are the Test HOD and Test Teacher accounts above.`}
         >
           <dl className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 lg:grid-cols-6">
             {UNIVERSITY_SUMMARY.map((item) => (
