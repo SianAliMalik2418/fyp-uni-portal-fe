@@ -32,6 +32,17 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // React Compiler caches the result of watch() in render, so values such as a Select's
+      // label go stale. useWatch subscribes properly. See ProgramFormCard.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.name='watch'], CallExpression[callee.property.name='watch']",
+          message:
+            'Do not call watch() while rendering: React Compiler caches it. Use useWatch({ control, name }).',
+        },
+      ],
       '@typescript-eslint/consistent-type-imports': [
         'warn',
         {

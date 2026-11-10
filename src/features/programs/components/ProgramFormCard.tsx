@@ -1,4 +1,4 @@
-import { Controller, type UseFormReturn } from 'react-hook-form'
+import { Controller, useWatch, type UseFormReturn } from 'react-hook-form'
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
@@ -26,7 +26,7 @@ export function ProgramFormCard({ departments, formId, form, onSubmit }: Program
     handleSubmit,
   } = form
   const activeDepartments = departments.filter((department) => department.isActive)
-  const selectedDepartmentId = form.watch('departmentId')
+  const selectedDepartmentId = useWatch({ control, name: 'departmentId' })
   const selectedDepartment = departments.find(
     (department) => department.id === selectedDepartmentId
   )

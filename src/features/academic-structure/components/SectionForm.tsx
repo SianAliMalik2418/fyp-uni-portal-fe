@@ -1,4 +1,4 @@
-import { Controller, type UseFormReturn } from 'react-hook-form'
+import { Controller, useWatch, type UseFormReturn } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -36,15 +36,14 @@ export function SectionForm({
     control,
     formState: { errors },
     handleSubmit,
-    watch,
   } = form
-  const selectedProgramId = watch('programId')
+  const selectedProgramId = useWatch({ control, name: 'programId' })
   const matchingBatches = batches.filter(
     (batch) => batch.isActive && (!selectedProgramId || batch.program.id === selectedProgramId)
   )
   const availableSemesters = semesters.filter((semester) => !semester.isClosed)
-  const selectedBatchId = watch('batchId')
-  const selectedSemesterId = watch('semesterId')
+  const selectedBatchId = useWatch({ control, name: 'batchId' })
+  const selectedSemesterId = useWatch({ control, name: 'semesterId' })
   const selectedBatch = batches.find((batch) => batch.id === selectedBatchId)
   const selectedSemester = semesters.find((semester) => semester.id === selectedSemesterId)
 
