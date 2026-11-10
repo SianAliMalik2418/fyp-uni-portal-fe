@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
-import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type QueryState = {
   error: unknown
@@ -31,14 +30,7 @@ export function AcademicQueryMessage({
   }
 
   if (query.isError) {
-    return (
-      <Alert variant="destructive">
-        <AlertTitle>{title} unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(query.error, `Unable to load ${title}`)}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource={title.toLowerCase()} error={query.error} />
   }
 
   return (

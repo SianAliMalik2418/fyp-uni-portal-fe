@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertCircleIcon, ChartEvaluationIcon } from '@hugeicons/core-free-icons'
+import { ChartEvaluationIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast-manager'
@@ -13,6 +12,7 @@ import {
 } from '../api/academic-performance-queries'
 import { AssessmentStructureForm } from '../components/AssessmentStructureForm'
 import type { AssessmentStructureFormValues } from '../schemas/assessment-structure.schemas'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function AssessmentStructureSettingsPage({ title }: { title: string }) {
   const queryClient = useQueryClient()
@@ -38,15 +38,7 @@ export function AssessmentStructureSettingsPage({ title }: { title: string }) {
   })
 
   if (structureQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Assessment structure unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(structureQuery.error, 'Unable to load assessment settings.')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="assessment structure" error={structureQuery.error} />
   }
 
   return (

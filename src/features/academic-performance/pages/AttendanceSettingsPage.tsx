@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast-manager'
 import { getApiErrorMessage } from '@/shared/api/http-client'
@@ -16,6 +15,7 @@ import {
   attendanceSettingsSchema,
   type AttendanceSettingsFormValues,
 } from '../schemas/attendance-settings.schemas'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 const defaultAttendanceSettings: AttendanceSettingsFormValues = {
   minimumAttendancePercentage: 75,
@@ -75,12 +75,7 @@ export function AttendanceSettingsPage() {
           <Skeleton className="h-9 w-32" />
         </div>
       ) : configurationQuery.isError ? (
-        <Alert variant="destructive">
-          <AlertTitle>Attendance setting unavailable</AlertTitle>
-          <AlertDescription>
-            {getApiErrorMessage(configurationQuery.error, 'Unable to load the attendance setting')}
-          </AlertDescription>
-        </Alert>
+        <QueryErrorState resource="attendance setting" error={configurationQuery.error} />
       ) : (
         <AttendanceSettingsForm
           form={form}

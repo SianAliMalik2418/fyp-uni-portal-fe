@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast-manager'
@@ -30,6 +29,7 @@ import {
   formatSectionLabel,
   timetableToFormValues,
 } from '../utils/timetable-formatters'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function TimetablePage({ title, user }: { title: string; user: PortalUser }) {
   if (user.role === 'admin') {
@@ -53,10 +53,7 @@ function StudentTimetablePage({ title }: { title: string }) {
     >
       {timetableQuery.isPending ? <TimetablePageSkeleton /> : null}
       {timetableQuery.isError ? (
-        <QueryErrorState
-          title="Timetable unavailable"
-          message={getApiErrorMessage(timetableQuery.error, 'Unable to load timetable')}
-        />
+        <QueryErrorState resource="timetable" error={timetableQuery.error} />
       ) : null}
       {timetableQuery.isSuccess && timetableQuery.data.timetable ? (
         <WeeklyTimetableBoard timetable={timetableQuery.data.timetable} />
@@ -78,10 +75,7 @@ function TeacherTimetablePage({ title }: { title: string }) {
     >
       {timetablesQuery.isPending ? <TimetablePageSkeleton /> : null}
       {timetablesQuery.isError ? (
-        <QueryErrorState
-          title="Teaching timetable unavailable"
-          message={getApiErrorMessage(timetablesQuery.error, 'Unable to load teaching timetable')}
-        />
+        <QueryErrorState resource="teaching timetable" error={timetablesQuery.error} />
       ) : null}
       {timetablesQuery.isSuccess && timetablesQuery.data.timetables.length === 0 ? (
         <EmptyState message="No published timetable slots are assigned to you yet." />
@@ -215,10 +209,7 @@ function AdminTimetablePage({ title }: { title: string }) {
       {isReferenceDataPending ? (
         <TimetablePageSkeleton />
       ) : referenceDataError ? (
-        <QueryErrorState
-          title="Timetable setup unavailable"
-          message={getApiErrorMessage(referenceDataError, 'Unable to load timetable setup data')}
-        />
+        <QueryErrorState resource="timetable setup" error={referenceDataError} />
       ) : (
         <div className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
           <Card className="bg-background self-start">
@@ -291,13 +282,7 @@ function AdminTimetablePage({ title }: { title: string }) {
           ) : workspaceQuery.isPending ? (
             <TimetablePageSkeleton />
           ) : workspaceQuery.isError ? (
-            <QueryErrorState
-              title="Timetable workspace unavailable"
-              message={getApiErrorMessage(
-                workspaceQuery.error,
-                'Unable to load timetable workspace'
-              )}
-            />
+            <QueryErrorState resource="timetable workspace" error={workspaceQuery.error} />
           ) : workspace ? (
             <div className="grid gap-5">
               <TimetableDraftEditor
@@ -359,15 +344,6 @@ function TimetablePageSkeleton() {
         <Skeleton className="h-64 w-full" />
       </div>
     </div>
-  )
-}
-
-function QueryErrorState({ message, title }: { message: string; title: string }) {
-  return (
-    <Alert variant="destructive">
-      <AlertTitle>{title}</AlertTitle>
-      <AlertDescription>{message}</AlertDescription>
-    </Alert>
   )
 }
 

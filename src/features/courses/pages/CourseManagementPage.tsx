@@ -7,7 +7,6 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { usePaginatedQuery } from '@/hooks/use-paginated-query'
 import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
@@ -52,6 +51,7 @@ import { DeleteCourseDialog } from '../components/DeleteCourseDialog'
 import { courseSchema, type CourseFormValues } from '../schemas/course.schemas'
 import type { Course } from '../types/course.types'
 import { courseValues, emptyCourseValues, toCoursePayload } from '../utils/course-mappers'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 const courseFormId = 'course-sheet-form'
 
@@ -301,15 +301,10 @@ export function CourseManagementPage({ title, user }: { title: string; user: Por
           <ScrollArea className="h-[calc(100vh-230px)] flex-1 grow py-4">
             <div className="space-y-4 px-4">
               {departmentsQuery.isError || programsQuery.isError || semestersQuery.isError ? (
-                <Alert variant="destructive">
-                  <AlertTitle>Academic references unavailable</AlertTitle>
-                  <AlertDescription>
-                    {getApiErrorMessage(
-                      departmentsQuery.error ?? programsQuery.error ?? semestersQuery.error,
-                      'Unable to load academic references'
-                    )}
-                  </AlertDescription>
-                </Alert>
+                <QueryErrorState
+                  resource="academic references"
+                  error={departmentsQuery.error ?? programsQuery.error ?? semestersQuery.error}
+                />
               ) : null}
               <CourseFormCard
                 departments={departments}

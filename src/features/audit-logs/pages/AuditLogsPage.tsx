@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
-import { getApiErrorMessage } from '@/shared/api/http-client'
 import { auditLogsQueryOptions } from '../api/audit-log-queries'
 import { AuditLogFilters } from '../components/AuditLogFilters'
 import { AuditLogTable } from '../components/AuditLogTable'
@@ -14,6 +12,7 @@ import type {
   AuditLogListQuery,
   AuditModule,
 } from '../types/audit-log.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 const pageSize = 20
 
@@ -55,12 +54,7 @@ export function AuditLogsPage() {
       />
 
       {auditLogsQuery.isError ? (
-        <Alert variant="destructive">
-          <AlertTitle>Audit log unavailable</AlertTitle>
-          <AlertDescription>
-            {getApiErrorMessage(auditLogsQuery.error, 'Unable to load audit activity')}
-          </AlertDescription>
-        </Alert>
+        <QueryErrorState resource="audit log" error={auditLogsQuery.error} />
       ) : (
         <Card className="gap-0 py-0">
           <CardContent className="px-0">

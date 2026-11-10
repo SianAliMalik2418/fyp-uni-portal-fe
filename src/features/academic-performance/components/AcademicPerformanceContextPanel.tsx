@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { AlertCircleIcon, Books01Icon, Layers01Icon } from '@hugeicons/core-free-icons'
+import { Books01Icon, Layers01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { academicPerformanceContextQueryOptions } from '../api/academic-performance-queries'
 import type { AcademicPerformanceContext } from '../types/academic-performance.types'
 import { AcademicPerformanceStudentTable } from './AcademicPerformanceStudentTable'
-import { getApiErrorMessage } from '@/shared/api/http-client'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 function uniquePrograms(context: AcademicPerformanceContext) {
   const programs = new Map<string, string>()
@@ -61,18 +60,7 @@ export function AcademicPerformanceContextPanel({ moduleId }: { moduleId?: strin
   }
 
   if (contextQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Academic structure context unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(
-            contextQuery.error,
-            'Program, semester, and section context failed to load.'
-          )}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="academic structure context" error={contextQuery.error} />
   }
 
   const context = contextQuery.data

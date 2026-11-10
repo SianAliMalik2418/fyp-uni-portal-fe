@@ -1,6 +1,5 @@
-import { AlertCircleIcon, ChartNoAxesColumnDecreasingIcon } from '@hugeicons/core-free-icons'
+import { ChartNoAxesColumnDecreasingIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -13,8 +12,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { markStatusLabels } from '@/features/academic-performance/utils/academic-performance-labels'
-import { getApiErrorMessage } from '@/shared/api/http-client'
 import type { PublishedStudentMark } from '../types/student-dashboard.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 function markValue(mark: PublishedStudentMark) {
   if (mark.status) {
@@ -56,13 +55,7 @@ export function StudentRecentMarks({
             ))}
           </div>
         ) : isError ? (
-          <Alert variant="destructive">
-            <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-            <AlertTitle>Recent marks unavailable</AlertTitle>
-            <AlertDescription>
-              {getApiErrorMessage(error, 'Unable to load your recent marks.')}
-            </AlertDescription>
-          </Alert>
+          <QueryErrorState resource="recent marks" error={error} />
         ) : marks.length ? (
           <Table>
             <TableHeader>

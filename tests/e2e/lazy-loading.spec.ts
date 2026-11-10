@@ -39,7 +39,7 @@ test('a failed screen download keeps navigation available and can be reloaded', 
   await page.route(screenModule, (route) => route.abort('failed'))
   await page.goto('/exams')
   await expect(page.getByRole('navigation', { name: 'Student navigation' })).toBeVisible()
-  await expect(page.getByRole('alert')).toContainText('Page unavailable')
+  await expect(page.getByRole('alert')).toContainText("This page didn't load")
   await page.unroute(screenModule)
   await page.getByRole('button', { name: 'Reload page' }).click()
   await expect(page.getByRole('heading', { name: 'Exams' })).toBeVisible()

@@ -1,8 +1,7 @@
 import { useDeferredValue, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Alert02Icon, AlertCircleIcon, Calendar03Icon } from '@hugeicons/core-free-icons'
+import { Alert02Icon, Calendar03Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -28,10 +27,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
-import { getApiErrorMessage } from '@/shared/api/http-client'
 import { filteredAttendanceShortagesQueryOptions } from '../api/academic-performance-queries'
 import type { AttendanceShortagesQuery } from '../types/academic-performance.types'
 import { AcademicRecordFilters, type AcademicRecordFilterField } from './AcademicRecordFilters'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 function percentageLabel(value: number) {
   return `${value.toFixed(value % 1 === 0 ? 0 : 2)}%`
@@ -99,13 +98,7 @@ export function HodAttendanceShortages({ title }: { title: string }) {
         {shortagesQuery.isPending ? (
           <TableSkeleton columns={6} rows={5} />
         ) : shortagesQuery.isError ? (
-          <Alert variant="destructive">
-            <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-            <AlertTitle>Shortages unavailable</AlertTitle>
-            <AlertDescription>
-              {getApiErrorMessage(shortagesQuery.error, 'Unable to load attendance shortages.')}
-            </AlertDescription>
-          </Alert>
+          <QueryErrorState resource="shortages" error={shortagesQuery.error} />
         ) : shortages.length ? (
           <Table>
             <TableHeader>

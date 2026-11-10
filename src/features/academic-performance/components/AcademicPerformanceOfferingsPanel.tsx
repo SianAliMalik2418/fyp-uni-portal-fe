@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { AlertCircleIcon, CourseIcon } from '@hugeicons/core-free-icons'
+import { CourseIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Select,
@@ -22,8 +21,8 @@ import {
 import { TableSkeleton } from '@/components/ui/table-skeleton'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import type { CourseOffering } from '@/features/courses/types/course.types'
-import { getApiErrorMessage } from '@/shared/api/http-client'
 import { academicPerformanceOfferingsQueryOptions } from '../api/academic-performance-queries'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 const moduleCopy: Record<
   string,
@@ -132,15 +131,7 @@ export function AcademicPerformanceOfferingsPanel({
   }
 
   if (offeringsQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Course offerings unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(offeringsQuery.error, 'Unable to load course offerings.')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="course offerings" error={offeringsQuery.error} />
   }
 
   const offerings = offeringsQuery.data.offerings

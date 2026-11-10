@@ -6,7 +6,6 @@ import { usePaginatedQuery } from '@/hooks/use-paginated-query'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { Add01Icon, FloppyDiskIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
@@ -30,6 +29,7 @@ import { ProgramsCard } from '../components/ProgramsCard'
 import { programSchema, type ProgramFormValues } from '../schemas/program.schemas'
 import type { Program } from '../types/program.types'
 import { emptyProgramValues, programValues, toProgramPayload } from '../utils/program-mappers'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 const programFormId = 'program-sheet-form'
 
@@ -216,12 +216,7 @@ export function ProgramsPage({ title }: { title: string }) {
           <ScrollArea className="h-[calc(100vh-230px)] flex-1 grow py-4">
             <div className="space-y-4 px-4">
               {departmentsQuery.isError ? (
-                <Alert variant="destructive">
-                  <AlertTitle>Departments unavailable</AlertTitle>
-                  <AlertDescription>
-                    {getApiErrorMessage(departmentsQuery.error, 'Unable to load departments')}
-                  </AlertDescription>
-                </Alert>
+                <QueryErrorState resource="departments" error={departmentsQuery.error} />
               ) : null}
               <ProgramFormCard
                 departments={departments}

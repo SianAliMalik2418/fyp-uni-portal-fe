@@ -2,7 +2,6 @@ import { useDeferredValue, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Add01Icon, Megaphone01Icon, Search01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,6 +20,7 @@ import { AnnouncementsList } from '../components/AnnouncementsList'
 import { DeleteAnnouncementDialog } from '../components/DeleteAnnouncementDialog'
 import type { AnnouncementFormValues } from '../schemas/announcement.schemas'
 import type { Announcement, AnnouncementStatus } from '../types/announcement.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 const adminStatuses: Array<{ value: AnnouncementStatus; label: string }> = [
   { value: 'active', label: 'Active' },
@@ -184,12 +184,7 @@ export function AnnouncementsPage({ title, user }: { title: string; user: Portal
           <Skeleton className="h-40 w-full" />
         </div>
       ) : announcementsQuery.isError ? (
-        <Alert variant="destructive">
-          <AlertTitle>Announcements unavailable</AlertTitle>
-          <AlertDescription>
-            {getApiErrorMessage(announcementsQuery.error, 'Unable to load announcements.')}
-          </AlertDescription>
-        </Alert>
+        <QueryErrorState resource="announcements" error={announcementsQuery.error} />
       ) : announcementsQuery.data.announcements.length === 0 ? (
         <Card className="bg-background">
           <CardContent className="grid min-h-52 place-items-center text-center">

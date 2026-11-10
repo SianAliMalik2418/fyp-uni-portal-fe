@@ -2,8 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { UserIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { roleLabels } from '@/shared/constants/user-roles'
-import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ownUserAccountQueryOptions } from '../api/user-accounts-queries'
 import type { ProvisionedUserAccount } from '../types/user-account.types'
 import { identifierForAccount } from '../utils/account-sections'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function CurrentUserProfilePage() {
   const profileQuery = useQuery(ownUserAccountQueryOptions)
@@ -36,14 +35,7 @@ export function CurrentUserProfilePage() {
   }
 
   if (profileQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <AlertTitle>Profile unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(profileQuery.error, 'Unable to load account profile')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="profile" error={profileQuery.error} />
   }
 
   const account = profileQuery.data.user

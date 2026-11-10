@@ -6,8 +6,6 @@ import {
   MoreVerticalIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -28,6 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { Department } from '../types/department.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type DepartmentsCardProps = {
   departments: Department[]
@@ -53,14 +52,7 @@ export function DepartmentsCard({
   if (isPending) {
     content = <TableSkeleton columns={4} />
   } else if (isError) {
-    content = (
-      <Alert variant="destructive">
-        <AlertTitle>Departments unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(error, 'Unable to load departments')}
-        </AlertDescription>
-      </Alert>
-    )
+    content = <QueryErrorState resource="departments" error={error} />
   } else if (departments.length) {
     content = (
       <Table>

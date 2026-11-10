@@ -1087,7 +1087,7 @@ describe('App', () => {
 
     render(<App />)
 
-    expect(await screen.findByText(/timetable setup unavailable/i)).toBeInTheDocument()
+    expect(await screen.findByText(/couldn.t load timetable setup/i)).toBeInTheDocument()
     expect(screen.getByText(/programs could not be loaded/i)).toBeInTheDocument()
   })
 

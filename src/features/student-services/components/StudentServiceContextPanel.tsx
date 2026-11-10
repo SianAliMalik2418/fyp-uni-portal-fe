@@ -1,17 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import {
-  AlertCircleIcon,
   AiMagicIcon,
   Calendar03Icon,
   SchoolReportCardIcon,
   UserIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getApiErrorMessage } from '@/shared/api/http-client'
 import { studentServiceContextQueryOptions } from '../api/student-services-queries'
 import type {
   StudentServiceContext,
@@ -19,6 +16,7 @@ import type {
   StudentServiceStudentContext,
   StudentServiceStructureScope,
 } from '../types/student-services.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 function uniquePrograms(context: StudentServiceContext) {
   const programs = new Map<string, string>()
@@ -158,18 +156,7 @@ export function StudentServiceContextPanel() {
   }
 
   if (contextQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Student-service context unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(
-            contextQuery.error,
-            'Program, semester, and section context failed to load.'
-          )}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="student-service context" error={contextQuery.error} />
   }
 
   const context = contextQuery.data

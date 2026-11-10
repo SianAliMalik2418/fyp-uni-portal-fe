@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { Alert02Icon, AlertCircleIcon, Calendar03Icon } from '@hugeicons/core-free-icons'
+import { Alert02Icon, Calendar03Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -14,8 +13,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
-import { getApiErrorMessage } from '@/shared/api/http-client'
 import { studentAttendanceQueryOptions } from '../api/academic-performance-queries'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 function percentageLabel(value: number) {
   return `${value.toFixed(value % 1 === 0 ? 0 : 2)}%`
@@ -39,15 +38,7 @@ export function StudentAttendanceSummary({ title }: { title: string }) {
   }
 
   if (attendanceQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Attendance unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(attendanceQuery.error, 'Unable to load attendance summaries.')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="attendance" error={attendanceQuery.error} />
   }
 
   const summaries = attendanceQuery.data.summaries

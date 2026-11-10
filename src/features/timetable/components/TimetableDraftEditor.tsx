@@ -26,6 +26,7 @@ import {
   timetableSlotTypeLabels,
 } from '../utils/timetable-formatters'
 import type { TimetableFormValues } from '../schemas/timetable.schemas'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type TimetableDraftEditorProps = {
   availableCourseOfferings: TimetableOffering[]
@@ -105,12 +106,7 @@ export function TimetableDraftEditor({
 
       <CardContent className="grid gap-5">
         {workspaceError ? (
-          <Alert variant="destructive">
-            <AlertTitle>Workspace unavailable</AlertTitle>
-            <AlertDescription>
-              The section timetable workspace could not be loaded.
-            </AlertDescription>
-          </Alert>
+          <QueryErrorState resource="the section timetable workspace" error={workspaceError} />
         ) : null}
 
         {!availableCourseOfferings.length ? (

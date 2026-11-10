@@ -1,8 +1,6 @@
 import { type ReactNode } from 'react'
 import { CourseIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   Select,
@@ -21,6 +19,7 @@ import {
 } from '@/components/ui/table'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
 import type { AssignableTeacher, CourseOffering } from '../types/course.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type CourseOfferingsCardProps = {
   canAssignTeacher?: boolean
@@ -48,14 +47,7 @@ export function CourseOfferingsCard({
   if (isPending) {
     content = <TableSkeleton columns={canAssignTeacher ? 6 : 5} />
   } else if (isError) {
-    content = (
-      <Alert variant="destructive">
-        <AlertTitle>Course offerings unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(error, 'Unable to load course offerings')}
-        </AlertDescription>
-      </Alert>
-    )
+    content = <QueryErrorState resource="course offerings" error={error} />
   } else if (offerings.length) {
     content = (
       <Table>

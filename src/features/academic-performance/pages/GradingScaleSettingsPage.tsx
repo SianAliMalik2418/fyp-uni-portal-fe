@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertCircleIcon, SchoolReportCardIcon } from '@hugeicons/core-free-icons'
+import { SchoolReportCardIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast-manager'
@@ -13,6 +12,7 @@ import {
 } from '../api/academic-performance-queries'
 import { GradingScaleForm } from '../components/GradingScaleForm'
 import type { GradingScaleFormValues } from '../schemas/grading-scale.schemas'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function GradingScaleSettingsPage({ title }: { title: string }) {
   const queryClient = useQueryClient()
@@ -38,15 +38,7 @@ export function GradingScaleSettingsPage({ title }: { title: string }) {
   })
 
   if (gradingScaleQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Grading scale unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(gradingScaleQuery.error, 'Unable to load grading settings.')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="grading scale" error={gradingScaleQuery.error} />
   }
 
   return (

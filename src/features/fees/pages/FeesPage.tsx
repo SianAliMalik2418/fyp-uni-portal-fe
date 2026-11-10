@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { SearchIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,6 +20,7 @@ import { FeeInformationCard } from '../components/FeeInformationCard'
 import { StudentFeePicker } from '../components/StudentFeePicker'
 import { feeFormSchema, type FeeFormValues } from '../schemas/fee.schemas'
 import { emptyFeeFormValues, feeFormToPayload, feeToFormValues } from '../utils/fee-formatters'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function FeesPage({ user }: { user: PortalUser }) {
   return user.role === 'admin' ? <AdminFeesPage /> : <StudentFeesPage />
@@ -214,14 +214,7 @@ function FeePageSkeleton() {
 }
 
 function FeeQueryError({ error }: { error: unknown }) {
-  return (
-    <Alert variant="destructive">
-      <AlertTitle>Fee information unavailable</AlertTitle>
-      <AlertDescription>
-        {getApiErrorMessage(error, 'Unable to load fee information')}
-      </AlertDescription>
-    </Alert>
-  )
+  return <QueryErrorState resource="fee information" error={error} />
 }
 
 function EmptyFeeState({ message }: { message: string }) {

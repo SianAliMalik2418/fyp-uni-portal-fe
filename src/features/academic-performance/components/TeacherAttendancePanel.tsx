@@ -1,13 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  AlertCircleIcon,
-  Calendar03Icon,
-  CourseIcon,
-  UserGroupIcon,
-} from '@hugeicons/core-free-icons'
+import { Calendar03Icon, CourseIcon, UserGroupIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -45,6 +39,7 @@ import type {
   AttendanceSessionPayload,
   AttendanceStatus,
 } from '../types/academic-performance.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 const attendanceStatuses: AttendanceStatus[] = ['present', 'absent', 'leave']
 
@@ -160,15 +155,7 @@ export function TeacherAttendancePanel({ title }: { title: string }) {
   }
 
   if (offeringsQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Attendance unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(offeringsQuery.error, 'Unable to load assigned courses.')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="attendance" error={offeringsQuery.error} />
   }
 
   return (
@@ -258,13 +245,7 @@ export function TeacherAttendancePanel({ title }: { title: string }) {
 
               {studentsQuery.isPending ? <TableSkeleton columns={3} rows={5} /> : null}
               {studentsQuery.isError ? (
-                <Alert variant="destructive">
-                  <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-                  <AlertTitle>Students unavailable</AlertTitle>
-                  <AlertDescription>
-                    {getApiErrorMessage(studentsQuery.error, 'Unable to load enrolled students.')}
-                  </AlertDescription>
-                </Alert>
+                <QueryErrorState resource="students" error={studentsQuery.error} />
               ) : null}
               {studentsQuery.data ? (
                 <Table>
@@ -350,13 +331,7 @@ export function TeacherAttendancePanel({ title }: { title: string }) {
         <CardContent>
           {sessionsQuery.isPending ? <TableSkeleton columns={4} rows={3} /> : null}
           {sessionsQuery.isError ? (
-            <Alert variant="destructive">
-              <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-              <AlertTitle>History unavailable</AlertTitle>
-              <AlertDescription>
-                {getApiErrorMessage(sessionsQuery.error, 'Unable to load attendance history.')}
-              </AlertDescription>
-            </Alert>
+            <QueryErrorState resource="history" error={sessionsQuery.error} />
           ) : null}
           {sessionsQuery.data?.sessions.length ? (
             <Table>

@@ -1,12 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  AlertCircleIcon,
-  ChartNoAxesColumnDecreasingIcon,
-  CourseIcon,
-} from '@hugeicons/core-free-icons'
+import { ChartNoAxesColumnDecreasingIcon, CourseIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Select,
@@ -29,6 +24,7 @@ import { CourseOfferingPicker } from '../components/CourseOfferingPicker'
 import { MarksEntryTable } from '../components/MarksEntryTable'
 import type { MarkSheetPayload } from '../types/academic-performance.types'
 import { assessmentCategoryLabels } from '../utils/academic-performance-labels'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function MarksPage({ title }: { title: string }) {
   const queryClient = useQueryClient()
@@ -66,15 +62,7 @@ export function MarksPage({ title }: { title: string }) {
   })
 
   if (offeringsQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Marks unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(offeringsQuery.error, 'Unable to load assigned course sections.')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="marks" error={offeringsQuery.error} />
   }
 
   return (
@@ -134,13 +122,7 @@ export function MarksPage({ title }: { title: string }) {
             </div>
 
             {assessmentsQuery.isError ? (
-              <Alert variant="destructive">
-                <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-                <AlertTitle>Assessments unavailable</AlertTitle>
-                <AlertDescription>
-                  {getApiErrorMessage(assessmentsQuery.error, 'Unable to load assessments.')}
-                </AlertDescription>
-              </Alert>
+              <QueryErrorState resource="assessments" error={assessmentsQuery.error} />
             ) : assessmentsQuery.isPending ? (
               <TableSkeleton columns={4} rows={5} />
             ) : !assessments.length ? (
@@ -155,13 +137,7 @@ export function MarksPage({ title }: { title: string }) {
             ) : markSheetQuery.isPending ? (
               <TableSkeleton columns={4} rows={6} />
             ) : markSheetQuery.isError ? (
-              <Alert variant="destructive">
-                <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-                <AlertTitle>Mark sheet unavailable</AlertTitle>
-                <AlertDescription>
-                  {getApiErrorMessage(markSheetQuery.error, 'Unable to load the mark sheet.')}
-                </AlertDescription>
-              </Alert>
+              <QueryErrorState resource="mark sheet" error={markSheetQuery.error} />
             ) : markSheetQuery.data ? (
               <MarksEntryTable
                 key={`${activeAssessmentId}-${markSheetQuery.data.sheet.updatedAt ?? 'new'}`}

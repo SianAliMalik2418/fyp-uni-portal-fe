@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { AlertCircleIcon, FileDownloadIcon } from '@hugeicons/core-free-icons'
+import { FileDownloadIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -23,9 +22,9 @@ import {
 } from '@/components/ui/table'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
 import { toast } from '@/components/ui/toast-manager'
-import { getApiErrorMessage } from '@/shared/api/http-client'
 import { studentResultCardQueryOptions } from '../api/academic-performance-queries'
 import { downloadResultCard } from '../utils/download-result-card'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function StudentResultCardDialog({
   semesterId,
@@ -73,16 +72,7 @@ export function StudentResultCardDialog({
 
         {resultCardQuery.isPending ? <TableSkeleton columns={6} rows={5} /> : null}
         {resultCardQuery.isError ? (
-          <Alert variant="destructive">
-            <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-            <AlertTitle>Result card unavailable</AlertTitle>
-            <AlertDescription>
-              {getApiErrorMessage(
-                resultCardQuery.error,
-                'This semester does not have an approved result card.'
-              )}
-            </AlertDescription>
-          </Alert>
+          <QueryErrorState resource="result card" error={resultCardQuery.error} />
         ) : null}
         {resultCard ? (
           <div className="grid gap-5">

@@ -1,11 +1,10 @@
-import { AlertCircleIcon, ChartEvaluationIcon } from '@hugeicons/core-free-icons'
+import { ChartEvaluationIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getApiErrorMessage } from '@/shared/api/http-client'
 import type { StudentAcademicSummary as AcademicSummary } from '../types/student-dashboard.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 function percentage(value: number) {
   return `${value.toFixed(value % 1 === 0 ? 0 : 2)}%`
@@ -39,13 +38,7 @@ export function StudentAcademicSummary({
             ))}
           </div>
         ) : isError ? (
-          <Alert variant="destructive">
-            <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-            <AlertTitle>Academic summary unavailable</AlertTitle>
-            <AlertDescription>
-              {getApiErrorMessage(error, 'Unable to load your academic summary.')}
-            </AlertDescription>
-          </Alert>
+          <QueryErrorState resource="academic summary" error={error} />
         ) : summary?.publishedAssessments ? (
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="bg-muted/30 rounded-md border p-3">

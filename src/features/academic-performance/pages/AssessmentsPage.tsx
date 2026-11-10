@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertCircleIcon, ChartEvaluationIcon, CourseIcon } from '@hugeicons/core-free-icons'
+import { ChartEvaluationIcon, CourseIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/components/ui/toast-manager'
 import { getApiErrorMessage } from '@/shared/api/http-client'
@@ -18,6 +17,7 @@ import { AssessmentCreationForm } from '../components/AssessmentCreationForm'
 import { AssessmentsTable } from '../components/AssessmentsTable'
 import { CourseOfferingPicker } from '../components/CourseOfferingPicker'
 import type { AssessmentFormValues } from '../schemas/assessment.schemas'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function AssessmentsPage({ title }: { title: string }) {
   const queryClient = useQueryClient()
@@ -55,16 +55,10 @@ export function AssessmentsPage({ title }: { title: string }) {
 
   if (offeringsQuery.isError || structureQuery.isError) {
     return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Assessments unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(
-            offeringsQuery.error ?? structureQuery.error,
-            'Unable to load the assessment workspace.'
-          )}
-        </AlertDescription>
-      </Alert>
+      <QueryErrorState
+        resource="assessments"
+        error={offeringsQuery.error ?? structureQuery.error}
+      />
     )
   }
 
@@ -99,13 +93,7 @@ export function AssessmentsPage({ title }: { title: string }) {
                 onSubmit={handleCreate}
               />
               {assessmentsQuery.isError ? (
-                <Alert variant="destructive">
-                  <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-                  <AlertTitle>Assessment list unavailable</AlertTitle>
-                  <AlertDescription>
-                    {getApiErrorMessage(assessmentsQuery.error, 'Unable to load assessments.')}
-                  </AlertDescription>
-                </Alert>
+                <QueryErrorState resource="assessment list" error={assessmentsQuery.error} />
               ) : (
                 <AssessmentsTable
                   assessments={assessmentsQuery.data?.assessments ?? []}

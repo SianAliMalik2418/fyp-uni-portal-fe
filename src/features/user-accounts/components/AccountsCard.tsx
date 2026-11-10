@@ -8,8 +8,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { roleLabels } from '@/shared/constants/user-roles'
-import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -32,6 +30,7 @@ import {
 } from '@/components/ui/table'
 import type { ProvisionedUserAccount } from '../types/user-account.types'
 import { identifierForAccount } from '../utils/account-sections'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type AccountsCardProps = {
   accounts: ProvisionedUserAccount[]
@@ -61,12 +60,7 @@ export function AccountsCard({
   if (isPending) {
     content = <TableSkeleton columns={7} />
   } else if (isError) {
-    content = (
-      <Alert variant="destructive">
-        <AlertTitle>Accounts unavailable</AlertTitle>
-        <AlertDescription>{getApiErrorMessage(error, 'Unable to load accounts')}</AlertDescription>
-      </Alert>
-    )
+    content = <QueryErrorState resource="accounts" error={error} />
   } else if (accounts.length) {
     content = (
       <Table>

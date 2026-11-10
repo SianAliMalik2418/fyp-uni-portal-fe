@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Add01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -23,6 +22,7 @@ import { ExamFormSheet } from '../components/ExamFormSheet'
 import { ExamScheduleCard } from '../components/ExamScheduleCard'
 import type { ExamFormValues } from '../schemas/exam.schemas'
 import type { Exam, ExamPayload } from '../types/exam.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function ExamsPage({ title, user }: { title: string; user: PortalUser }) {
   if (user.role === 'admin') {
@@ -48,11 +48,7 @@ function RoleExamPage({ title, role }: { title: string; role: 'student' | 'teach
     <PageShell title={title} description={description}>
       {examsQuery.isPending ? <ExamPageSkeleton /> : null}
       {examsQuery.isError ? (
-        <QueryError
-          title="Exam schedule unavailable"
-          error={examsQuery.error}
-          fallback="Unable to load exam schedule"
-        />
+        <QueryErrorState resource="exam schedule" error={examsQuery.error} />
       ) : null}
       {examsQuery.isSuccess ? (
         <ExamScheduleCard
@@ -185,11 +181,7 @@ function AdminExamsPage({ title }: { title: string }) {
       {isReferencePending ? (
         <ExamPageSkeleton />
       ) : referenceError ? (
-        <QueryError
-          title="Exam setup unavailable"
-          error={referenceError}
-          fallback="Unable to load academic reference data"
-        />
+        <QueryErrorState resource="exam setup" error={referenceError} />
       ) : (
         <div className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
           <Card className="bg-background self-start">
@@ -248,11 +240,7 @@ function AdminExamsPage({ title }: { title: string }) {
           ) : examsQuery.isPending ? (
             <ExamPageSkeleton />
           ) : examsQuery.isError ? (
-            <QueryError
-              title="Section exams unavailable"
-              error={examsQuery.error}
-              fallback="Unable to load section exams"
-            />
+            <QueryErrorState resource="section exams" error={examsQuery.error} />
           ) : (
             <ExamScheduleCard
               canManage
@@ -329,23 +317,6 @@ function PageShell({
       </div>
       {children}
     </div>
-  )
-}
-
-function QueryError({
-  error,
-  fallback,
-  title,
-}: {
-  error: unknown
-  fallback: string
-  title: string
-}) {
-  return (
-    <Alert variant="destructive">
-      <AlertTitle>{title}</AlertTitle>
-      <AlertDescription>{getApiErrorMessage(error, fallback)}</AlertDescription>
-    </Alert>
   )
 }
 

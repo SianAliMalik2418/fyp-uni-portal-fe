@@ -6,8 +6,6 @@ import {
   Mortarboard01Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -28,6 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { Program } from '../types/program.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type ProgramsCardProps = {
   error: unknown
@@ -53,12 +52,7 @@ export function ProgramsCard({
   if (isPending) {
     content = <TableSkeleton columns={5} />
   } else if (isError) {
-    content = (
-      <Alert variant="destructive">
-        <AlertTitle>Programs unavailable</AlertTitle>
-        <AlertDescription>{getApiErrorMessage(error, 'Unable to load programs')}</AlertDescription>
-      </Alert>
-    )
+    content = <QueryErrorState resource="programs" error={error} />
   } else if (programs.length) {
     content = (
       <Table>

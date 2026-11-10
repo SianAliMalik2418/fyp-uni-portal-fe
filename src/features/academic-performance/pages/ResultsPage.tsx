@@ -45,6 +45,7 @@ import type {
   ResultCommentPayload,
   ResultStatus,
 } from '../types/academic-performance.types'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type CommentAction = 'return' | 'reopen' | null
 
@@ -62,15 +63,7 @@ function StudentResultsPage({ title }: { title: string }) {
 
   if (resultsQuery.isPending) return <TableSkeleton columns={5} rows={5} />
   if (resultsQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Published results unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(resultsQuery.error, 'Unable to load your published results.')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="published results" error={resultsQuery.error} />
   }
 
   return (
@@ -174,15 +167,7 @@ function ManagedResultsPage({ title, user }: { title: string; user: PortalUser }
   })
 
   if (offeringsQuery.isError) {
-    return (
-      <Alert variant="destructive">
-        <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-        <AlertTitle>Results unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(offeringsQuery.error, 'Unable to load course sections.')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="results" error={offeringsQuery.error} />
   }
 
   return (
@@ -227,13 +212,7 @@ function ManagedResultsPage({ title, user }: { title: string; user: PortalUser }
             {resultQuery.isPending ? (
               <TableSkeleton columns={5} rows={6} />
             ) : resultQuery.isError ? (
-              <Alert variant="destructive">
-                <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-                <AlertTitle>Course result unavailable</AlertTitle>
-                <AlertDescription>
-                  {getApiErrorMessage(resultQuery.error, 'Unable to calculate this result.')}
-                </AlertDescription>
-              </Alert>
+              <QueryErrorState resource="course result" error={resultQuery.error} />
             ) : result ? (
               <>
                 {result.hodComment ? (

@@ -1,8 +1,6 @@
 import type { UseFormReturn } from 'react-hook-form'
 import { FloppyDiskIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { getApiErrorMessage } from '@/shared/api/http-client'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
@@ -25,6 +23,7 @@ import type { AcademicStructureTab, Batch, Semester } from '../types/academic-st
 import { BatchForm } from './BatchForm'
 import { SectionForm } from './SectionForm'
 import { SemesterForm } from './SemesterForm'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type AcademicStructureFormSheetProps = {
   activeTab: AcademicStructureTab
@@ -86,12 +85,7 @@ export function AcademicStructureFormSheet({
         <ScrollArea className="h-[calc(100vh-230px)] flex-1 grow py-4">
           <div className="space-y-4 px-4">
             {programsHaveError && activeTab !== 'semesters' ? (
-              <Alert variant="destructive">
-                <AlertTitle>Programs unavailable</AlertTitle>
-                <AlertDescription>
-                  {getApiErrorMessage(programsError, 'Unable to load programs')}
-                </AlertDescription>
-              </Alert>
+              <QueryErrorState resource="programs" error={programsError} />
             ) : null}
             {activeTab === 'batches' ? (
               <BatchForm

@@ -1,10 +1,5 @@
 import { Link } from 'react-router-dom'
-import {
-  Alert02Icon,
-  AlertCircleIcon,
-  ArrowRight01Icon,
-  Calendar03Icon,
-} from '@hugeicons/core-free-icons'
+import { Alert02Icon, ArrowRight01Icon, Calendar03Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -13,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { AttendanceCourseSummary } from '@/features/academic-performance/types/academic-performance.types'
-import { getApiErrorMessage } from '@/shared/api/http-client'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 type StudentAttendanceOverviewProps = {
   summaries?: AttendanceCourseSummary[]
@@ -82,13 +77,7 @@ export function StudentAttendanceOverview({
         <AttendanceSkeleton />
       ) : isError ? (
         <CardContent>
-          <Alert variant="destructive">
-            <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} className="size-4" />
-            <AlertTitle>Attendance summary unavailable</AlertTitle>
-            <AlertDescription>
-              {getApiErrorMessage(error, 'Unable to load your attendance summary.')}
-            </AlertDescription>
-          </Alert>
+          <QueryErrorState resource="attendance summary" error={error} />
         </CardContent>
       ) : summaries.length ? (
         <CardContent className="grid gap-4">

@@ -2,7 +2,6 @@ import { Component, lazy, Suspense, type ReactNode } from 'react'
 import { PortalSkeleton } from '../components/PortalSkeleton'
 import { useParams } from 'react-router-dom'
 import { ShieldUserIcon, UserIcon } from '@hugeicons/core-free-icons'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { PortalUser } from '@/features/auth/types/auth.types'
 import { PlaceholderModule } from '@/features/portal/components/PlaceholderModule'
@@ -284,15 +283,21 @@ class PortalModuleBoundary extends Component<{ children: ReactNode }, { hasError
     }
 
     return (
-      <Alert variant="destructive" role="alert">
-        <AlertTitle>Page unavailable</AlertTitle>
-        <AlertDescription className="grid gap-3">
-          <span>Reload the page and try opening this section again.</span>
-          <Button type="button" variant="outline" onClick={() => window.location.reload()}>
-            Reload page
-          </Button>
-        </AlertDescription>
-      </Alert>
+      <div
+        role="alert"
+        className="bg-muted/30 flex flex-col items-center gap-4 rounded-lg border border-dashed px-6 py-10 text-center"
+      >
+        <div className="grid max-w-md gap-1">
+          <p className="text-foreground text-sm font-medium">This page didn&apos;t load</p>
+          <p className="text-muted-foreground text-sm">
+            Something interrupted it, and your data is safe. Reload the page and try opening this
+            section again.
+          </p>
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={() => window.location.reload()}>
+          Reload page
+        </Button>
+      </div>
     )
   }
 }

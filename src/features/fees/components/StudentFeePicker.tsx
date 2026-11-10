@@ -1,8 +1,7 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ProvisionedUserAccount } from '@/features/user-accounts/types/user-account.types'
-import { getApiErrorMessage } from '@/shared/api/http-client'
+import { QueryErrorState } from '@/components/ui/query-error-state'
 
 export function StudentFeePicker({
   error,
@@ -29,14 +28,7 @@ export function StudentFeePicker({
   }
 
   if (isError) {
-    return (
-      <Alert variant="destructive">
-        <AlertTitle>Students unavailable</AlertTitle>
-        <AlertDescription>
-          {getApiErrorMessage(error, 'Unable to load student accounts')}
-        </AlertDescription>
-      </Alert>
-    )
+    return <QueryErrorState resource="students" error={error} />
   }
 
   if (!students.length) {
