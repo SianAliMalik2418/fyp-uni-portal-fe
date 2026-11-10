@@ -1,6 +1,7 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { DIRECTORY_PASSWORD } from '@/features/demo/constants/demo-directory'
 import { DEMO_ACCOUNTS } from '@/features/demo/constants/demo-guide'
 import { DemoGuidePage } from './DemoGuidePage'
 
@@ -28,6 +29,22 @@ describe('DemoGuidePage', () => {
 
     await user.click(screen.getByRole('tab', { name: 'Student' }))
     expect(screen.getByText('Results and result card')).toBeInTheDocument()
+  })
+
+  it('lists the university directory with a login for every role', async () => {
+    const user = userEvent.setup()
+    render(<DemoGuidePage />)
+
+    expect(screen.getByText('registrar@uni-portal.example')).toBeInTheDocument()
+    expect(screen.getByText('tariq.mehmood@uni-portal.example')).toBeInTheDocument()
+    expect(
+      screen.getByText(`Every account below uses the password ${DIRECTORY_PASSWORD}`, {
+        exact: false,
+      })
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('tab', { name: /students by program/i }))
+    expect(screen.getByText('ayesha.khan@student.uni-portal.example')).toBeInTheDocument()
   })
 
   it('asks the presenter to try a read-only refusal on the AI assistant', () => {

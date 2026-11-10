@@ -4,6 +4,12 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
+  DIRECTORY_PASSWORD,
+  DIRECTORY_STAFF,
+  DIRECTORY_STUDENTS,
+  UNIVERSITY_SUMMARY,
+} from '@/features/demo/constants/demo-directory'
+import {
   ADMIN_STEPS,
   AI_NOTES,
   AI_PROMPTS,
@@ -25,6 +31,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000
 
 const SECTIONS = [
   { id: 'accounts', label: 'Accounts' },
+  { id: 'directory', label: 'Directory' },
   { id: 'pitch', label: 'Pitch' },
   { id: 'flows', label: 'Demo flow' },
   { id: 'ai', label: 'AI assistant' },
@@ -221,6 +228,120 @@ export function DemoGuidePage() {
             Demo order: {DEMO_ORDER.map((item) => item.role).join(' → ')}. Later steps depend on
             data created in earlier ones.
           </p>
+        </Section>
+
+        <Section
+          id="directory"
+          title="University directory"
+          description={`A full university is loaded in the database. Every account below uses the password ${DIRECTORY_PASSWORD}.`}
+        >
+          <dl className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 lg:grid-cols-6">
+            {UNIVERSITY_SUMMARY.map((item) => (
+              <div key={item.label} className="rounded-lg border p-3">
+                <dd className="text-2xl font-semibold tabular-nums">{item.value}</dd>
+                <dt className="text-muted-foreground text-xs">{item.label}</dt>
+              </div>
+            ))}
+          </dl>
+          <Tabs defaultValue="staff">
+            <TabsList>
+              <TabsTrigger value="staff">Staff ({DIRECTORY_STAFF.length})</TabsTrigger>
+              <TabsTrigger value="students">Students by program</TabsTrigger>
+            </TabsList>
+            <TabsContent value="staff">
+              <div className="overflow-x-auto rounded-lg border">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-muted text-muted-foreground">
+                    <tr>
+                      <th scope="col" className="px-3 py-2 font-medium">
+                        Name
+                      </th>
+                      <th scope="col" className="px-3 py-2 font-medium">
+                        Role
+                      </th>
+                      <th scope="col" className="px-3 py-2 font-medium">
+                        Department
+                      </th>
+                      <th scope="col" className="px-3 py-2 font-medium">
+                        Email
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {DIRECTORY_STAFF.map((member) => (
+                      <tr key={member.email} className="border-t align-top">
+                        <td className="px-3 py-2">
+                          {member.name}
+                          <span className="text-muted-foreground block text-xs">
+                            {member.designation}
+                            {member.courses ? `, ${member.courses} courses` : ''}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 capitalize">
+                          {member.role === 'hod' ? 'HOD' : member.role}
+                        </td>
+                        <td className="px-3 py-2">{member.department ?? 'Administration'}</td>
+                        <td className="px-3 py-2">
+                          <span className="flex items-center justify-between gap-2">
+                            <span className="font-mono break-all">{member.email}</span>
+                            <CopyButton value={member.email} label={`${member.name} email`} />
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </TabsContent>
+            <TabsContent value="students">
+              <p className="text-muted-foreground mb-2 text-sm">
+                One student per program to start with. Each has 5 current courses, attendance,
+                marks, a fee record and last term&apos;s approved results. Other students follow the
+                same pattern: change the first part of the registration number.
+              </p>
+              <div className="overflow-x-auto rounded-lg border">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-muted text-muted-foreground">
+                    <tr>
+                      <th scope="col" className="px-3 py-2 font-medium">
+                        Student
+                      </th>
+                      <th scope="col" className="px-3 py-2 font-medium">
+                        Program
+                      </th>
+                      <th scope="col" className="px-3 py-2 font-medium">
+                        Email
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {DIRECTORY_STUDENTS.map((student) => (
+                      <tr key={student.email} className="border-t align-top">
+                        <td className="px-3 py-2">
+                          {student.name}
+                          <span className="text-muted-foreground block text-xs">
+                            {student.registrationNumber}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2">
+                          {student.program}
+                          <span className="text-muted-foreground block text-xs">
+                            {student.batch}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2">
+                          <span className="flex items-center justify-between gap-2">
+                            <span className="font-mono break-all">{student.email}</span>
+                            <CopyButton value={student.email} label={`${student.name} email`} />
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </TabsContent>
+          </Tabs>
         </Section>
 
         <Section id="pitch" title="The one-minute pitch">
