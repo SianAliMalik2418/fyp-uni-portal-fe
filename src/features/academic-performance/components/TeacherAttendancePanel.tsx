@@ -269,7 +269,7 @@ export function TeacherAttendancePanel({ title }: { title: string }) {
                             }
                           >
                             <SelectTrigger className="w-36">
-                              <SelectValue />
+                              <SelectValue>{statusByStudent[student.id] ?? 'present'}</SelectValue>
                             </SelectTrigger>
                             <SelectContent side="bottom" alignItemWithTrigger>
                               {attendanceStatuses.map((status) => (

@@ -42,6 +42,12 @@ export default tseslint.config(
           message:
             'Do not call watch() while rendering: React Compiler caches it. Use useWatch({ control, name }).',
         },
+        {
+          selector:
+            "JSXElement[openingElement.name.name='SelectValue'][openingElement.selfClosing=true]",
+          message:
+            'An empty <SelectValue /> shows the raw value (for example "result_withheld"). Give it the label as children.',
+        },
       ],
       '@typescript-eslint/consistent-type-imports': [
         'warn',

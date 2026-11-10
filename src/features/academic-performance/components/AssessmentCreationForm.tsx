@@ -56,20 +56,30 @@ export function AssessmentCreationForm({
           <Controller
             control={form.control}
             name="category"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={(value) => value && field.onChange(value)}>
-                <SelectTrigger id="assessmentCategory" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent side="bottom" alignItemWithTrigger>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.label} ({category.weightPercentage}%)
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            render={({ field }) => {
+              const selectedCategory = categories.find((category) => category.id === field.value)
+              return (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => value && field.onChange(value)}
+                >
+                  <SelectTrigger id="assessmentCategory" className="w-full">
+                    <SelectValue>
+                      {selectedCategory
+                        ? `${selectedCategory.label} (${selectedCategory.weightPercentage}%)`
+                        : 'Select category'}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent side="bottom" alignItemWithTrigger>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.label} ({category.weightPercentage}%)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )
+            }}
           />
         </div>
         <div className="grid gap-2">

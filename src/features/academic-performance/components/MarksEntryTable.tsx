@@ -153,7 +153,9 @@ export function MarksEntryTable({
                         className="w-full"
                         aria-label={`Status for ${record.student.name}`}
                       >
-                        <SelectValue />
+                        <SelectValue>
+                          {entry.status ? markStatusLabels[entry.status] : 'Numeric marks'}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent side="bottom" alignItemWithTrigger>
                         <SelectItem value="numeric">Numeric marks</SelectItem>
